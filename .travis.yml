@@ -1,0 +1,11 @@
+language: java
+jdk:
+  - openjdk8
+notifications:
+  slack: $SLACK_TOKEN
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+  - curl -L https://github.com/codegeny/codegeny-keys/archive/master.tar.gz | tar xz -C ~
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $HOME/codegeny-keys-master/pubring.gpg.enc -out $HOME/codegeny-keys-master/pubring.gpg -d
+  - openssl aes-256-cbc -pass pass:$ENCRYPTION_PASSWORD -in $HOME/codegeny-keys-master/secring.gpg.enc -out $HOME/codegeny-keys-master/secring.gpg -d
+  - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && mvn deploy --settings $HOME/codegeny-keys-master/settings.xml -DskipTests=true -B"
