@@ -10,7 +10,7 @@ testing but certainly not for production-grade applications.
 Jakartron is split in multiple modules which represent sub-specifications of the Jakarta EE specification.
 
 In your `pom.xml`, import the module you need in your application:
-```
+```xml
 <dependencyManagement>
     <dependencies>
         <dependency>
@@ -43,7 +43,7 @@ In your `pom.xml`, import the module you need in your application:
 </dependencies>
 ```
 In your test:
-```
+```java
 @EnableCDI
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = JPADBTest.President.class, properties = {
@@ -108,7 +108,7 @@ Jakartron annotations must be put on your bootstrap class (or test class) and fo
 All Jakartron annotations can be used as meta-annotations to group common features.
 
 Instead of doing this:
-```
+```java
 @AdditionalClasses({Foo.class, Bar.class, FooBar.class})
 @EnabledAlternatives(Baz.class)
 public class MyFirstTest {}
@@ -118,7 +118,7 @@ public class MyFirstTest {}
 public class MySecondTest {}
 ```
 Prefer creating a meta-annotation like this:
-```
+```java
 @AdditionalClasses({Foo.class, Bar.class, FooBar.class})
 @EnabledAlternatives(Baz.class)
 @Retention(RetentionPolicy.RUNTIME)
@@ -140,7 +140,7 @@ Jakartron modules are CDI extensions which are automatically discovered at runti
 If your tests contains CDI alternatives or other beans, they may conflict or create ambiguity with the CDI beans present in your application.
 Therefore, it is recommended (unless you know what you do) to disable auto-discovery in your test classpath by setting `bean-discovery-mode="none"` in your test `META-INF/beans.xml`:
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" bean-discovery-mode="none"
        xmlns="http://xmlns.jcp.org/xml/ns/javaee"
