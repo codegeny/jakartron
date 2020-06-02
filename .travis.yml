@@ -2,5 +2,6 @@ language: java
 jdk:
   - openjdk8
 after_success:
-  - curl -L https://raw.githubusercontent.com/codegeny/codegeny-keys/master/secured.tar.gz | openssl enc -d -aes-256-cbc -pass pass:$PASSPHRASE | tar xz -C ~
+  - wget https://raw.githubusercontent.com/codegeny/codegeny-keys/master/secured.tar.gz -O ~/secured.tar.gz
+  - openssl enc -d -aes-256-cbc -pass pass:$PASSPHRASE -in ~/secured.tar.gz | tar xz -C ~
   - "[[ ${TRAVIS_PULL_REQUEST} == 'false' ]] && [[ ${TRAVIS_TAG} == '' ]] && mvn deploy --settings $HOME/settings.xml -DskipTests=true -B"
