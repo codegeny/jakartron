@@ -45,6 +45,12 @@ public final class Jakartron {
         }
     }
 
+    public static <T, R> R call(Class<T> klass, Function<T, R> application) {
+        try (SeContainer container = initialize(klass).addBeanClasses(klass).initialize()) {
+            return application.apply(container.select(klass).get());
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private static SeContainerInitializer scanAnnotations(Class<?> type, SeContainerInitializer initializer, Set<Class<?>> visited) {
         if (type == null || !visited.add(type)) {
