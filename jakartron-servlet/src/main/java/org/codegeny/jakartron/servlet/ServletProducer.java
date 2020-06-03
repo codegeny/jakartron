@@ -93,7 +93,8 @@ final class ServletProducer {
 
     @Produces
     private WebAppContext webAppContext(BeanManager beanManager, BridgingServletContextListener listener, LoginService loginService) throws Exception {
-        WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("META-INF/resources"), "/");
+        //WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("META-INF/resources"), "/");
+        WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("/"), "/");
         webAppContext.setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN, ".*taglibs-standard-impl-.*\\.jar$");
         webAppContext.addEventListener(new WeldInitialListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.addEventListener(listener);

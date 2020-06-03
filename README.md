@@ -93,7 +93,7 @@ public class JPATest {
 
 ## Annotations
 
-Jakartron annotations must be put on your bootstrap class (or test class) and follow closely the semantics of the initializing methods present on the `SeContainerInitialize` class from CDI-SE.
+Jakartron annotations follow closely the semantics of the initializing methods present on the `SeContainerInitialize` class from CDI-SE and must be put on your bootstrap class (or test class).
 
 `@AdditionalClasses` allows adding beans/interceptors/decorators/extensions classes that are not automatically discovered (either because `bean-discovery-mode="none"` is used or `@DisableDiscovery` is present).
 
@@ -130,7 +130,7 @@ public class MyFirstTest {}
 @EnableFoo
 public class MySecondTest {}
 ```
-Jakartron itselfs uses that feature for its `@EnableJPA|JTA|JMS|EJB|...` annotations.
+Jakartron itselfs uses that feature for its `@EnableJPA`, `@EnableJTA`, `@EnableJMS`... annotations.
 
 
 ## Auto-discovery
@@ -150,13 +150,13 @@ Therefore, it is recommended (unless you know what you do) to disable auto-disco
 Putting this file in your test resources won't prevent CDI beans from being discovered in your main java folder.
 
 It is also possible to **completely** disable auto-discovery by annotating your test class with `@DisableDiscovery`.
-If you do that, you will need to manually add each bean with `@AdditionalClasses`.
+If you do that, you will need to manually add each bean with `@AdditionalClasses` and enable the needed Jakartron modules.
 
 ## Modules
 
 ### Core
 
-The core module contains the Jakartron annotations and the logic to initialize CDI by scanning those annotations on the given classes.
+The core module contains the Jakartron annotations and the logic to initialize CDI by scanning those annotations from the test/main class.
 
 This module depends on Weld.
 

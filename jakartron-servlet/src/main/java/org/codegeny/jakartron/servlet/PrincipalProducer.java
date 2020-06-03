@@ -20,22 +20,34 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
-import javax.annotation.Priority;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Produces;
-import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
+import org.codegeny.jakartron.security.PrincipalHolder;
 
-@ApplicationScoped
-@Priority(-1)
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletRequestEvent;
+import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpServletRequest;
+
 public class PrincipalProducer {
 
-    @Produces
-    @RequestScoped
-    @Alternative
-    public Principal principal(HttpServletRequest request) {
-        return request.getUserPrincipal();
+    public void observe(@Observes @Initialized(ApplicationScoped.class) ServletContext context, PrincipalHolder holder) {
+        context.addListener(new ServletRequestListener() {
+
+            @Override
+            public void requestDestroyed(ServletRequestEvent event) {
+                holder.setPrincipal(null);
+            }
+
+            @Override
+            public void requestInitialized(ServletRequestEvent event) {
+                ServletRequest request = event.getServletRequest();
+                if (request instanceof HttpServletRequest) {
+                    holder.setPrincipal(((HttpServletRequest) request).getUserPrincipal());
+                }
+            }
+        });
     }
 }
