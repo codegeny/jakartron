@@ -46,18 +46,18 @@
 
     <issueManagement>
         <system>GitHub Issues</system>
-        <url>https://github.com/codegeny/codegeny-beans/issues</url>
+        <url>https://github.com/codegeny/jakartron/issues</url>
     </issueManagement>
 
     <ciManagement>
         <system>Travis CI</system>
-        <url>https://travis-ci.org/codegeny/codegeny-beans</url>
+        <url>https://travis-ci.org/codegeny/jakartron</url>
     </ciManagement>
 
     <scm>
-        <url>https://github.com/codegeny/codegeny-beans</url>
-        <connection>scm:git:github.com/codegeny/codegeny-beans.git</connection>
-        <developerConnection>scm:git:git@github.com:codegeny/codegeny-beans.git</developerConnection>
+        <url>https://github.com/codegeny/jakartron</url>
+        <connection>scm:git:github.com/codegeny/jakartron.git</connection>
+        <developerConnection>scm:git:git@github.com:codegeny/jakartron.git</developerConnection>
     </scm>
 
     <developers>
@@ -100,6 +100,26 @@
                 <version>3.1.4.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.4.1.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.25</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml</groupId>
+                <artifactId>classmate</artifactId>
+                <version>1.5.1</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.14</version>
             </dependency>
             <dependency>
                 <groupId>org.junit</groupId>
@@ -192,24 +212,62 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-                <version>1.4.1</version>
+                <groupId>org.basepom.maven</groupId>
+                <artifactId>duplicate-finder-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+                    <ignoredResourcePatterns>
+                        <ignoredResourcePattern>about.html</ignoredResourcePattern>
+                    </ignoredResourcePatterns>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>enforce-maven</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-versions</id>
                         <goals>
                             <goal>enforce</goal>
                         </goals>
-                        <configuration>
-                            <rules>
-                                <requireMavenVersion>
-                                    <version>3.2.2</version>
-                                </requireMavenVersion>
-                            </rules>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <rules>
+<!--                        <requireReleaseDeps/>-->
+                        <requireNoRepositories/>
+                        <reactorModuleConvergence/>
+                        <dependencyConvergence/>
+                        <requireUpperBoundDeps/>
+                        <requireMavenVersion>
+                            <version>3.3.9</version>
+                        </requireMavenVersion>
+                        <requireSameVersions>
+                            <plugins>
+                                <plugin>org.apache.maven.plugins:maven-surefire-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-failsafe-plugin</plugin>
+                                <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
+                            </plugins>
+                        </requireSameVersions>
+<!--                        <bannedDependencies>-->
+<!--                            <searchTransitive>true</searchTransitive>-->
+<!--                            <excludes>-->
+<!--                                <exclude>commons-logging:*</exclude>-->
+<!--                                <exclude>log4j:*</exclude>-->
+<!--                            </excludes>-->
+<!--                        </bannedDependencies>-->
+                    </rules>
+                </configuration>
             </plugin>
         </plugins>
     </build>

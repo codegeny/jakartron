@@ -11,12 +11,19 @@ Jakartron is split in multiple modules which represent sub-specifications of the
 
 In your `pom.xml`, import the module you need in your application:
 ```xml
+<repositories>
+    <repository>
+        <id>sonatype.snapshots</id>
+        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </repository>
+</repositories>
+
 <dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-bom</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1-SNAPSHOT</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
