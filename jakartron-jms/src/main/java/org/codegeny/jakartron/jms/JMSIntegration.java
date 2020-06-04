@@ -20,7 +20,7 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-import org.codegeny.jakartron.ObservesAsyncLiteral;
+import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Resource;
@@ -28,13 +28,22 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.literal.NamedLiteral;
-import javax.enterprise.inject.spi.*;
-import javax.jms.*;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.WithAnnotations;
+import javax.jms.Destination;
+import javax.jms.JMSContext;
+import javax.jms.MessageListener;
+import javax.jms.Queue;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -43,18 +52,17 @@ import java.util.stream.Stream;
 public final class JMSIntegration implements Extension {
 
     private final Set<String> names = new HashSet<>();
+    private final Map<String, Class<? extends MessageListener>> messageDrivenBeans = new HashMap<>();
 
     public void makeObserver(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<? extends MessageListener> event) {
         Stream.of(event.getAnnotatedType().getAnnotation(MessageDriven.class).activationConfig())
                 .filter(ac -> ac.propertyName().equals("destination"))
                 .map(ActivationConfigProperty::propertyValue)
                 .findAny()
-                .ifPresent(name -> event.configureAnnotatedType()
-                        .remove(MessageDriven.class::isInstance)
-                        .add(ApplicationScoped.Literal.INSTANCE)
-                        .filterMethods(m -> m.getJavaMember().getName().equals("onMessage") && m.getParameters().size() == 1 && m.getParameters().get(0).getJavaParameter().getType().equals(Message.class))
-                        .forEach(m -> m.params().forEach(p -> p.add(new ObservesAsyncLiteral()).add(NamedLiteral.of(name))))
-                );
+                .ifPresent(name -> {
+                    names.add(name);
+                    messageDrivenBeans.put(name, event.getAnnotatedType().getJavaClass());
+                });
     }
 
     public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
@@ -71,15 +79,20 @@ public final class JMSIntegration implements Extension {
     }
 
     public void createDestinations(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
-        event.<JMSEvent>addObserverMethod()
-                .observedType(JMSEvent.class)
-                .transactionPhase(TransactionPhase.AFTER_SUCCESS)
-                .notifyWith(e -> e.getEvent().fire(beanManager.getEvent().select(Message.class)));
         names.forEach(name -> event.addBean()
-                .createWith(c -> new DestinationImpl(name))
+                .createWith(c -> beanManager.createInstance().select(JMSContext.class).get().createQueue(name))
                 .scope(ApplicationScoped.class)
-                .types(Object.class, Destination.class, Queue.class, Topic.class)
+                .types(Object.class, Destination.class, Queue.class, ActiveMQQueue.class)
                 .qualifiers(Any.Literal.INSTANCE, NamedLiteral.of(name))
         );
+    }
+
+    public void initializeMessageDrivenBeans(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+        messageDrivenBeans.forEach((name, klass) -> {
+            Queue queue = beanManager.createInstance().select(Queue.class, NamedLiteral.of(name)).get();
+            MessageListener listener = beanManager.createInstance().select(klass).get();
+            JMSContext context = beanManager.createInstance().select(JMSContext.class).get();
+            context.createConsumer(queue).setMessageListener(listener);
+        });
     }
 }

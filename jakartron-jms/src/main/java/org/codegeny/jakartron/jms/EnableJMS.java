@@ -31,10 +31,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @EnableJTA
-@AdditionalClasses({
-        JMSIntegration.class,
-        JMSProducerImpl.class,
-        JMSContextImpl.class
-})
+@AdditionalClasses({JMSIntegration.class, JMSProducer.class})
 public @interface EnableJMS {
 }

@@ -62,5 +62,12 @@ public class ResourceTest {
         given().baseUri(baseUri)
                 .when().get("api/foo/bar")
                 .then().body(Matchers.is("hello world!"));
+
+        given().baseUri(baseUri)
+                .formParam("foo", "bar")
+                .body("{foo:1}")
+                .put()
+                .then()
+                .statusCode(200);
     }
 }
