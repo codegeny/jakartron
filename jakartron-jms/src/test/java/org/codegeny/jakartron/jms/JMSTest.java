@@ -20,7 +20,7 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-import org.codegeny.jakartron.AdditionalClasses;
+import org.awaitility.Awaitility;
 import org.codegeny.jakartron.junit.EnableCDI;
 import org.junit.jupiter.api.Test;
 
@@ -34,18 +34,19 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 
 @EnableCDI
-@AdditionalClasses({JMSProducer.class, JMSIntegration.class})
 public class JMSTest {
 
     @MessageDriven(activationConfig = @ActivationConfigProperty(propertyName = "destination", propertyValue = "testQueue"))
     public static class MyMessageListener implements MessageListener {
 
+        private static volatile boolean received = false;
+
         @Override
         public void onMessage(Message message) {
             try {
-                System.out.println("received: " + message.getBody(String.class));
-            } catch (JMSException e) {
-                throw new RuntimeException(e);
+                received = message.getBody(String.class).equals("hello world!");
+            } catch (JMSException jmsException) {
+                throw new RuntimeException(jmsException);
             }
         }
     }
@@ -54,8 +55,8 @@ public class JMSTest {
     private Queue queue;
 
     @Test
-    public void test(JMSContext context) throws Exception {
+    public void test(JMSContext context) {
         context.createProducer().send(queue, "hello world!");
-        Thread.sleep(1000);
+        Awaitility.await().until(() -> MyMessageListener.received);
     }
 }

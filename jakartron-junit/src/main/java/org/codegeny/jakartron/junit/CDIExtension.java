@@ -21,22 +21,26 @@ package org.codegeny.jakartron.junit;
  */
 
 import org.codegeny.jakartron.Jakartron;
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestInstanceFactory;
+import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InterceptionFactory;
-import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
 
-public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, InvocationInterceptor {
+public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback {
 
     private static final Namespace NAMESPACE = Namespace.create(CDIExtension.class);
 
@@ -62,47 +66,12 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
         return getBeanManager(extensionContext).createInstance().select(extensionContext.getRequiredTestClass()).get();
     }
 
-    @Override
-    public void interceptTestMethod(Invocation<Void> invocation, ReflectiveInvocationContext<Method> invocationContext, ExtensionContext extensionContext) throws Throwable {
-        InterceptionFactory<VoidInvocation> factory = getBeanManager(extensionContext).createInterceptionFactory(null, VoidInvocation.class);
-        AnnotatedTypeConfigurator<VoidInvocation> configurator = factory.configure();
-        Stream.of(invocationContext.getTargetClass().getAnnotations()).forEach(configurator::add);
-        Stream.of(invocationContext.getExecutable().getAnnotations()).forEach(a -> configurator.methods().forEach(m -> m.add(a)));
-        factory.createInterceptedInstance(new VoidInvocation.Adapter(invocation)).proceed();
-    }
-
     public static BeanManager getBeanManager(ExtensionContext extensionContext) {
         return getStore(extensionContext).get(SeContainer.class, SeContainer.class).getBeanManager();
     }
 
     public static ExtensionContext.Store getStore(ExtensionContext extensionContext) {
         return extensionContext.getStore(NAMESPACE);
-    }
-
-    /**
-     * To avoid generics warnings.
-     */
-    private interface VoidInvocation extends Invocation<Void> {
-
-        class Adapter implements VoidInvocation {
-
-            private final Invocation<Void> invocation;
-
-            Adapter(Invocation<Void> invocation) {
-                this.invocation = invocation;
-            }
-
-            @Override
-            public Void proceed() throws Throwable {
-                invocation.proceed();
-                return null;
-            }
-
-            @Override
-            public void skip() {
-                invocation.skip();
-            }
-        }
     }
 
     private static abstract class AbstractParameterResolver implements ParameterResolver {

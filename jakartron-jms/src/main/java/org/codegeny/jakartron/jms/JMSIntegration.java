@@ -34,9 +34,11 @@ import javax.enterprise.inject.literal.NamedLiteral;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSContext;
 import javax.jms.MessageListener;
@@ -80,19 +82,38 @@ public final class JMSIntegration implements Extension {
 
     public void createDestinations(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
         names.forEach(name -> event.addBean()
-                .createWith(c -> beanManager.createInstance().select(JMSContext.class).get().createQueue(name))
+                .createWith(c -> {
+                    synchronized (applicationWideContext) {
+                        return applicationWideContext.createQueue(name);
+                    }
+//                    try (JMSContext context = beanManager.createInstance().select(ConnectionFactory.class).get().createContext()) {
+//                        return context.createQueue(name);
+//                    }
+                })
                 .scope(ApplicationScoped.class)
                 .types(Object.class, Destination.class, Queue.class, ActiveMQQueue.class)
                 .qualifiers(Any.Literal.INSTANCE, NamedLiteral.of(name))
         );
     }
 
+    private JMSContext applicationWideContext;
+
     public void initializeMessageDrivenBeans(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+        if (!names.isEmpty()) {
+            applicationWideContext = beanManager.createInstance().select(ConnectionFactory.class).get().createContext();
+        }
         messageDrivenBeans.forEach((name, klass) -> {
             Queue queue = beanManager.createInstance().select(Queue.class, NamedLiteral.of(name)).get();
             MessageListener listener = beanManager.createInstance().select(klass).get();
-            JMSContext context = beanManager.createInstance().select(JMSContext.class).get();
-            context.createConsumer(queue).setMessageListener(listener);
+            //try (JMSContext context = beanManager.createInstance().select(ConnectionFactory.class).get().createContext()) {
+                applicationWideContext.createConsumer(queue).setMessageListener(listener);
+            //}
         });
+    }
+
+    public void destroyContext(@Observes BeforeShutdown event) {
+        if (applicationWideContext != null) {
+            applicationWideContext.close();
+        }
     }
 }

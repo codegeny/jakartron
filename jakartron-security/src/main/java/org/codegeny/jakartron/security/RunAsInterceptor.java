@@ -20,16 +20,18 @@ package org.codegeny.jakartron.security;
  * #L%
  */
 
-import javax.annotation.security.RunAs;
+import org.jboss.weld.interceptor.WeldInvocationContext;
+
+import javax.annotation.Priority;
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import java.security.Principal;
 
-@SuppressWarnings("CdiInterceptorInspection")
 @Interceptor
-@RunAs("")
+@RunAsUser(name = "dummy")
+@Priority(Interceptor.Priority.LIBRARY_BEFORE + 100)
 public class RunAsInterceptor {
 
     @Inject
@@ -37,21 +39,14 @@ public class RunAsInterceptor {
 
     @AroundInvoke
     public Object intercept(InvocationContext context) throws Exception {
-        RunAs runAs = runAs(context.getTarget().getClass());
+        WeldInvocationContext weldInvocationContext = (WeldInvocationContext) context;
+        RunAsUser runAs = weldInvocationContext.getInterceptorBindingsByType(RunAsUser.class).stream().findFirst().orElseThrow(InternalError::new);
         Principal old = principalHolder.getPrincipal();
-        principalHolder.setPrincipal(runAs::value);
+        principalHolder.setPrincipal(runAs::name);
         try {
             return context.proceed();
         } finally {
             principalHolder.setPrincipal(old);
         }
-    }
-
-    public RunAs runAs(Class<?> intercepted) {
-        return intercepted == null
-                ? null
-                : intercepted.isAnnotationPresent(RunAs.class)
-                    ? intercepted.getAnnotation(RunAs.class)
-                    : runAs(intercepted.getSuperclass());
     }
 }

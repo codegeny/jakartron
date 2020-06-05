@@ -24,6 +24,7 @@ import org.codegeny.jakartron.PriorityLiteral;
 import org.junit.platform.commons.annotation.Testable;
 import org.kohsuke.MetaInfServices;
 
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
@@ -40,7 +41,7 @@ public final class TestExtension implements Extension {
     private final Set<Type> testTypes = new HashSet<>();
 
     public void processTestClass(@Observes @WithAnnotations(Testable.class) ProcessAnnotatedType<?> event) {
-        event.configureAnnotatedType().add(PriorityLiteral.DEFAULT);
+        event.configureAnnotatedType().add(PriorityLiteral.DEFAULT).add(() -> ActivateRequestContext.class);
         testTypes.add(event.getAnnotatedType().getJavaClass());
     }
 

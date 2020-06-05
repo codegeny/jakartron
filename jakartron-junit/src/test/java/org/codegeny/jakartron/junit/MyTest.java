@@ -25,11 +25,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 @EnableCDI
-@AdditionalClasses({MyTest.class, DefaultService.class, AlternativeService.class, TestInterceptor.class})
+@AdditionalClasses({MyTest.class, DefaultService.class, AlternativeService.class})
 public class MyTest {
 
     @Test
-    @Intercepted
     public void test(Service service) {
         Assertions.assertEquals("ALTERNATE ECHO hello world!", service.echo("hello world!"));
     }

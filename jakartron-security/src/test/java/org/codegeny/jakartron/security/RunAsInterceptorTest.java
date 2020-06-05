@@ -1,17 +1,17 @@
-package org.codegeny.jakartron.junit;
+package org.codegeny.jakartron.security;
 
 /*-
  * #%L
- * jakartron-junit
+ * jakartron-security
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,21 +20,20 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
-import javax.interceptor.AroundInvoke;
-import javax.interceptor.Interceptor;
-import javax.interceptor.InvocationContext;
+import org.codegeny.jakartron.junit.EnableCDI;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-@Intercepted
-@Interceptor
-public class TestInterceptor {
+import javax.enterprise.context.control.ActivateRequestContext;
+import java.security.Principal;
 
-    @AroundInvoke
-    public Object intercept(InvocationContext context) throws Exception {
-        System.out.println("before");
-        try {
-            return context.proceed();
-        } finally {
-            System.out.println("after");
-        }
+@EnableCDI
+public class RunAsInterceptorTest {
+
+    @Test
+    @ActivateRequestContext
+    @RunAsUser(name = "foobar")
+    public void test(Principal principal) {
+        Assertions.assertEquals("foobar", principal.getName());
     }
 }

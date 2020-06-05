@@ -23,11 +23,13 @@ package org.codegeny.jakartron.ejb;
 import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
+import javax.ejb.MessageDriven;
 import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
@@ -40,10 +42,12 @@ import javax.transaction.Transactional;
 @MetaInfServices
 public final class EJBIntegration implements Extension {
 
-    public void process(@Observes @WithAnnotations({Stateless.class, Singleton.class}) ProcessAnnotatedType<?> event) {
+    public void process(@Observes @WithAnnotations({Stateless.class, Singleton.class, MessageDriven.class}) ProcessAnnotatedType<?> event) {
         event.configureAnnotatedType()
-                .remove(Stateless.class::isInstance)
-                .remove(Singleton.class::isInstance)
+//                .remove(Stateless.class::isInstance)
+//                .remove(Singleton.class::isInstance)
+//                .remove(MessageDriven.class::isInstance)
+                .add(() -> ActivateRequestContext.class)
                 .add(ApplicationScoped.Literal.INSTANCE)
                 .add(transactionLiteral(event.getAnnotatedType().getAnnotation(TransactionAttribute.class)))
                 .filterMethods(m -> m.isAnnotationPresent(TransactionAttribute.class))

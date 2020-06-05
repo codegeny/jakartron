@@ -25,6 +25,8 @@ import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
@@ -94,6 +96,7 @@ final class ServletProducer {
     private WebAppContext webAppContext(BeanManager beanManager, BridgingServletContextListener listener, LoginService loginService) throws Exception {
         //WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("META-INF/resources"), "/");
         WebAppContext webAppContext = new WebAppContext(System.getProperty("java.io.tmpdir"), "/");
+        webAppContext.setBaseResource(Resource.newClassPathResource("META-INF/resources"));
         webAppContext.setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN, ".*taglibs-standard-impl-.*\\.jar$");
         webAppContext.addEventListener(new WeldInitialListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.addEventListener(listener);

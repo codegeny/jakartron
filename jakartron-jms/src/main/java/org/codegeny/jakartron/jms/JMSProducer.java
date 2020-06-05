@@ -20,7 +20,9 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
+import org.apache.activemq.artemis.api.core.QueueConfiguration;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
+import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.api.jms.ActiveMQJMSClient;
 import org.apache.activemq.artemis.api.jms.JMSFactoryType;
 import org.apache.activemq.artemis.core.config.Configuration;
@@ -31,10 +33,12 @@ import org.apache.activemq.artemis.core.remoting.impl.invm.TransportConstants;
 import org.apache.activemq.artemis.core.server.ActiveMQServer;
 import org.apache.activemq.artemis.core.server.ActiveMQServers;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
+import org.apache.activemq.artemis.utils.Env;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.jms.ConnectionFactory;
@@ -42,18 +46,24 @@ import javax.jms.JMSContext;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ApplicationScoped
 public class JMSProducer {
 
+    private static final Logger LOGGER = Logger.getLogger(JMSProducer.class.getName());
     private final static AtomicInteger SERVER_ID = new AtomicInteger();
 
     private final Map<String, Object> params = Collections.singletonMap(TransportConstants.SERVER_ID_PROP_NAME, Integer.toString(SERVER_ID.incrementAndGet()));
 
     private ActiveMQServer server;
+    private ActiveMQConnectionFactory connectionFactory;
+//    private JMSContext context;
 
     @PostConstruct
     public void startServer() {
+        Env.setTestEnv(true);
         Configuration configuration = new ConfigurationImpl()
                 .setSecurityEnabled(false)
                 .setPersistenceEnabled(false)
@@ -65,49 +75,40 @@ public class JMSProducer {
         } catch (Exception exception) {
             throw new RuntimeException();
         }
-        System.out.println("server started");
+        connectionFactory = ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, new TransportConfiguration(InVMConnectorFactory.class.getName(), params)).disableFinalizeChecks();
+//        context = connectionFactory.createContext();
     }
 
     @PreDestroy
     public void stopServer() {
         try {
-            server.stop();
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            throw new RuntimeException();
+//            context.close();
+        } finally {
+            try {
+                connectionFactory.close();
+            } finally {
+                try {
+                    server.stop();
+                } catch (Exception exception) {
+                    LOGGER.log(Level.WARNING, "Error while shutting down JMS", exception);
+                }
+            }
         }
-        System.out.println("server stopped");
     }
 
     @Produces
     @ApplicationScoped
-    public ActiveMQConnectionFactory createConnectionFactory() {
-        System.out.println("creating connectionfactory");
-        return ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, new TransportConfiguration(InVMConnectorFactory.class.getName(), params)).disableFinalizeChecks();
-    }
-
-    public void closeConnectionFactory(@Disposes ActiveMQConnectionFactory connectionFactory) {
-        System.out.println("closing connectionfactory");
-        connectionFactory.close();
+    public ConnectionFactory connectionFactory() {
+        return connectionFactory;
     }
 
     @Produces
-    @ApplicationScoped
-    public JMSContext createJMSContext(ConnectionFactory connectionFactory) {
-        System.out.println("creating jmsContext");
+    @RequestScoped
+    public JMSContext jmsContext() {
         return connectionFactory.createContext();
     }
 
-    public void closeJMSContext(@Disposes JMSContext jmsContext) {
-        System.out.println("closing jmsContext");
-        jmsContext.close();
+    public void close(@Disposes JMSContext context) {
+        context.close();
     }
-
-//    public void startServer(@Observes @Initialized(ApplicationScoped.class) Object event, ActiveMQServer server) throws Exception {
-//        server.start();
-//    }
-//
-//    public void stopServer(@Observes @Destroyed(ApplicationScoped.class) Object event, ActiveMQServer server) throws Exception {
-//        server.stop();
-//    }
 }

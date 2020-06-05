@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   #%L
-  jakartron-security
+  jakartron-jms
   %%
   Copyright (C) 2018 - 2020 Codegeny
   %%
@@ -18,10 +18,4 @@
 -->
 <beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" bean-discovery-mode="all"
        xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-       xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd">
-
-<!--    <interceptors>-->
-<!--        <class>org.codegeny.jakartron.security.RunAsInterceptor</class>-->
-<!--    </interceptors>-->
-
-</beans>
+       xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd" />

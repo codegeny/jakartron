@@ -29,5 +29,5 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@AdditionalClasses({SecurityIntegration.class, RunAsInterceptor.class, PrincipalHolder.class})
+@AdditionalClasses({RunAsInterceptor.class, PrincipalHolder.class})
 public @interface EnableSecurity {}

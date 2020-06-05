@@ -22,6 +22,7 @@ package org.codegeny.jakartron.jta;
 
 import org.jboss.weld.interceptor.WeldInvocationContext;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.Destroyed;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Event;
@@ -34,6 +35,7 @@ import java.util.stream.Stream;
 
 @Interceptor
 @Transactional
+@Priority(Interceptor.Priority.PLATFORM_AFTER + 100)
 final class RequiredTransactionInterceptor {
 
     @Inject
