@@ -20,6 +20,7 @@ package org.codegeny.jakartron.jta;
  * #L%
  */
 
+import com.arjuna.ats.jta.cdi.TransactionExtension;
 import org.codegeny.jakartron.AdditionalClasses;
 
 import java.lang.annotation.ElementType;
@@ -29,9 +30,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@AdditionalClasses({
-        JTAIntegration.class,
-        RequiredTransactionInterceptor.class
-})
+@AdditionalClasses({TransactionExtension.class, JTAIntegration.class})
 public @interface EnableJTA {
 }

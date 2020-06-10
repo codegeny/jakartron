@@ -27,11 +27,13 @@ import org.junit.jupiter.api.Test;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
+import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Queue;
+import javax.transaction.Transactional;
 
 @EnableCDI
 public class JMSTest {
@@ -51,12 +53,25 @@ public class JMSTest {
         }
     }
 
-    @Resource(name = "testQueue")
-    private Queue queue;
+    @Transactional
+    public static class MyMessageSender {
+
+        @Resource(lookup = "testQueue")
+        private Queue queue;
+
+        @Inject
+        private JMSContext context;
+
+        public void send(String message) throws Exception {
+             context.createProducer().send(queue, "hello world!");
+             Thread.sleep(1000);
+             System.out.println("end of tx");
+        }
+    }
 
     @Test
-    public void test(JMSContext context) {
-        context.createProducer().send(queue, "hello world!");
+    public void test(MyMessageSender sender) throws Exception {
+        sender.send("hello world!");
         Awaitility.await().until(() -> MyMessageListener.received);
     }
 }

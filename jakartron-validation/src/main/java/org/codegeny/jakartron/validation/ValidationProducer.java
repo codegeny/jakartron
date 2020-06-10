@@ -20,7 +20,10 @@ package org.codegeny.jakartron.validation;
  * #L%
  */
 
+import org.codegeny.jakartron.jndi.JNDI;
+
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.validation.Validation;
@@ -30,6 +33,8 @@ public final class ValidationProducer {
 
     @ApplicationScoped
     @Produces
+    @Default
+    @JNDI("java:comp/ValidatorFactory")
     public ValidatorFactory buildFactory() {
         return Validation.buildDefaultValidatorFactory();
     }

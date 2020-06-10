@@ -22,7 +22,9 @@ package org.codegeny.jakartron.junit;
 
 import org.codegeny.jakartron.Jakartron;
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -32,15 +34,19 @@ import org.junit.jupiter.api.extension.TestInstanceFactory;
 import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.platform.commons.util.ReflectionUtils;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Event;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.se.SeContainer;
+import javax.enterprise.inject.spi.AnnotatedMethod;
+import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.stream.Stream;
 
-public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback {
+public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback {
 
     private static final Namespace NAMESPACE = Namespace.create(CDIExtension.class);
 
@@ -62,6 +68,20 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
     }
 
     @Override
+    public void afterEach(ExtensionContext extensionContext) {
+        getStore(extensionContext).get(CreationalContext.class, CreationalContext.class).release();
+    }
+
+    @Override
+    public void beforeEach(ExtensionContext extensionContext) {
+        getStore(extensionContext).put(CreationalContext.class, getBeanManager(extensionContext).createCreationalContext(null));
+        getBeanManager(extensionContext).createAnnotatedType(extensionContext.getRequiredTestClass()).getMethods().stream()
+                .filter(m -> m.getJavaMember().equals(extensionContext.getRequiredTestMethod()))
+                .findFirst()
+                .ifPresent(m -> getStore(extensionContext).put(AnnotatedMethod.class, m));
+    }
+
+    @Override
     public Object createTestInstance(TestInstanceFactoryContext testInstanceFactoryContext, ExtensionContext extensionContext) {
         return getBeanManager(extensionContext).createInstance().select(extensionContext.getRequiredTestClass()).get();
     }
@@ -72,6 +92,10 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
 
     public static ExtensionContext.Store getStore(ExtensionContext extensionContext) {
         return extensionContext.getStore(NAMESPACE);
+    }
+
+    private static Annotation[] qualifiers(BeanManager beanManager, ParameterContext parameterContext) {
+        return Stream.of(parameterContext.getParameter().getAnnotations()).filter(a -> beanManager.isQualifier(a.annotationType())).toArray(Annotation[]::new);
     }
 
     private static abstract class AbstractParameterResolver implements ParameterResolver {
@@ -93,10 +117,6 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
         protected abstract boolean supportsParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException;
 
         protected abstract Object resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException;
-
-        private static Annotation[] qualifiers(BeanManager beanManager, ParameterContext parameterContext) {
-            return Stream.of(parameterContext.getParameter().getAnnotations()).filter(a -> beanManager.isQualifier(a.annotationType())).toArray(Annotation[]::new);
-        }
     }
 
     private static abstract class SimpleTypeParameterResolver extends AbstractParameterResolver {
@@ -133,7 +153,7 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
 
         @Override
         protected Instance<?> resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return beanManager.createInstance().select(rawType, qualifiers);
+            return beanManager.createInstance().select(rawType, qualifiers); // Instance does not support select(Type), only select(Class/TypeLiteral).
         }
     }
 
@@ -149,18 +169,21 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
         }
     }
 
-    public static final class BeanParameterResolver extends AbstractParameterResolver {
-
-        private final InstanceParameterResolver delegate = new InstanceParameterResolver();
+    public static final class BeanParameterResolver implements ParameterResolver {
 
         @Override
-        protected boolean supportsParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return delegate.resolveParameter(beanManager, rawType, genericType, qualifiers).isResolvable();
+        public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+            BeanManager beanManager = getBeanManager(extensionContext);
+            return beanManager.resolve(beanManager.getBeans(parameterContext.getParameter().getParameterizedType(), qualifiers(beanManager, parameterContext))) != null;
         }
 
         @Override
-        protected Object resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return delegate.resolveParameter(beanManager, rawType, genericType, qualifiers).get();
+        public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+            BeanManager beanManager = getBeanManager(extensionContext);
+            AnnotatedMethod<?> annotatedMethod = getStore(extensionContext).get(AnnotatedMethod.class, AnnotatedMethod.class);
+            AnnotatedParameter<?> annotatedParameter = annotatedMethod.getParameters().get(parameterContext.getIndex());
+            InjectionPoint injectionPoint = beanManager.createInjectionPoint(annotatedParameter);
+            return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
         }
     }
 }

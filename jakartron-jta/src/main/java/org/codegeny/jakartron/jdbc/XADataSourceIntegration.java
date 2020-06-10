@@ -20,75 +20,60 @@ package org.codegeny.jakartron.jdbc;
  * #L%
  */
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.codegeny.jakartron.jndi.JNDI;
 import org.kohsuke.MetaInfServices;
 
-import javax.annotation.Priority;
-import javax.annotation.Resource;
 import javax.annotation.sql.DataSourceDefinition;
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.literal.InjectLiteral;
-import javax.enterprise.inject.literal.NamedLiteral;
-import javax.enterprise.inject.spi.*;
-import javax.enterprise.inject.spi.configurator.AnnotatedFieldConfigurator;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.WithAnnotations;
+import javax.inject.Singleton;
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
 import java.util.HashSet;
 import java.util.Set;
 
 @MetaInfServices
 public final class XADataSourceIntegration implements Extension {
 
-    private final Set<PoolingDataSource> dataSources = new HashSet<>();
+    private final Set<DataSourceDefinition> dataSources = new HashSet<>();
 
     public void process(@Observes @WithAnnotations(DataSourceDefinition.class) ProcessAnnotatedType<?> event) {
-        event.getAnnotatedType().getAnnotations(DataSourceDefinition.class).forEach(this::createDataSource);
-    }
-
-    public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
-        event.configureAnnotatedType()
-                .filterFields(f -> f.isAnnotationPresent(Resource.class) && DataSource.class.isAssignableFrom(f.getJavaMember().getType()))
-                .forEach(this::processField);
-    }
-
-    private void processField(AnnotatedFieldConfigurator<?> f) {
-        Resource resource = f.getAnnotated().getAnnotation(Resource.class);
-        String name = resource.lookup();
-        if (name.isEmpty()) {
-            name = f.getAnnotated().getJavaMember().getName();
-        }
-        f.add(InjectLiteral.INSTANCE).add(NamedLiteral.of(name));
+        dataSources.addAll(event.getAnnotatedType().getAnnotations(DataSourceDefinition.class));
     }
 
     public void makeDataSourceInjectable(@Observes AfterBeanDiscovery event) {
-        dataSources.forEach(dataSource -> event.addBean()
-                .beanClass(PoolingDataSource.class)
-                .types(DataSource.class)
-                .qualifiers(NamedLiteral.of(dataSource.getUniqueName()))
-                .produceWith(context -> dataSource)
-                .scope(ApplicationScoped.class)
+        dataSources.forEach(dataSource -> event.<HikariDataSource>addBean()
+                .types(Object.class, DataSource.class, XADataSource.class)
+                .createWith(context -> createDataSource(dataSource))
+                .destroyWith((instance, context) -> instance.close())
+                .qualifiers(JNDI.Literal.of(dataSource.name()))
+                .scope(Singleton.class)
         );
     }
 
-    public void afterDeploymentValidation(@Observes @Priority(0) AfterDeploymentValidation event) {
-        dataSources.forEach(PoolingDataSource::init);
-    }
-
-    public void beforeShutdown(@Observes BeforeShutdown event) {
-        dataSources.forEach(PoolingDataSource::close);
-    }
-
-    private void createDataSource(DataSourceDefinition definition) {
-        PoolingDataSource dataSource = new PoolingDataSource();
-        dataSource.setUniqueName(definition.name());
-        dataSource.setMinPoolSize(definition.minPoolSize());
-        dataSource.setMaxPoolSize(definition.maxPoolSize());
-        dataSource.setPreparedStatementCacheSize(50);
-        dataSource.setAllowLocalTransactions(definition.transactional());
-        dataSource.setClassName(definition.className());
-        dataSource.getDriverProperties().put("url", definition.url());
-        dataSource.getDriverProperties().put("user", definition.user());
-        dataSource.getDriverProperties().put("password", definition.password());
-        dataSources.add(dataSource);
+    private HikariDataSource createDataSource(DataSourceDefinition definition) {
+        HikariConfig config = new HikariConfig();
+        config.setPoolName(definition.name());
+        if (!definition.url().isEmpty()) {
+            config.setJdbcUrl(definition.url());
+        }
+        if (!definition.user().isEmpty()) {
+            config.setUsername(definition.user());
+        }
+        if (!definition.password().isEmpty()) {
+            config.setPassword(definition.password());
+        }
+        if (definition.maxPoolSize() >= 0) {
+            config.setMaximumPoolSize(definition.maxPoolSize());
+        }
+        if (definition.maxIdleTime() >= 0) {
+            config.setIdleTimeout(definition.maxIdleTime());
+        }
+        return new HikariDataSource(config);
     }
 }

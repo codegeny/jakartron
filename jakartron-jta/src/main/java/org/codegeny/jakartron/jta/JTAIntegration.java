@@ -20,27 +20,49 @@ package org.codegeny.jakartron.jta;
  * #L%
  */
 
-import bitronix.tm.TransactionManagerServices;
+import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
+import org.codegeny.jakartron.jndi.JNDI;
 import org.kohsuke.MetaInfServices;
 
+import javax.annotation.Resource;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Default;
+import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.WithAnnotations;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
 @MetaInfServices
 public final class JTAIntegration implements Extension {
 
+    public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
+        event.configureAnnotatedType()
+                .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty())
+                .forEach(f -> f.add(InjectLiteral.INSTANCE).add(JNDI.Literal.of(f.getAnnotated().getAnnotation(Resource.class).lookup())));
+    }
+
     public void addTransactionContextAndProducer(@Observes AfterBeanDiscovery event) {
-        event.addContext(new TransactionContext(TransactionManagerServices.getTransactionSynchronizationRegistry()));
+//        event.addObserverMethod().observedType(Object.class).qualifiers(Initialized.Literal.of(TransactionScoped.class)).notifyWith(context -> System.out.println("<TX>"));
+//        event.addObserverMethod().observedType(Object.class).qualifiers(Destroyed.Literal.of(TransactionScoped.class)).notifyWith(context -> System.out.println("</TX>"));
+
         event.addBean()
                 .scope(ApplicationScoped.class)
-                .qualifiers(Default.Literal.INSTANCE, Any.Literal.INSTANCE)
-                .types(TransactionManager.class, UserTransaction.class)
-                .createWith(context -> TransactionManagerServices.getTransactionManager());
+                .qualifiers(JNDI.Literal.of("java:/TransactionManager"))
+                .types(Object.class, TransactionManager.class)
+                .createWith(context -> com.arjuna.ats.jta.TransactionManager.transactionManager());
+        event.addBean()
+                .scope(ApplicationScoped.class)
+                .qualifiers(JNDI.Literal.of("java:/UserTransaction"))
+                .types(Object.class, UserTransaction.class)
+                .createWith(context -> com.arjuna.ats.jta.UserTransaction.userTransaction());
+        event.addBean()
+                .scope(ApplicationScoped.class)
+                .qualifiers(JNDI.Literal.of("java:/TransactionSynchronizationRegistry"))
+                .types(Object.class, TransactionSynchronizationRegistry.class)
+                .createWith(context -> new TransactionSynchronizationRegistryImple());
     }
 }

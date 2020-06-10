@@ -63,7 +63,6 @@ public final class Jakartron {
                 if (Extension.class.isAssignableFrom(additionalClass)) {
                     initializer.addExtensions(additionalClass.asSubclass(Extension.class));
                 } else {
-                    initializer.addBeanClasses(additionalClass);
                     if (additionalClass.isAnnotationPresent(Interceptor.class)) {
                         initializer.enableInterceptors(additionalClass);
                     }
@@ -73,6 +72,7 @@ public final class Jakartron {
                     if (additionalClass.isAnnotationPresent(Alternative.class)) {
                         initializer.selectAlternatives(additionalClass);
                     }
+                    initializer.addBeanClasses(additionalClass);
                 }
             }
         }
