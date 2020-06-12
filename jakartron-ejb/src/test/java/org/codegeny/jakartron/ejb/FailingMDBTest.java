@@ -57,6 +57,6 @@ public class FailingMDBTest {
     @Test
     public void testProxy(JMSContext context) {
         context.createProducer().send(queue, "ping");
-        Awaitility.await().pollDelay(15, TimeUnit.SECONDS).until(() -> received == 3); // because redeliveryAttempts = 3
+        Awaitility.await().timeout(20, TimeUnit.SECONDS).pollDelay(15, TimeUnit.SECONDS).until(() -> received == 3); // because redeliveryAttempts = 3
     }
 }
