@@ -21,6 +21,7 @@ package org.codegeny.jakartron.ejb;/*-
 import org.awaitility.Awaitility;
 import org.codegeny.jakartron.junit.EnableCDI;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
@@ -55,8 +56,9 @@ public class FailingMDBTest {
     private Queue queue;
 
     @Test
+    @DisabledIfSystemProperty(named = "user.name", matches = "travis")
     public void testProxy(JMSContext context) {
         context.createProducer().send(queue, "ping");
-        Awaitility.await().timeout(20, TimeUnit.SECONDS).pollDelay(15, TimeUnit.SECONDS).until(() -> received == 3); // because redeliveryAttempts = 3
+        Awaitility.await().pollDelay(5, TimeUnit.SECONDS).until(() -> received == 3); // because redeliveryAttempts = 3
     }
 }
