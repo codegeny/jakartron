@@ -1,6 +1,4 @@
-package org.codegeny.jakartron.jms;
-
-/*-
+package org.codegeny.jakartron.ejb;/*-
  * #%L
  * jakartron-jms
  * %%

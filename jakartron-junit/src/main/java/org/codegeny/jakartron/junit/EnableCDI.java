@@ -20,6 +20,8 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
+import org.codegeny.jakartron.AdditionalClasses;
+import org.codegeny.jakartron.CoreExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.ElementType;
@@ -29,12 +31,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@ExtendWith({
-        CDIExtension.class,
-        CDIExtension.BeanManagerParameterResolver.class,
-        CDIExtension.InstanceParameterResolver.class,
-        CDIExtension.EventParameterResolver.class,
-        CDIExtension.BeanParameterResolver.class
-})
+@ExtendWith(CDIExtension.class)
+@AdditionalClasses(CoreExtension.class)
 public @interface EnableCDI {
 }

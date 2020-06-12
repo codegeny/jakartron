@@ -20,30 +20,24 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-
 import javax.enterprise.inject.Instance;
 import javax.jms.Message;
 import javax.jms.MessageListener;
-import javax.resource.spi.endpoint.MessageEndpoint;
-import java.lang.reflect.Method;
+import javax.transaction.TransactionManager;
+import javax.transaction.xa.XAResource;
 
-public class MessageListenerEndpoint<T extends MessageListener> implements MessageEndpoint, MessageListener {
+public class MessageListenerEndpoint<T extends MessageListener> extends TransactionalMessageEndpoint implements MessageListener {
 
     private final Instance<T> instance;
     private final T delegate;
 
-    public MessageListenerEndpoint(Instance<T> instance) {
+    public MessageListenerEndpoint(TransactionManager transactionManager, XAResource resource, Instance<T> instance) {
+        super(transactionManager, resource);
         this.delegate = (this.instance = instance).get();
     }
 
     public void onMessage(Message message) {
         delegate.onMessage(message);
-    }
-
-    public void beforeDelivery(Method method) {
-    }
-
-    public void afterDelivery() {
     }
 
     public void release() {

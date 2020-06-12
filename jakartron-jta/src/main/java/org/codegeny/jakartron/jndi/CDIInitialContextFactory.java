@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jms;
+package org.codegeny.jakartron.jndi;
 
 /*-
  * #%L
- * jakartron-jms
+ * jakartron-jta
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
@@ -20,17 +20,17 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-import org.apache.activemq.artemis.service.extensions.transactions.TransactionManagerLocator;
-import org.kohsuke.MetaInfServices;
 
 import javax.enterprise.inject.spi.CDI;
-import javax.transaction.TransactionManager;
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+import java.util.Hashtable;
 
-@MetaInfServices
-public class TransactionManagerLocatorImpl implements TransactionManagerLocator {
+public class CDIInitialContextFactory implements InitialContextFactory {
 
     @Override
-    public TransactionManager getTransactionManager() {
-        return CDI.current().select(TransactionManager.class).get();
+    public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
+        return new CDIContext(CDI.current().getBeanManager());
     }
 }

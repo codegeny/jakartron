@@ -20,9 +20,8 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-
-import com.arjuna.ats.internal.jta.transaction.arjunacore.TransactionSynchronizationRegistryImple;
-import com.arjuna.ats.internal.jta.transaction.arjunacore.jca.XATerminatorImple;
+import org.apache.activemq.artemis.api.core.QueueConfiguration;
+import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.api.jms.ActiveMQJMSClient;
 import org.apache.activemq.artemis.api.jms.JMSFactoryType;
@@ -33,107 +32,84 @@ import org.apache.activemq.artemis.core.remoting.impl.invm.InVMConnectorFactory;
 import org.apache.activemq.artemis.core.remoting.impl.invm.TransportConstants;
 import org.apache.activemq.artemis.core.server.ActiveMQServer;
 import org.apache.activemq.artemis.core.server.ActiveMQServers;
+import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQDestination;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
-import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
-import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
-import org.apache.activemq.artemis.ra.inflow.ActiveMQActivationSpec;
-import org.apache.activemq.artemis.utils.Env;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.geronimo.connector.GeronimoBootstrapContext;
-import org.apache.geronimo.connector.work.GeronimoWorkManager;
+import org.codegeny.jakartron.CoreExtension;
 import org.codegeny.jakartron.jndi.JNDI;
-import org.codegeny.jakartron.jta.TransactionalLiteral;
-import org.jboss.narayana.jta.jms.TransactionHelper;
-import org.jboss.narayana.jta.jms.TransactionHelperImpl;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Resource;
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
+import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeShutdown;
+import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
+import javax.enterprise.util.AnnotationLiteral;
+import javax.inject.Singleton;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
-import javax.jms.JMSException;
-import javax.jms.JMSRuntimeException;
-import javax.jms.MessageListener;
 import javax.jms.Queue;
-import javax.jms.Topic;
 import javax.jms.XAConnectionFactory;
 import javax.jms.XAJMSContext;
-import javax.resource.spi.BootstrapContext;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
-import javax.transaction.Transactional;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @MetaInfServices
-public class JMSExtension implements Extension {
+public class JMSExtension implements Extension  {
+
+    public static class JMSConnectionFactoryLiteral extends AnnotationLiteral<JMSConnectionFactory> implements JMSConnectionFactory {
+
+        private final String value;
+
+        public JMSConnectionFactoryLiteral(String value) {
+            this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String value() {
+            return value;
+        }
+    }
 
     private static final AtomicInteger SERVER_ID = new AtomicInteger();
 
-    static {
-        Env.setTestEnv(true);
+    private final Set<String> queues = new HashSet<>();
+
+    public void configure(@Observes BeforeBeanDiscovery event) {
+        event.configureQualifier(JMSConnectionFactory.class);
     }
 
-    private ActiveMQServer server;
-    private ActiveMQResourceAdapter resourceAdapter;
-    private final String serverId = Integer.toString(SERVER_ID.incrementAndGet());
-    private final Map<ActiveMQActivationSpec, Class<? extends MessageListener>> messageListeners = new HashMap<>();
-    private final Set<String> queues = new HashSet<>();
-    private final Set<String> topics = new HashSet<>();
-
-    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<? extends MessageListener> event) throws Exception {
+    public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
         event.configureAnnotatedType()
-                .filterFields(f -> f.isAnnotationPresent(Resource.class) && MessageDrivenContext.class.isAssignableFrom(f.getJavaMember().getType()))
-                .forEach(f -> f.add(InjectLiteral.INSTANCE));
-
-        event.configureAnnotatedType()
-                .add(new TransactionalLiteral(Transactional.TxType.REQUIRED));
-
-        ActiveMQActivationSpec activationSpec = new ActiveMQActivationSpec();
-        for (ActivationConfigProperty property : event.getAnnotatedType().getAnnotation(MessageDriven.class).activationConfig()) {
-            BeanUtils.copyProperty(activationSpec, property.propertyName(), property.propertyValue());
-        }
-        if (Topic.class.getName().equals(activationSpec.getDestinationType())) {
-            topics.add(activationSpec.getDestination());
-        } else {
-            queues.add(activationSpec.getDestination());
-            activationSpec.setDestinationType(Queue.class.getName());
-        }
-        messageListeners.put(activationSpec, event.getAnnotatedType().getJavaClass());
+                .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty() && Queue.class.isAssignableFrom(f.getJavaMember().getType()))
+                .forEach(f -> queues.add(f.getAnnotated().getAnnotation(Resource.class).lookup()));
     }
 
     public void addBeans(@Observes AfterBeanDiscovery event) {
-        event.addBean()
-                .types(TransactionHelper.class)
-                .produceWith(instance -> new TransactionHelperImpl(instance.select(TransactionManager.class).get()));
         event.<ActiveMQConnectionFactory>addBean()
                 .types(Object.class, ConnectionFactory.class, XAConnectionFactory.class, ActiveMQConnectionFactory.class)
                 .qualifiers(Default.Literal.INSTANCE, Any.Literal.INSTANCE, JNDI.Literal.of("connectionFactory"))
-                .createWith(context -> ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, new TransportConfiguration(InVMConnectorFactory.class.getName(), Collections.singletonMap(TransportConstants.SERVER_ID_PROP_NAME, serverId))))
+                .produceWith(instance -> ActiveMQJMSClient.createConnectionFactoryWithoutHA(JMSFactoryType.CF, new TransportConfiguration(InVMConnectorFactory.class.getName(), Collections.singletonMap(TransportConstants.SERVER_ID_PROP_NAME, instance.select(ActiveMQServer.class).get().getIdentity()))))
                 .disposeWith((instance, context) -> instance.close());
         event.<JMSContext>addBean()
                 .types(Object.class, JMSContext.class)
@@ -142,7 +118,7 @@ public class JMSExtension implements Extension {
                 .disposeWith((instance, context) -> instance.close());
         event.<JMSContext>addBean()
                 .types(Object.class, JMSContext.class)
-                .qualifiers(XA.Literal.INSTANCE, Any.Literal.INSTANCE)
+                .qualifiers(new JMSConnectionFactoryLiteral("java:/JmsXA"), Any.Literal.INSTANCE)
                 .produceWith(instance -> instance.select(XAJMSContext.class).get());
         event.<XAJMSContext>addBean()
                 .types(Object.class, XAJMSContext.class)
@@ -155,59 +131,55 @@ public class JMSExtension implements Extension {
                 .scope(ApplicationScoped.class)
                 .qualifiers(Any.Literal.INSTANCE, JNDI.Literal.of(name))
                 .createWith(context -> ActiveMQDestination.createQueue(name)));
-        topics.forEach(name -> event.addBean()
-                .types(Object.class, Destination.class, Topic.class, ActiveMQDestination.class, ActiveMQTopic.class)
-                .scope(ApplicationScoped.class)
-                .qualifiers(Any.Literal.INSTANCE, JNDI.Literal.of(name))
-                .createWith(context -> ActiveMQDestination.createTopic(name)));
         event.addBean()
                 .qualifiers(Any.Literal.INSTANCE)
                 .types(Object.class, MessageDrivenContext.class)
-                .produceWith(MyMessageDrivenContext::new);
+                .produceWith(MessageDrivenContextImpl::new);
     }
 
     private XAJMSContext xaJMSContext(Instance<Object> instance) {
         try {
             XAJMSContext context = instance.select(XAConnectionFactory.class).get().createXAContext();
-            instance.select(TransactionHelper.class).get().registerXAResource(context.getXAResource());
+            instance.select(TransactionManager.class).get().getTransaction().enlistResource(context.getXAResource());
             return context;
-        } catch (JMSException jmsException) {
-            throw new JMSRuntimeException(jmsException.getMessage(), jmsException.getErrorCode(), jmsException.getCause());
+        } catch (SystemException | RollbackException exception) {
+            throw new CreationException(exception);
         }
     }
 
-    public void start(@Observes AfterDeploymentValidation event, BeanManager beanManager) throws Exception {
-        Map<String, Object> params = Collections.singletonMap(TransportConstants.SERVER_ID_PROP_NAME, serverId);
-        Configuration configuration = new ConfigurationImpl()
-                .setSecurityEnabled(false)
-                .setPersistenceEnabled(false)
-                .setJMXManagementEnabled(false)
-                .addAcceptorConfiguration(new TransportConfiguration(InVMAcceptorFactory.class.getName(), params));
+    public void start(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        event.<ActiveMQServer>addBean()
+                .types(ActiveMQServer.class)
+                .scope(Singleton.class)
+                .createWith(context -> {
+                    String serverId = Integer.toString(SERVER_ID.incrementAndGet());
+                    Map<String, Object> params = Collections.singletonMap(TransportConstants.SERVER_ID_PROP_NAME, serverId);
+                    Configuration configuration = new ConfigurationImpl()
+                            .setSecurityEnabled(false)
+                            .setPersistenceEnabled(false)
+                            .setJMXManagementEnabled(false)
+                            .addAddressesSetting("#", new AddressSettings()
+                                    .setAutoCreateQueues(true)
+                                    .setDeadLetterAddress(new SimpleString("dlq"))
+                                    .setExpiryAddress(new SimpleString("dlq"))
+                                    .setMaxDeliveryAttempts(3)
+                                    .setRedeliveryDelay(0)
+                            )
+                            .addQueueConfiguration(new QueueConfiguration("dlq"))
+                            .addAcceptorConfiguration(new TransportConfiguration(InVMAcceptorFactory.class.getName(), params));
+                    ActiveMQServer server = ActiveMQServers.newActiveMQServer(configuration);
+                    server.setIdentity(serverId);
+                    try {
+                        server.start();
+                    }catch (Exception exception) {
+                        throw new RuntimeException(exception);
+                    }
+                    beanManager.getExtension(CoreExtension.class).addShutdownHook(server::stop);
+                    return server;
+                });
+   }
 
-        server = ActiveMQServers.newActiveMQServer(configuration);
-        server.start();
-
-        Executor threadPool = Executors.newFixedThreadPool(5);
-        GeronimoWorkManager workManager = new GeronimoWorkManager(threadPool, threadPool, threadPool, null);
-        BootstrapContext bootstrapContext = new GeronimoBootstrapContext(workManager, new XATerminatorImple(), new TransactionSynchronizationRegistryImple());
-
-        resourceAdapter = new ActiveMQResourceAdapter();
-        resourceAdapter.setConnectorClassName(InVMConnectorFactory.class.getName());
-        resourceAdapter.setConnectionParameters(String.format("%s=%s", TransportConstants.SERVER_ID_PROP_NAME, serverId));
-        resourceAdapter.start(bootstrapContext);
-
-        for (Map.Entry<ActiveMQActivationSpec, Class<? extends MessageListener>> entry : messageListeners.entrySet()) {
-            entry.getKey().validate();
-            entry.getKey().setResourceAdapter(resourceAdapter);
-            resourceAdapter.endpointActivation(new MessageListenerEndpointFactory(beanManager.createInstance().select(entry.getValue()), entry.getValue().getName()), entry.getKey());
-        }
-    }
-
-    public void stop(@Observes BeforeShutdown event) throws Exception {
-        try {
-            resourceAdapter.stop();
-        } finally {
-            server.stop();
-        }
-    }
+   public void addQueue(String name) {
+        queues.add(name);
+   }
 }

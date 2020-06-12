@@ -42,7 +42,7 @@ import javax.transaction.Transactional;
 @MetaInfServices
 public final class EJBIntegration implements Extension {
 
-    public void process(@Observes @WithAnnotations({Stateless.class, Singleton.class, MessageDriven.class}) ProcessAnnotatedType<?> event) {
+    public void process(@Observes @WithAnnotations({Stateless.class, Singleton.class}) ProcessAnnotatedType<?> event) {
         event.configureAnnotatedType()
 //                .remove(Stateless.class::isInstance)
 //                .remove(Singleton.class::isInstance)

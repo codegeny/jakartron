@@ -78,18 +78,20 @@
     </properties>
 
     <modules>
-    	<module>jakartron-core</module>
-        <module>jakartron-junit</module>
-        <module>jakartron-mockito</module>
-        <module>jakartron-security</module>
-        <module>jakartron-validation</module>
+	<module>jakartron-core</module>
+	<module>jakartron-junit</module>
+	<module>jakartron-mockito</module>
+	<module>jakartron-security</module>
+	<module>jakartron-validation</module>
     	<module>jakartron-jta</module>
     	<module>jakartron-jpa</module>
+	<module>jakartron-jca</module>
     	<module>jakartron-jms</module>
+	<module>jakartron-jmsra</module>
     	<module>jakartron-ejb</module>
     	<module>jakartron-servlet</module>
     	<module>jakartron-jaxrs</module>
-        <module>jakartron-bom</module>
+	<module>jakartron-bom</module>
     </modules>
 
     <dependencyManagement>

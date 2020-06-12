@@ -1,6 +1,4 @@
-package org.codegeny.jakartron.jms;
-
-/*-
+package org.codegeny.jakartron.ejb;/*-
  * #%L
  * jakartron-jms
  * %%
@@ -20,26 +18,24 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
+import org.awaitility.Awaitility;
 import org.codegeny.jakartron.junit.EnableCDI;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJBException;
 import javax.ejb.MessageDriven;
-import javax.ejb.MessageDrivenContext;
-import javax.inject.Inject;
-import javax.jms.Destination;
 import javax.jms.JMSContext;
-import javax.jms.JMSException;
-import javax.jms.JMSRuntimeException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Queue;
+import java.util.concurrent.TimeUnit;
 
 @EnableCDI
-public class MDBTest {
+public class FailingMDBTest {
 
+    private static volatile int received;
     private static final String QUEUE_NAME = "myQueue";
 
     @MessageDriven(activationConfig = {
@@ -48,21 +44,10 @@ public class MDBTest {
     })
     public static class MyMDB implements MessageListener {
 
-        @Inject
-        @XA
-        private JMSContext context;
-
-        @Resource
-        private MessageDrivenContext messageDrivenContext;
-
         @Override
         public void onMessage(Message message) {
-            try {
-                Assertions.assertEquals("ping", message.getBody(String.class));
-                context.createProducer().setJMSCorrelationID(message.getJMSCorrelationID()).send(message.getJMSReplyTo(), "pong");
-            } catch (JMSException jmsException) {
-                throw new JMSRuntimeException(jmsException.getMessage(), jmsException.getErrorCode(), jmsException.getCause());
-            }
+            received++;
+            throw new EJBException();
         }
     }
 
@@ -71,8 +56,7 @@ public class MDBTest {
 
     @Test
     public void testProxy(JMSContext context) {
-        Destination temporaryQueue = context.createTemporaryQueue();
-        context.createProducer().setJMSReplyTo(temporaryQueue).send(queue, "ping");
-        Assertions.assertEquals("pong", context.createConsumer(temporaryQueue).receiveBody(String.class, 5000));
+        context.createProducer().send(queue, "ping");
+        Awaitility.await().pollDelay(5, TimeUnit.SECONDS).until(() -> received == 3); // because redeliveryAttempts = 3
     }
 }

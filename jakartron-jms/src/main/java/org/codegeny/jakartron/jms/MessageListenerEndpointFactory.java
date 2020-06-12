@@ -20,11 +20,11 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-
 import javax.enterprise.inject.Instance;
 import javax.jms.MessageListener;
 import javax.resource.spi.endpoint.MessageEndpoint;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.Method;
 
@@ -32,8 +32,10 @@ public class MessageListenerEndpointFactory implements MessageEndpointFactory {
 
     private final String name;
     private final Instance<? extends MessageListener> instance;
+    private final TransactionManager transactionManager;
 
-    public MessageListenerEndpointFactory(Instance<? extends MessageListener> instance, String name) {
+    public MessageListenerEndpointFactory(TransactionManager transactionManager, Instance<? extends MessageListener> instance, String name) {
+        this.transactionManager = transactionManager;
         this.instance = instance;
         this.name = name;
     }
@@ -54,8 +56,8 @@ public class MessageListenerEndpointFactory implements MessageEndpointFactory {
     }
 
     @Override
-    public MessageEndpoint createEndpoint(XAResource xaResource) {
-        return new MessageListenerEndpoint<>(instance);
+    public MessageEndpoint createEndpoint(XAResource resource) {
+        return new MessageListenerEndpoint<>(transactionManager, resource, instance);
     }
 
     @Override

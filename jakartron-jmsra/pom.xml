@@ -31,13 +31,18 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>jakartron-jms</artifactId>
+    <artifactId>jakartron-jmsra</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jakartron-jta</artifactId>
+            <artifactId>jakartron-jca</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jakartron-jms</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -47,7 +52,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-jms-server</artifactId>
+            <artifactId>artemis-ra</artifactId>
             <version>2.13.0</version>
             <exclusions>
                 <exclusion>

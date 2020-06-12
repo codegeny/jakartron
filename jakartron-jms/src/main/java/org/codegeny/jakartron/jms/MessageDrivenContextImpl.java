@@ -20,7 +20,6 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-
 import org.codegeny.jakartron.jndi.JNDI;
 
 import javax.ejb.EJBHome;
@@ -35,11 +34,11 @@ import java.security.Principal;
 import java.util.Map;
 import java.util.Properties;
 
-class MyMessageDrivenContext implements MessageDrivenContext {
+class MessageDrivenContextImpl implements MessageDrivenContext {
 
     private final Instance<Object> instance;
 
-    public MyMessageDrivenContext(Instance<Object> instance) {
+    public MessageDrivenContextImpl(Instance<Object> instance) {
         this.instance = instance;
     }
 

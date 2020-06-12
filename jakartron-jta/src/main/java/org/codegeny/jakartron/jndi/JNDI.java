@@ -1,17 +1,17 @@
-package org.codegeny.jakartron.ejb;
+package org.codegeny.jakartron.jndi;
 
 /*-
  * #%L
- * jakartron-ejb
+ * jakartron-jta
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +20,34 @@ package org.codegeny.jakartron.ejb;
  * #L%
  */
 
-import org.codegeny.jakartron.AdditionalClasses;
-import org.codegeny.jakartron.jta.EnableJTA;
-import org.codegeny.jakartron.security.EnableSecurity;
 
-import java.lang.annotation.ElementType;
+import javax.enterprise.util.AnnotationLiteral;
+import javax.inject.Qualifier;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Objects;
 
+@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@EnableJTA
-@EnableSecurity
-@AdditionalClasses({EJBIntegration.class, MDBExtension.class}) // merge the two
-public @interface EnableEJB {
+public @interface JNDI {
+
+    class Literal extends AnnotationLiteral<JNDI> implements JNDI {
+
+        public static JNDI of(String value) {
+            return new Literal(value);
+        }
+
+        private final String value;
+
+        private Literal(String value) {
+            this.value = Objects.requireNonNull(value);
+        }
+
+        @Override
+        public String value() {
+            return value;
+        }
+    }
+
+    String value();
 }

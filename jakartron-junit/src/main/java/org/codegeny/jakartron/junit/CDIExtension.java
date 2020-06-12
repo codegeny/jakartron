@@ -35,18 +35,15 @@ import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.event.Event;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.stream.Stream;
 
-public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback {
+public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     private static final Namespace NAMESPACE = Namespace.create(CDIExtension.class);
 
@@ -98,92 +95,18 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
         return Stream.of(parameterContext.getParameter().getAnnotations()).filter(a -> beanManager.isQualifier(a.annotationType())).toArray(Annotation[]::new);
     }
 
-    private static abstract class AbstractParameterResolver implements ParameterResolver {
-
-        @Override
-        public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-            BeanManager beanManager = getBeanManager(extensionContext);
-            Annotation[] qualifiers = qualifiers(beanManager, parameterContext);
-            return supportsParameter(beanManager, parameterContext.getParameter().getType(), parameterContext.getParameter().getType(), qualifiers);
-        }
-
-        @Override
-        public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-            BeanManager beanManager = getBeanManager(extensionContext);
-            Annotation[] qualifiers = qualifiers(beanManager, parameterContext);
-            return resolveParameter(beanManager, parameterContext.getParameter().getType(), parameterContext.getParameter().getType(), qualifiers);
-        }
-
-        protected abstract boolean supportsParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException;
-
-        protected abstract Object resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException;
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        BeanManager beanManager = getBeanManager(extensionContext);
+        return beanManager.resolve(beanManager.getBeans(parameterContext.getParameter().getParameterizedType(), qualifiers(beanManager, parameterContext))) != null;
     }
 
-    private static abstract class SimpleTypeParameterResolver extends AbstractParameterResolver {
-
-        private final Class<?> type;
-
-        SimpleTypeParameterResolver(Class<?> type) {
-            this.type = type;
-        }
-
-        @Override
-        protected boolean supportsParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return type.equals(rawType);
-        }
-    }
-
-    public static final class BeanManagerParameterResolver extends SimpleTypeParameterResolver {
-
-        public BeanManagerParameterResolver() {
-            super(BeanManager.class);
-        }
-
-        @Override
-        protected BeanManager resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return beanManager;
-        }
-    }
-
-    public static final class InstanceParameterResolver extends SimpleTypeParameterResolver {
-
-        public InstanceParameterResolver() {
-            super(Instance.class);
-        }
-
-        @Override
-        protected Instance<?> resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return beanManager.createInstance().select(rawType, qualifiers); // Instance does not support select(Type), only select(Class/TypeLiteral).
-        }
-    }
-
-    public static final class EventParameterResolver extends SimpleTypeParameterResolver {
-
-        public EventParameterResolver() {
-            super(Event.class);
-        }
-
-        @Override
-        protected Event<?> resolveParameter(BeanManager beanManager, Class<?> rawType, Type genericType, Annotation... qualifiers) throws ParameterResolutionException {
-            return beanManager.getEvent().select(rawType, qualifiers);
-        }
-    }
-
-    public static final class BeanParameterResolver implements ParameterResolver {
-
-        @Override
-        public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-            BeanManager beanManager = getBeanManager(extensionContext);
-            return beanManager.resolve(beanManager.getBeans(parameterContext.getParameter().getParameterizedType(), qualifiers(beanManager, parameterContext))) != null;
-        }
-
-        @Override
-        public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-            BeanManager beanManager = getBeanManager(extensionContext);
-            AnnotatedMethod<?> annotatedMethod = getStore(extensionContext).get(AnnotatedMethod.class, AnnotatedMethod.class);
-            AnnotatedParameter<?> annotatedParameter = annotatedMethod.getParameters().get(parameterContext.getIndex());
-            InjectionPoint injectionPoint = beanManager.createInjectionPoint(annotatedParameter);
-            return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
-        }
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
+        BeanManager beanManager = getBeanManager(extensionContext);
+        AnnotatedMethod<?> annotatedMethod = getStore(extensionContext).get(AnnotatedMethod.class, AnnotatedMethod.class);
+        AnnotatedParameter<?> annotatedParameter = annotatedMethod.getParameters().get(parameterContext.getIndex());
+        InjectionPoint injectionPoint = beanManager.createInjectionPoint(annotatedParameter);
+        return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
     }
 }
