@@ -20,33 +20,20 @@ package org.codegeny.jakartron.jndi;
  * #L%
  */
 
-import javax.enterprise.util.AnnotationLiteral;
-import javax.inject.Qualifier;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Objects;
+import org.kohsuke.MetaInfServices;
 
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-public @interface JNDI {
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
 
-    class Literal extends AnnotationLiteral<JNDI> implements JNDI {
+@MetaInfServices
+public class JNDIExtension implements Extension {
 
-        public static JNDI of(String value) {
-            return new Literal(value);
-        }
-
-        private final String value;
-
-        private Literal(String value) {
-            this.value = Objects.requireNonNull(value);
-        }
-
-        @Override
-        public String value() {
-            return value;
-        }
+    public void addBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        event.addBean()
+                .types(Object.class)
+                .qualifiers(JNDI.Literal.of("java:comp/BeanManager"))
+                .createWith(context -> beanManager);
     }
-
-    String value();
 }

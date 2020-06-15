@@ -78,20 +78,21 @@
     </properties>
 
     <modules>
-	<module>jakartron-core</module>
-	<module>jakartron-junit</module>
-	<module>jakartron-mockito</module>
-	<module>jakartron-security</module>
-	<module>jakartron-validation</module>
-    	<module>jakartron-jta</module>
-    	<module>jakartron-jpa</module>
-	<module>jakartron-jca</module>
-    	<module>jakartron-jms</module>
-	<module>jakartron-jmsra</module>
-    	<module>jakartron-ejb</module>
-    	<module>jakartron-servlet</module>
-    	<module>jakartron-jaxrs</module>
-	<module>jakartron-bom</module>
+        <module>jakartron-core</module>
+        <module>jakartron-junit</module>
+        <module>jakartron-mockito</module>
+        <module>jakartron-security</module>
+        <module>jakartron-validation</module>
+        <module>jakartron-jta</module>
+        <module>jakartron-jsf</module>
+        <module>jakartron-jpa</module>
+        <module>jakartron-jca</module>
+        <module>jakartron-jms</module>
+        <module>jakartron-jmsra</module>
+        <module>jakartron-ejb</module>
+        <module>jakartron-servlet</module>
+        <module>jakartron-jaxrs</module>
+        <module>jakartron-bom</module>
     </modules>
 
     <dependencyManagement>
@@ -126,12 +127,12 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.6</version>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.9</version>
+                <version>3.10</version>
             </dependency>
             <dependency>
                 <groupId>org.jboss.logmanager</groupId>
@@ -256,6 +257,9 @@
                 </executions>
                 <configuration>
                     <skip>${skipTests}</skip>
+                    <includes>
+                        <include>org.codegeny.jakartron.*</include>
+                    </includes>Se
                 </configuration>
             </plugin>
             <plugin>
@@ -267,6 +271,10 @@
                     <ignoredResourcePatterns>
                         <ignoredResourcePattern>about.html</ignoredResourcePattern>
                     </ignoredResourcePatterns>
+                    <ignoredClassPatterns>
+                        <!-- JSF api & impl are not separated: https://github.com/eclipse-ee4j/mojarra/issues/4480 -->
+                        <ignoredClassPattern>javax.faces.*</ignoredClassPattern>
+                    </ignoredClassPatterns>
                 </configuration>
                 <executions>
                     <execution>
@@ -291,7 +299,7 @@
                 </executions>
                 <configuration>
                     <rules>
-<!--                        <requireReleaseDeps/>-->
+                        <!--                        <requireReleaseDeps/>-->
                         <requireNoRepositories/>
                         <reactorModuleConvergence/>
                         <dependencyConvergence/>
@@ -306,13 +314,13 @@
                                 <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
                             </plugins>
                         </requireSameVersions>
-<!--                        <bannedDependencies>-->
-<!--                            <searchTransitive>true</searchTransitive>-->
-<!--                            <excludes>-->
-<!--                                <exclude>commons-logging:*</exclude>-->
-<!--                                <exclude>log4j:*</exclude>-->
-<!--                            </excludes>-->
-<!--                        </bannedDependencies>-->
+                        <!--                        <bannedDependencies>-->
+                        <!--                            <searchTransitive>true</searchTransitive>-->
+                        <!--                            <excludes>-->
+                        <!--                                <exclude>commons-logging:*</exclude>-->
+                        <!--                                <exclude>log4j:*</exclude>-->
+                        <!--                            </excludes>-->
+                        <!--                        </bannedDependencies>-->
                     </rules>
                 </configuration>
             </plugin>
