@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
@@ -42,8 +41,8 @@ public class SimpleTest {
 
         private final WebDriver driver;
 
-        @FindBy(how = How.ID, id = "q")
-        private WebElement q;
+        @FindBy(how = How.ID, id = "message")
+        private WebElement message;
 
         @FindBy(how = How.ID, id = "form:input")
         private WebElement input;
@@ -51,27 +50,24 @@ public class SimpleTest {
         @FindBy(how = How.ID, id = "form:submit")
         private WebElement submit;
 
-        public String getQ() {
-            return q.getText();
+        public String getMessage() {
+            return message.getText();
         }
 
-        public MyBeanPage submit(String q) {
+        public MyBeanPage submit(String message) {
             input.clear();
-            input.sendKeys(q);
+            input.sendKeys(message);
             submit.submit();
             return PageFactory.initElements(driver, MyBeanPage.class);
         }
     }
 
     @Test
-    public void test(@Base("my-bean.xhtml") String uri) {
-        WebDriver driver = new HtmlUnitDriver();
-        driver.get(uri);
-
+    public void test(@Base("my-bean.xhtml") WebDriver driver) {
         MyBeanPage page = PageFactory.initElements(driver, MyBeanPage.class);
-        Assertions.assertEquals("hello", page.getQ());
+        Assertions.assertEquals("hello", page.getMessage());
 
         page = page.submit("world");
-        Assertions.assertEquals("world", page.getQ());
+        Assertions.assertEquals("world", page.getMessage());
     }
 }
