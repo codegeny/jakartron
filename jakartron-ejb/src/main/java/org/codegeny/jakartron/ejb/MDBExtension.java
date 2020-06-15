@@ -21,6 +21,7 @@ package org.codegeny.jakartron.ejb;
  */
 
 import org.codegeny.jakartron.jca.JCAExtension;
+import org.codegeny.jakartron.jndi.JNDI;
 import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
@@ -28,16 +29,28 @@ import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.literal.InjectLiteral;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.JMSContext;
+import javax.jms.Queue;
+import javax.jms.XAConnectionFactory;
+import javax.jms.XAJMSContext;
+import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +93,13 @@ public class MDBExtension implements Extension {
                 .collect(Collectors.toMap(ActivationConfigProperty::propertyName, ActivationConfigProperty::propertyValue));
 
         beanManager.getExtension(JCAExtension.class).addListener(event.getAnnotatedType(), listenerInterface, activationConfiguration);
+    }
+
+    public void addBeans(@Observes AfterBeanDiscovery event) {
+        event.addBean()
+                .qualifiers(Any.Literal.INSTANCE)
+                .types(Object.class, MessageDrivenContext.class)
+                .produceWith(MessageDrivenContextImpl::new);
     }
 
     private static Stream<Class<?>> getAllInterfaces(Class<?> klass) {

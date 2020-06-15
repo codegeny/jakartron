@@ -41,7 +41,6 @@ import org.codegeny.jakartron.jndi.JNDI;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Resource;
-import javax.ejb.MessageDrivenContext;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
@@ -131,10 +130,6 @@ public class JMSExtension implements Extension  {
                 .scope(ApplicationScoped.class)
                 .qualifiers(Any.Literal.INSTANCE, JNDI.Literal.of(name))
                 .createWith(context -> ActiveMQDestination.createQueue(name)));
-        event.addBean()
-                .qualifiers(Any.Literal.INSTANCE)
-                .types(Object.class, MessageDrivenContext.class)
-                .produceWith(MessageDrivenContextImpl::new);
     }
 
     private XAJMSContext xaJMSContext(Instance<Object> instance) {
