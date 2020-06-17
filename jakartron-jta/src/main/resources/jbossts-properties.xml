@@ -21,4 +21,6 @@
 <properties>
     <entry key="CoreEnvironmentBean.nodeIdentifier">1</entry>
     <entry key="ObjectStoreEnvironmentBean.objectStoreDir">./target/ObjectStore/</entry>
+    <entry key="ObjectStoreEnvironmentBean.stateStore.objectStoreDir">./target/ObjectStore/</entry>
+    <entry key="ObjectStoreEnvironmentBean.communicationStore.objectStoreDir">./target/ObjectStore/</entry>
 </properties>
