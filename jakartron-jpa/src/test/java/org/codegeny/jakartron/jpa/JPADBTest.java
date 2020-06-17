@@ -31,7 +31,7 @@ import javax.persistence.*;
 import static javax.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCAL;
 
 @EnableCDI
-@DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;")
+@DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = JPADBTest.President.class, properties = {
         @Property(name = "javax.persistence.schema-generation.database.action", value = "create"),
         @Property(name = "hibernate.show_sql", value = "true")

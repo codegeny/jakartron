@@ -40,13 +40,13 @@ public final class Jakartron {
     }
 
     public static <T> void run(Class<T> klass, Consumer<T> application) {
-        try (SeContainer container = initialize(klass).addBeanClasses(klass).initialize()) {
+        try (SeContainer container = initialize(klass).addBeanClasses(klass).addBeanClasses(klass.getDeclaredClasses()).initialize()) {
             application.accept(container.select(klass).get());
         }
     }
 
     public static <T, R> R call(Class<T> klass, Function<T, R> application) {
-        try (SeContainer container = initialize(klass).addBeanClasses(klass).initialize()) {
+        try (SeContainer container = initialize(klass).addBeanClasses(klass).addBeanClasses(klass.getDeclaredClasses()).initialize()) {
             return application.apply(container.select(klass).get());
         }
     }
@@ -60,7 +60,13 @@ public final class Jakartron {
         AdditionalClasses additionalClasses = type.getAnnotation(AdditionalClasses.class);
         if (additionalClasses != null) {
             for (Class<?> additionalClass : additionalClasses.value()) {
-                if (Extension.class.isAssignableFrom(additionalClass)) {
+                if (Customizer.class.isAssignableFrom(additionalClass)) {
+                    try {
+                        additionalClass.asSubclass(Customizer.class).newInstance().customize(initializer);
+                    } catch (Exception exception) {
+                        throw new IllegalStateException("Can not instantiate `" + type.getName() + "'", exception);
+                    }
+                } else if (Extension.class.isAssignableFrom(additionalClass)) {
                     initializer.addExtensions(additionalClass.asSubclass(Extension.class));
                 } else {
                     if (additionalClass.isAnnotationPresent(Interceptor.class)) {
