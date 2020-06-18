@@ -20,13 +20,12 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
+import org.codegeny.jakartron.CoreExtension;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
@@ -37,7 +36,6 @@ import org.jboss.weld.module.web.servlet.WeldInitialListener;
 import org.jboss.weld.module.web.servlet.WeldTerminalListener;
 
 import javax.enterprise.event.Event;
-import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -82,12 +80,13 @@ final class ServletProducer {
 
     @Produces
     @Singleton
-    private Server startServer(WebAppContext webAppContext) throws Exception {
+    private Server startServer(WebAppContext webAppContext, BeanManager beanManager) throws Exception {
         Server server = new Server(0);
         Configuration.ClassList.setServerDefault(server)
                 .addBefore(JettyWebXmlConfiguration.class.getName(), AnnotationConfiguration.class.getName());
         server.setHandler(webAppContext);
         server.start();
+        beanManager.getExtension(CoreExtension.class).addShutdownHook(server::stop);
         LOGGER.info(() -> String.format("Started server on %s", server.getURI()));
         return server;
     }
@@ -118,10 +117,6 @@ final class ServletProducer {
         UserStore userStore = new UserStore();
         event.fire((name, credentials, roles) -> userStore.addUser(name, new PlainCredentials(credentials), roles));
         return userStore;
-    }
-
-    public void stopServer(@Disposes Server server) throws Exception {
-        server.stop();
     }
 
     private static final class PlainCredentials extends Credential {

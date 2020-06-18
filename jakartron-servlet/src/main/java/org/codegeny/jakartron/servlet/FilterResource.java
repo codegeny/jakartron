@@ -37,9 +37,7 @@ public class FilterResource extends Resource {
     }
 
     @Override
-    public void close() {
-        throw new UnsupportedOperationException();
-    }
+    public void close() {}
 
     @Override
     public boolean exists() {
