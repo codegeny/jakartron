@@ -60,4 +60,9 @@ public final class BeanContract {
     public Set<Annotation> getQualifiers() {
         return qualifiers;
     }
+
+    @Override
+    public String toString() {
+        return type.getTypeName() + getQualifiers();
+    }
 }

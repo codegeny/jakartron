@@ -58,6 +58,7 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
     @Override
     public void beforeAll(ExtensionContext context) {
         getStore(context).put(SeContainer.class, Jakartron.initialize(context.getRequiredTestClass())
+                .addExtensions(TestExtension.class)
                 .addBeanClasses(context.getRequiredTestClass())
                 .addBeanClasses(ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).toArray(new Class<?>[0]))
                 .initialize()
@@ -67,12 +68,15 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
     @Override
     public void afterEach(ExtensionContext extensionContext) {
         getStore(extensionContext).get(CreationalContext.class, CreationalContext.class).release();
+        BeanManager beanManager = getBeanManager(extensionContext);
+        beanManager.getExtension(TestExtension.class).reset();
     }
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
+        BeanManager beanManager = getBeanManager(extensionContext);
         getStore(extensionContext).put(CreationalContext.class, getBeanManager(extensionContext).createCreationalContext(null));
-        getBeanManager(extensionContext).createAnnotatedType(extensionContext.getRequiredTestClass()).getMethods().stream()
+        beanManager.createAnnotatedType(extensionContext.getRequiredTestClass()).getMethods().stream()
                 .filter(m -> m.getJavaMember().equals(extensionContext.getRequiredTestMethod()))
                 .findFirst()
                 .ifPresent(m -> getStore(extensionContext).put(AnnotatedMethod.class, m));
@@ -98,15 +102,20 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         BeanManager beanManager = getBeanManager(extensionContext);
-        return beanManager.resolve(beanManager.getBeans(parameterContext.getParameter().getParameterizedType(), qualifiers(beanManager, parameterContext))) != null;
+        InjectionPoint injectionPoint = injectionPoint(parameterContext, extensionContext, beanManager);
+        return beanManager.resolve(beanManager.getBeans(injectionPoint.getType(), injectionPoint.getQualifiers().toArray(new Annotation[0]))) != null;
     }
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         BeanManager beanManager = getBeanManager(extensionContext);
+        InjectionPoint injectionPoint = injectionPoint(parameterContext, extensionContext, beanManager);
+        return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
+    }
+
+    private InjectionPoint injectionPoint(ParameterContext parameterContext, ExtensionContext extensionContext, BeanManager beanManager) {
         AnnotatedMethod<?> annotatedMethod = getStore(extensionContext).get(AnnotatedMethod.class, AnnotatedMethod.class);
         AnnotatedParameter<?> annotatedParameter = annotatedMethod.getParameters().get(parameterContext.getIndex());
-        InjectionPoint injectionPoint = beanManager.createInjectionPoint(annotatedParameter);
-        return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
+        return beanManager.createInjectionPoint(annotatedParameter);
     }
 }

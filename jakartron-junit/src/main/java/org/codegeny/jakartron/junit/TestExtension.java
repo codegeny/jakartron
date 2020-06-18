@@ -22,10 +22,10 @@ package org.codegeny.jakartron.junit;
 
 import org.codegeny.jakartron.PriorityLiteral;
 import org.junit.platform.commons.annotation.Testable;
-import org.kohsuke.MetaInfServices;
 
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessBeanAttributes;
@@ -35,10 +35,10 @@ import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
-@MetaInfServices
 public final class TestExtension implements Extension {
 
     private final Set<Type> testTypes = new HashSet<>();
+    private final TestContext context = new TestContext();
 
     public void processTestClass(@Observes @WithAnnotations(Testable.class) ProcessAnnotatedType<?> event) {
         event.configureAnnotatedType().add(PriorityLiteral.DEFAULT).add(() -> ActivateRequestContext.class);
@@ -51,5 +51,13 @@ public final class TestExtension implements Extension {
                     .scope(Singleton.class)
                     .alternative(true);
         }
+    }
+
+    public void registerContext(@Observes AfterBeanDiscovery event) {
+        event.addContext(context);
+    }
+
+    public void reset() {
+        context.reset();
     }
 }
