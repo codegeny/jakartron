@@ -95,10 +95,6 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
         return extensionContext.getStore(NAMESPACE);
     }
 
-    private static Annotation[] qualifiers(BeanManager beanManager, ParameterContext parameterContext) {
-        return Stream.of(parameterContext.getParameter().getAnnotations()).filter(a -> beanManager.isQualifier(a.annotationType())).toArray(Annotation[]::new);
-    }
-
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         BeanManager beanManager = getBeanManager(extensionContext);

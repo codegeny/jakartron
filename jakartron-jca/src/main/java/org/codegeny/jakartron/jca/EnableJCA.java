@@ -2,7 +2,7 @@ package org.codegeny.jakartron.jca;
 
 /*-
  * #%L
- * jakartron-jms
+ * jakartron-jca
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
