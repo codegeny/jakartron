@@ -20,7 +20,7 @@ package org.codegeny.jakartron;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 import java.io.Serializable;
 
-@EnableCDI
+@ExtendWithJakartron
 public class JTATest {
 
     @TransactionScoped

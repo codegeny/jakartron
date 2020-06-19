@@ -20,7 +20,7 @@ package org.codegeny.jakartron;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
@@ -30,7 +30,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
-@EnableCDI
+@ExtendWithJakartron
 public class JDBCTest {
 
     @Resource(lookup = "mydb")

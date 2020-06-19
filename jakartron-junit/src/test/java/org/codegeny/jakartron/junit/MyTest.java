@@ -24,7 +24,7 @@ import org.codegeny.jakartron.AdditionalClasses;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-@EnableCDI
+@ExtendWithJakartron
 @AdditionalClasses({MyTest.class, DefaultService.class, AlternativeService.class})
 public class MyTest {
 

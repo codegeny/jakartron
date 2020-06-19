@@ -21,7 +21,7 @@ package org.codegeny.jakartron.jpa;
  */
 
 import org.codegeny.jakartron.jpa.PersistenceUnitDefinition.Property;
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import javax.persistence.*;
 
 import static javax.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCAL;
 
-@EnableCDI
+@ExtendWithJakartron
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = JPADBTest.President.class, properties = {
         @Property(name = "javax.persistence.schema-generation.database.action", value = "create"),

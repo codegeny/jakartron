@@ -20,7 +20,7 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ import javax.jms.JMSRuntimeException;
 import javax.jms.Message;
 import java.util.concurrent.TimeUnit;
 
-@EnableCDI
+@ExtendWithJakartron
 public class JMSTest {
 
     @Test

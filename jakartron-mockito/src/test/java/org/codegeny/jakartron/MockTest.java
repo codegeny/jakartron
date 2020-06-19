@@ -20,7 +20,7 @@ package org.codegeny.jakartron;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.mockito.EnableMockito;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -29,7 +29,7 @@ import org.mockito.Spy;
 import javax.inject.Inject;
 
 @DisableDiscovery
-@EnableCDI
+@ExtendWithJakartron
 @EnableMockito
 public class MockTest {
 

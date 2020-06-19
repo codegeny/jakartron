@@ -20,7 +20,7 @@ package org.codegeny.jakartron.jsf;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.servlet.Base;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,44 +30,55 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 
-@EnableCDI
+@ExtendWithJakartron
 public class SimpleTest {
 
-    public static class MyBeanPage {
-
-        public MyBeanPage(WebDriver driver) {
-            this.driver = driver;
-        }
+    public static class MyForm {
 
         private final WebDriver driver;
 
-        @FindBy(how = How.ID, id = "message")
-        private WebElement message;
-
-        @FindBy(how = How.ID, id = "form:input")
+        @FindBy(id = "form:input")
         private WebElement input;
 
-        @FindBy(how = How.ID, id = "form:submit")
+        @FindBy(id = "form:submit")
         private WebElement submit;
 
-        public String getMessage() {
-            return message.getText();
+        public MyForm(WebDriver driver) {
+            this.driver = driver;
         }
 
-        public MyBeanPage submit(String message) {
+        public MyPage submit(String message) {
             input.clear();
             input.sendKeys(message);
             submit.submit();
-            return PageFactory.initElements(driver, MyBeanPage.class);
+            return FragmentablePageFactory.createPage(driver, MyPage.class);
+        }
+    }
+
+    public static class MyPage {
+
+        @FindBy(id = "message")
+        private WebElement message;
+
+        @FindBy(id = "form")
+        private MyForm myForm;
+
+        public MyForm getMyForm() {
+            return myForm;
+        }
+
+        public String getMessage() {
+            return message.getText();
         }
     }
 
     @Test
     public void test(@Base("my-bean.xhtml") WebDriver driver) {
-        MyBeanPage page = PageFactory.initElements(driver, MyBeanPage.class);
+        MyPage page = FragmentablePageFactory.createPage(driver, MyPage.class);
         Assertions.assertEquals("hello", page.getMessage());
 
-        page = page.submit("world");
+        page = page.getMyForm().submit("world");
         Assertions.assertEquals("world", page.getMessage());
     }
 }
+

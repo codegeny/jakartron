@@ -18,7 +18,7 @@ package org.codegeny.jakartron.ejb;/*-
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Queue;
 
-@EnableCDI
+@ExtendWithJakartron
 public class MDBTest {
 
     private static final String QUEUE_NAME = "myQueue";

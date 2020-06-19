@@ -41,7 +41,9 @@ public class WebDriverProducer {
         Annotation base = injectionPoint.getQualifiers().stream().filter(Base.class::isInstance).findFirst().orElseThrow(InternalError::new);
         String uri = uriProvider.select(base).get();
         WebDriver driver = new HtmlUnitDriver();
-        driver.get(uri);
+        if (!uri.isEmpty()) {
+            driver.get(uri);
+        }
         return driver;
     }
 

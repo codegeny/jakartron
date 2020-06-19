@@ -43,9 +43,9 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-public final class CDIExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver {
+public final class JakartronExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
-    private static final Namespace NAMESPACE = Namespace.create(CDIExtension.class);
+    private static final Namespace NAMESPACE = Namespace.create(JakartronExtension.class);
 
     @Override
     public void afterAll(ExtensionContext context) {
@@ -58,7 +58,7 @@ public final class CDIExtension implements TestInstanceFactory, BeforeAllCallbac
     @Override
     public void beforeAll(ExtensionContext context) {
         getStore(context).put(SeContainer.class, Jakartron.initialize(context.getRequiredTestClass())
-                .addExtensions(TestExtension.class)
+                .addExtensions(new TestExtension())
                 .addBeanClasses(context.getRequiredTestClass())
                 .addBeanClasses(ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).toArray(new Class<?>[0]))
                 .initialize()

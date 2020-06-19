@@ -20,14 +20,14 @@ package org.codegeny.jakartron.security;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.enterprise.context.control.ActivateRequestContext;
 import java.security.Principal;
 
-@EnableCDI
+@ExtendWithJakartron
 public class RunAsInterceptorTest {
 
     @Test

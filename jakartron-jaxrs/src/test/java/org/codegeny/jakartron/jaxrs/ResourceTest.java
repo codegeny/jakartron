@@ -20,7 +20,7 @@ package org.codegeny.jakartron.jaxrs;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.servlet.Base;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 
-@EnableCDI
+@ExtendWithJakartron
 public class ResourceTest {
 
     @Path("foo")
@@ -58,9 +58,9 @@ public class ResourceTest {
     }
 
     @Test
-    public void test(@Base String baseUri) {
+    public void test(@Base("api") String baseUri) {
         given().baseUri(baseUri)
-                .when().get("api/foo/bar")
+                .when().get("foo/bar")
                 .then().body(Matchers.is("hello world!"));
     }
 }

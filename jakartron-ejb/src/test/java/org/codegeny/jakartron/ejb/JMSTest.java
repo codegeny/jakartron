@@ -19,7 +19,7 @@ package org.codegeny.jakartron.ejb;/*-
  */
 
 import org.awaitility.Awaitility;
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
@@ -33,7 +33,7 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import javax.transaction.Transactional;
 
-@EnableCDI
+@ExtendWithJakartron
 public class JMSTest {
 
     @MessageDriven(activationConfig = @ActivationConfigProperty(propertyName = "destination", propertyValue = "testQueue"))

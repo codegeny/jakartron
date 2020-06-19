@@ -20,7 +20,7 @@ package org.codegeny.jakartron.ejb;/*-
 
 import org.codegeny.jakartron.DisableDiscovery;
 import org.codegeny.jakartron.jmsra.EnableJMSRA;
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import java.util.concurrent.TimeUnit;
 
-@EnableCDI
+@ExtendWithJakartron
 @EnableEJB
 @EnableJMSRA
 @DisableDiscovery

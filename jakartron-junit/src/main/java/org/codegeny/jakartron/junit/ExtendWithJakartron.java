@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@ExtendWith(CDIExtension.class)
+@ExtendWith(JakartronExtension.class)
 @AdditionalClasses(CoreExtension.class)
-public @interface EnableCDI {
+public @interface ExtendWithJakartron {
 }

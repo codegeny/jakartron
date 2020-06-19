@@ -19,7 +19,7 @@ package org.codegeny.jakartron.ejb;/*-
  */
 
 import org.awaitility.Awaitility;
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
@@ -33,7 +33,7 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 import java.util.concurrent.TimeUnit;
 
-@EnableCDI
+@ExtendWithJakartron
 public class FailingMDBTest {
 
     private static volatile int received;

@@ -24,6 +24,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
+import javax.faces.component.UIInput;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 
@@ -31,6 +32,7 @@ import javax.servlet.ServletContext;
 public class JSFProducer {
 
     public void configure(@Observes @Initialized(ApplicationScoped.class) ServletContext context) {
+        context.setInitParameter(UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME, Boolean.TRUE.toString());
         context.addServlet("faces", FacesServlet.class).addMapping("*.xhtml");
     }
 }

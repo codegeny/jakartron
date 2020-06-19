@@ -20,7 +20,7 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
-import org.codegeny.jakartron.junit.EnableCDI;
+import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Scanner;
 
-@EnableCDI
+@ExtendWithJakartron
 public class ServletTest {
 
     @WebServlet(name = "test", urlPatterns = "/test")
