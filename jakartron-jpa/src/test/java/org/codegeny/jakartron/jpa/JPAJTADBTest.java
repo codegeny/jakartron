@@ -25,34 +25,58 @@ import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Resource;
 import javax.annotation.sql.DataSourceDefinition;
-import javax.persistence.*;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
+import javax.transaction.UserTransaction;
 
-import static javax.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCAL;
+import static javax.persistence.spi.PersistenceUnitTransactionType.JTA;
 
 @ExtendWithJakartron
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 1, maxPoolSize = 2, url = "jdbc:h2:mem:mydb")
-@PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = President.class, properties = {
+@PersistenceUnitDefinition(unitName = "tests", jtaDataSourceName = "mydb", transactionType = JTA, managedClasses = President.class, properties = {
         @Property(name = "javax.persistence.schema-generation.database.action", value = "create"),
-        @Property(name = "hibernate.show_sql", value = "true")
-//        @Property(name = "hibernate.dialect", value = "org.hibernate.dialect.H2Dialect")
+        @Property(name = "hibernate.show_sql", value = "true"),
+        @Property(name = "hibernate.dialect", value = "org.hibernate.dialect.H2Dialect")
 })
-public class JPADBTest {
+public class JPAJTADBTest {
 
-    @PersistenceContext(unitName = "tests", type = PersistenceContextType.EXTENDED)
+    @PersistenceContext(unitName = "tests")
     private EntityManager entityManager;
 
+    @Inject
+    private UserTransaction transaction;
+
+    @Resource(lookup = "mydb")
+    private DataSource dataSource;
+
     @Test
-    public void test() {
-        entityManager.getTransaction().begin();
+    public void test() throws Exception {
+
+        transaction.begin();
+        Assertions.assertEquals(0, entityManager.createNamedQuery("countPresidents", Number.class).getSingleResult().intValue());
+        transaction.rollback();
+
+        transaction.begin();
         entityManager.persist(new President("G. Washington"));
         entityManager.persist(new President("A. Lincoln"));
-        entityManager.getTransaction().commit();
+        entityManager.flush();
+        transaction.commit();
 
-        entityManager.clear();
-
-        entityManager.getTransaction().begin();
+        transaction.begin();
         Assertions.assertEquals(2, entityManager.createNamedQuery("countPresidents", Number.class).getSingleResult().intValue());
-        entityManager.getTransaction().rollback();
+        transaction.rollback();
+
+        transaction.begin();
+        entityManager.persist(new President("T. Roosevelt"));
+        entityManager.flush();
+        transaction.rollback();
+
+        transaction.begin();
+        Assertions.assertEquals(2, entityManager.createNamedQuery("countPresidents", Number.class).getSingleResult().intValue());
+        transaction.rollback();
     }
 }

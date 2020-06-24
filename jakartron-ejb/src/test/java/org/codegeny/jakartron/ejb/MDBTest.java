@@ -29,6 +29,7 @@ import javax.ejb.MessageDrivenContext;
 import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSContext;
+import javax.jms.JMSDestinationDefinition;
 import javax.jms.JMSException;
 import javax.jms.JMSRuntimeException;
 import javax.jms.Message;
@@ -36,9 +37,10 @@ import javax.jms.MessageListener;
 import javax.jms.Queue;
 
 @ExtendWithJakartron
+@JMSDestinationDefinition(name = MDBTest.QUEUE_NAME, interfaceName = "javax.jms.Queue")
 public class MDBTest {
 
-    private static final String QUEUE_NAME = "myQueue";
+    public static final String QUEUE_NAME = "myQueue";
 
     @MessageDriven(activationConfig = {
             @ActivationConfigProperty(propertyName = "destination", propertyValue = QUEUE_NAME),

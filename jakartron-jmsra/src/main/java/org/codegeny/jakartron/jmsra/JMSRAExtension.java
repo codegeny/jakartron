@@ -47,7 +47,7 @@ public class JMSRAExtension implements Extension {
                 MessageListener.class,
                 ActiveMQResourceAdapter.class,
                 ActiveMQActivationSpec::new,
-                spec -> beanManager.getExtension(JMSExtension.class).addQueue(spec.getDestination()),
+                spec -> {},
                 messageListener -> new MessageListenerEndpointFactory(beanManager.createInstance().select(TransactionManager.class).get(), beanManager.createInstance().select(messageListener), messageListener.getName())
         );
     }

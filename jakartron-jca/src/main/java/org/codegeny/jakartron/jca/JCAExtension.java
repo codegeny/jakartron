@@ -112,7 +112,7 @@ public class JCAExtension implements Extension {
     }
 
     public <L, S extends ActivationSpec> void registerConnector(Class<L> listenerInterface, Class<? extends ResourceAdapter> adapterClass, Supplier<S> activationSpecSupplier, Consumer<S> activationSpecConsumer, Function<Class<? extends L>, MessageEndpointFactory> messageEndpointFactoryBuilder) {
-        adapters.put(listenerInterface, new AdapterDefinition<L, S>(adapterClass, activationSpecSupplier, activationSpecConsumer, messageEndpointFactoryBuilder));
+        adapters.put(listenerInterface, new AdapterDefinition<>(adapterClass, activationSpecSupplier, activationSpecConsumer, messageEndpointFactoryBuilder));
     }
 
     public void startConnectors(@Observes AfterDeploymentValidation event, BeanManager beanManager) throws Exception {

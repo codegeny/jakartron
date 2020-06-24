@@ -182,10 +182,6 @@
             <version>4.3.0</version>
             <scope>test</scope>
             <exclusions>
-<!--                <exclusion>-->
-<!--                    <groupId>commons-logging</groupId>-->
-<!--                    <artifactId>commons-logging</artifactId>-->
-<!--                </exclusion>-->
                 <exclusion>
                     <groupId>jakarta.xml.bind</groupId>
                     <artifactId>jakarta.xml.bind-api</artifactId>
@@ -197,6 +193,10 @@
                 <exclusion>
                     <groupId>org.apache.sling</groupId>
                     <artifactId>org.apache.sling.javax.activation</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

@@ -27,6 +27,7 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
+import javax.jms.JMSDestinationDefinition;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -34,6 +35,7 @@ import javax.jms.Queue;
 import javax.transaction.Transactional;
 
 @ExtendWithJakartron
+@JMSDestinationDefinition(name = "testQueue", interfaceName = "javax.jms.Queue")
 public class JMSTest {
 
     @MessageDriven(activationConfig = @ActivationConfigProperty(propertyName = "destination", propertyValue = "testQueue"))

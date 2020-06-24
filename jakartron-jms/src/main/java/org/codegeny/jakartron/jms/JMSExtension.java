@@ -59,6 +59,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
+import javax.jms.JMSDestinationDefinition;
 import javax.jms.Queue;
 import javax.jms.XAConnectionFactory;
 import javax.jms.XAJMSContext;
@@ -174,7 +175,13 @@ public class JMSExtension implements Extension  {
                 });
    }
 
-   public void addQueue(String name) {
-        queues.add(name);
+   public void process(@Observes @WithAnnotations(JMSDestinationDefinition.class) ProcessAnnotatedType<?> event) {
+        for (JMSDestinationDefinition definition : event.getAnnotatedType().getAnnotations(JMSDestinationDefinition.class)) {
+            if (definition.interfaceName().equals(Queue.class.getName())) {
+                queues.add(definition.name());
+            } else {
+                throw new IllegalArgumentException("Unsupported destination " + definition.interfaceName());
+            }
+        }
    }
 }
