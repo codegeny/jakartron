@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jms;
+package org.codegeny.jakartron.jmsra;
 
 /*-
  * #%L
- * jakartron-jms
+ * jakartron-jmsra
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
@@ -28,13 +28,13 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.Method;
 
-public class MessageListenerEndpointFactory implements MessageEndpointFactory {
+public class JMSMessageEndpointFactory implements MessageEndpointFactory {
 
     private final String name;
     private final Instance<? extends MessageListener> instance;
     private final TransactionManager transactionManager;
 
-    public MessageListenerEndpointFactory(TransactionManager transactionManager, Instance<? extends MessageListener> instance, String name) {
+    public JMSMessageEndpointFactory(TransactionManager transactionManager, Instance<? extends MessageListener> instance, String name) {
         this.transactionManager = transactionManager;
         this.instance = instance;
         this.name = name;
@@ -57,7 +57,7 @@ public class MessageListenerEndpointFactory implements MessageEndpointFactory {
 
     @Override
     public MessageEndpoint createEndpoint(XAResource resource) {
-        return new MessageListenerEndpoint<>(transactionManager, resource, instance);
+        return new JMSMessageEndpoint<>(transactionManager, resource, instance);
     }
 
     @Override

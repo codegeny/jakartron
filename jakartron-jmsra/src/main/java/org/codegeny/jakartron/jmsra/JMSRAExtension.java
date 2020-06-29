@@ -26,8 +26,6 @@ import org.apache.activemq.artemis.core.server.ActiveMQServer;
 import org.apache.activemq.artemis.ra.ActiveMQResourceAdapter;
 import org.apache.activemq.artemis.ra.inflow.ActiveMQActivationSpec;
 import org.codegeny.jakartron.jca.JCAExtension;
-import org.codegeny.jakartron.jms.JMSExtension;
-import org.codegeny.jakartron.jms.MessageListenerEndpointFactory;
 import org.kohsuke.MetaInfServices;
 
 import javax.enterprise.event.Observes;
@@ -48,7 +46,7 @@ public class JMSRAExtension implements Extension {
                 ActiveMQResourceAdapter.class,
                 ActiveMQActivationSpec::new,
                 spec -> {},
-                messageListener -> new MessageListenerEndpointFactory(beanManager.createInstance().select(TransactionManager.class).get(), beanManager.createInstance().select(messageListener), messageListener.getName())
+                messageListener -> new JMSMessageEndpointFactory(beanManager.createInstance().select(TransactionManager.class).get(), beanManager.createInstance().select(messageListener), messageListener.getName())
         );
     }
 

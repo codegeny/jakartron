@@ -9,9 +9,9 @@ package org.codegeny.jakartron.ejb;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +20,16 @@ package org.codegeny.jakartron.ejb;
  * #L%
  */
 
-import org.codegeny.jakartron.AdditionalClasses;
-import org.codegeny.jakartron.jta.EnableJTA;
-import org.codegeny.jakartron.security.EnableSecurity;
+import javax.enterprise.context.RequestScoped;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+@RequestScoped
+public class ContextDataHolder {
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@EnableJTA
-@EnableSecurity
-@AdditionalClasses({EJBIntegration.class, EJBContextImpl.class})
-public @interface EnableEJB {
+    private final Map<String, Object> contextData = new HashMap<>();
+
+    public Map<String, Object> getContextData() {
+        return contextData;
+    }
 }

@@ -9,9 +9,9 @@ package org.codegeny.jakartron.ejb;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,45 +20,108 @@ package org.codegeny.jakartron.ejb;
  * #L%
  */
 
+import org.codegeny.jakartron.jca.JCAExtension;
 import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
+import javax.annotation.Resource;
+import javax.ejb.ActivationConfigProperty;
+import javax.ejb.EJBContext;
 import javax.ejb.MessageDriven;
 import javax.ejb.Singleton;
+import javax.ejb.Stateful;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.literal.InjectLiteral;
+import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
+import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
 import javax.transaction.Transactional;
+import java.io.Externalizable;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-// TODO support @Stateful
-// TODO support @TransactionManagement
-// TODO support EJBContext
 @MetaInfServices
 public final class EJBIntegration implements Extension {
 
-    public void process(@Observes @WithAnnotations({Stateless.class, Singleton.class}) ProcessAnnotatedType<?> event) {
-        event.configureAnnotatedType()
-//                .remove(Stateless.class::isInstance)
-//                .remove(Singleton.class::isInstance)
-//                .remove(MessageDriven.class::isInstance)
-                .add(() -> ActivateRequestContext.class)
-                .add(ApplicationScoped.Literal.INSTANCE)
-                .add(transactionLiteral(event.getAnnotatedType().getAnnotation(TransactionAttribute.class)))
-                .filterMethods(m -> m.isAnnotationPresent(TransactionAttribute.class))
-                .forEach(m -> m.add(transactionLiteral(m.getAnnotated().getAnnotation(TransactionAttribute.class))));
+    public void common(@Observes @WithAnnotations({Stateless.class, Singleton.class, Stateful.class, MessageDriven.class}) ProcessAnnotatedType<?> event) {
+
+        TransactionManagementType transactionManagementType = event.getAnnotatedType().isAnnotationPresent(TransactionManagement.class)
+                ? event.getAnnotatedType().getAnnotation(TransactionManagement.class).value()
+                : TransactionManagementType.CONTAINER;
+
+        AnnotatedTypeConfigurator<?> configurator = event.configureAnnotatedType()
+                .add(() -> ActivateRequestContext.class);
+
+        configurator
+                .filterFields(f -> f.isAnnotationPresent(Resource.class) && EJBContext.class.isAssignableFrom(f.getJavaMember().getType()))
+                .forEach(f -> f.add(InjectLiteral.INSTANCE));
+
+        if (transactionManagementType == TransactionManagementType.CONTAINER) {
+            event.configureAnnotatedType()
+                    .add(transactionLiteral(event.getAnnotatedType()))
+                    .filterMethods(m -> m.isAnnotationPresent(TransactionAttribute.class))
+                    .forEach(m -> m.add(transactionLiteral(m.getAnnotated())));
+        }
     }
 
-    private static TransactionalLiteral transactionLiteral(TransactionAttribute attribute) {
-        return attribute == null ? new TransactionalLiteral(Transactional.TxType.REQUIRED) : transactionLiteral(attribute.value());
+    public void scope(@Observes @WithAnnotations({Stateless.class, Singleton.class}) ProcessAnnotatedType<?> event) {
+        event.configureAnnotatedType().add(ApplicationScoped.Literal.INSTANCE);
     }
 
-    private static TransactionalLiteral transactionLiteral(TransactionAttributeType type) {
-        return new TransactionalLiteral(Transactional.TxType.valueOf(type.name()));
+    private final Set<Class<?>> messageDrivenBeans = new HashSet<>();
+
+    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event, BeanManager beanManager) throws Exception {
+
+        MessageDriven messageDriven = event.getAnnotatedType().getAnnotation(MessageDriven.class);
+
+        Class<?> listenerInterface;
+        if (messageDriven.messageListenerInterface().equals(Object.class)) {
+            Set<Class<?>> interfaces = getAllInterfaces(event.getAnnotatedType().getJavaClass())
+                    .distinct()
+                    .filter(i -> !i.getPackage().getName().startsWith("javax.ejb"))
+                    .filter(i -> !Arrays.asList(Serializable.class, Externalizable.class).contains(i))
+                    .collect(Collectors.toSet());
+            if (interfaces.size() != 1) {
+                throw new RuntimeException("MDB must implement a single interface or specify @MessageDriven.listenerInterface()");
+            }
+            listenerInterface = interfaces.iterator().next();
+        } else {
+            listenerInterface = messageDriven.messageListenerInterface();
+        }
+
+        Map<String, String> activationConfiguration = Stream.of(messageDriven.activationConfig())
+                .collect(Collectors.toMap(ActivationConfigProperty::propertyName, ActivationConfigProperty::propertyValue));
+
+        beanManager.getExtension(JCAExtension.class).addListener(event.getAnnotatedType(), listenerInterface, activationConfiguration);
+    }
+
+    private static Stream<Class<?>> getAllInterfaces(Class<?> klass) {
+        return klass == null ? Stream.empty() : Stream.<Stream<Class<?>>> of(
+                klass.isInterface() ? Stream.of(klass) : Stream.empty(),
+                getAllInterfaces(klass.getSuperclass()),
+                Stream.of(klass.getInterfaces()).flatMap(EJBIntegration::getAllInterfaces)
+        ).flatMap(Function.identity());
+    }
+
+    private static TransactionalLiteral transactionLiteral(Annotated annotated) {
+        return new TransactionalLiteral(annotated.isAnnotationPresent(TransactionAttribute.class)
+                ? Transactional.TxType.valueOf(annotated.getAnnotation(TransactionAttribute.class).value().name())
+                : Transactional.TxType.REQUIRED
+        );
     }
 }

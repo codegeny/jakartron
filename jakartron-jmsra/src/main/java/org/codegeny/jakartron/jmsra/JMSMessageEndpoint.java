@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jms;
+package org.codegeny.jakartron.jmsra;
 
 /*-
  * #%L
- * jakartron-jms
+ * jakartron-jmsra
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
@@ -20,18 +20,20 @@ package org.codegeny.jakartron.jms;
  * #L%
  */
 
+import org.codegeny.jakartron.jca.TransactedMessageEndpoint;
+
 import javax.enterprise.inject.Instance;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 
-public class MessageListenerEndpoint<T extends MessageListener> extends TransactionalMessageEndpoint implements MessageListener {
+public class JMSMessageEndpoint<T extends MessageListener> extends TransactedMessageEndpoint implements MessageListener {
 
     private final Instance<T> instance;
     private final T delegate;
 
-    public MessageListenerEndpoint(TransactionManager transactionManager, XAResource resource, Instance<T> instance) {
+    public JMSMessageEndpoint(TransactionManager transactionManager, XAResource resource, Instance<T> instance) {
         super(transactionManager, resource);
         this.delegate = (this.instance = instance).get();
     }

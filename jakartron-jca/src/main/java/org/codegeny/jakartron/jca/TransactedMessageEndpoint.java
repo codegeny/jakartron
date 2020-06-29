@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jms;
+package org.codegeny.jakartron.jca;
 
 /*-
  * #%L
- * jakartron-jms
+ * jakartron-jca
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
@@ -32,12 +32,12 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.Method;
 
-public abstract class TransactionalMessageEndpoint implements MessageEndpoint {
+public abstract class TransactedMessageEndpoint implements MessageEndpoint {
 
     private final TransactionManager transactionManager;
     private final XAResource resource;
 
-    public TransactionalMessageEndpoint(TransactionManager transactionManager, XAResource resource) {
+    public TransactedMessageEndpoint(TransactionManager transactionManager, XAResource resource) {
         this.transactionManager = transactionManager;
         this.resource = resource;
     }
