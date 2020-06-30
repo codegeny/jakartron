@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @EnableJTA
 @EnableSecurity
-@AdditionalClasses({EJBIntegration.class, EJBContextImpl.class})
+@AdditionalClasses({EJBIntegration.class, EJBContextImpl.class, ContextDataHolder.class})
 public @interface EnableEJB {
 }

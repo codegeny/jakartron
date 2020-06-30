@@ -35,19 +35,12 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.inject.Singleton;
 import javax.jms.MessageListener;
-import javax.transaction.TransactionManager;
 
 @MetaInfServices
 public class JMSRAExtension implements Extension {
 
     public void initialize(@Observes BeforeBeanDiscovery event, BeanManager beanManager) {
-        beanManager.getExtension(JCAExtension.class).registerConnector(
-                MessageListener.class,
-                ActiveMQResourceAdapter.class,
-                ActiveMQActivationSpec::new,
-                spec -> {},
-                messageListener -> new JMSMessageEndpointFactory(beanManager.createInstance().select(TransactionManager.class).get(), beanManager.createInstance().select(messageListener), messageListener.getName())
-        );
+        beanManager.getExtension(JCAExtension.class).registerConnector(MessageListener.class, ActiveMQResourceAdapter.class, ActiveMQActivationSpec.class);
     }
 
     public void addBeans(@Observes AfterBeanDiscovery event) {
