@@ -15,10 +15,6 @@ import javax.jms.MessageListener;
 public class JMSRAProducer {
 
     public void registerAdapter(@Observes ConfigureResourceAdapter event, ActiveMQServer server) {
-
-        server.getConnectorsService().getConnectors().forEach((k, v) -> System.out.printf("%s=%s%n", k, v));
-
-
         ActiveMQResourceAdapter resourceAdapter = new ActiveMQResourceAdapter();
         resourceAdapter.setConnectorClassName(InVMConnectorFactory.class.getName());
         resourceAdapter.setConnectionParameters(String.format("%s=%s", TransportConstants.SERVER_ID_PROP_NAME, server.getIdentity()));

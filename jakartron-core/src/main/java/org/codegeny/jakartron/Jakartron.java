@@ -27,6 +27,7 @@ import javax.enterprise.inject.se.SeContainerInitializer;
 import javax.enterprise.inject.spi.Extension;
 import javax.interceptor.Interceptor;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -64,7 +65,7 @@ public final class Jakartron {
             return initializer;
         }
 
-        if (Customizer.class.isAssignableFrom(type)) {
+        if (Customizer.class.isAssignableFrom(type) && !Modifier.isAbstract(type.getModifiers())) {
             try {
                 type.asSubclass(Customizer.class).newInstance().customize(initializer);
             } catch (Exception exception) {
@@ -113,8 +114,8 @@ public final class Jakartron {
         }
 
         return Stream.<Stream<Class<?>>>of(
-//                Stream.of(type.getSuperclass()),
-//                Stream.of(type.getInterfaces()),
+                Stream.of(type.getSuperclass()),
+                Stream.of(type.getInterfaces()),
                 Stream.of(type.getAnnotations()).map(Annotation::annotationType)
         ).flatMap(Function.identity()).reduce(initializer, (i, t) -> scanAnnotations(t, i, visited), (a, b) -> null);
     }

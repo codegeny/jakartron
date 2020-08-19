@@ -39,7 +39,7 @@
             <dependency>
                 <groupId>org.jboss.resteasy</groupId>
                 <artifactId>resteasy-bom</artifactId>
-                <version>4.5.3.Final</version>
+                <version>4.5.6.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-core</artifactId>
-            <version>4.5.3.Final</version>
+            <version>4.5.6.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
-            <version>4.5.3.Final</version>
+            <version>4.5.6.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.weld</groupId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-json-binding-provider</artifactId>
-            <version>4.5.3.Final</version>
+            <version>4.5.6.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse</groupId>
@@ -179,7 +179,7 @@
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
-            <version>4.3.0</version>
+            <version>4.3.1</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
