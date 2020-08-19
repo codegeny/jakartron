@@ -32,14 +32,21 @@ import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
 import java.lang.reflect.Method;
 
-public abstract class TransactedMessageEndpoint implements MessageEndpoint {
+class TransactedMessageEndpoint implements MessageEndpoint {
 
     private final TransactionManager transactionManager;
     private final XAResource resource;
+    private final Runnable releaser;
 
-    public TransactedMessageEndpoint(TransactionManager transactionManager, XAResource resource) {
+    public TransactedMessageEndpoint(TransactionManager transactionManager, XAResource resource, Runnable releaser) {
         this.transactionManager = transactionManager;
         this.resource = resource;
+        this.releaser = releaser;
+    }
+
+    @Override
+    public void release() {
+        releaser.run();
     }
 
     public void beforeDelivery(Method method) throws ResourceException {

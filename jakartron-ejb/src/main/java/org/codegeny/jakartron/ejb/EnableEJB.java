@@ -21,6 +21,7 @@ package org.codegeny.jakartron.ejb;
  */
 
 import org.codegeny.jakartron.AdditionalClasses;
+import org.codegeny.jakartron.jca.EnableJCA;
 import org.codegeny.jakartron.jta.EnableJTA;
 import org.codegeny.jakartron.security.EnableSecurity;
 
@@ -32,6 +33,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @EnableJTA
+@EnableJCA
 @EnableSecurity
 @AdditionalClasses({EJBIntegration.class, EJBContextImpl.class, ContextDataHolder.class})
 public @interface EnableEJB {

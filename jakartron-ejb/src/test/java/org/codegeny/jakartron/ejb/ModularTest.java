@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSConnectionFactory;
 import javax.jms.JMSContext;
+import javax.jms.JMSDestinationDefinition;
 import javax.jms.JMSException;
 import javax.jms.JMSRuntimeException;
 import javax.jms.Message;
@@ -43,9 +44,10 @@ import java.util.concurrent.TimeUnit;
 @EnableEJB
 @EnableJMSRA
 @DisableDiscovery
+@JMSDestinationDefinition(name = ModularTest.QUEUE_NAME, interfaceName = "javax.jms.Queue")
 public class ModularTest {
 
-    private static final String QUEUE_NAME = "myQueue";
+    public static final String QUEUE_NAME = "myQueue";
 
     @MessageDriven(activationConfig = {
             @ActivationConfigProperty(propertyName = "destination", propertyValue = QUEUE_NAME),

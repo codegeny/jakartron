@@ -23,16 +23,14 @@ package org.codegeny.jakartron.servlet;
 import org.eclipse.jetty.util.resource.Resource;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.ReadableByteChannel;
 
 public class FilterResource extends Resource {
 
     @Override
-    public boolean isContainedIn(Resource r) throws MalformedURLException {
+    public boolean isContainedIn(Resource r) {
         throw new UnsupportedOperationException();
     }
 
@@ -65,7 +63,7 @@ public class FilterResource extends Resource {
     }
 
     @Override
-    public File getFile() throws IOException {
+    public File getFile() {
         throw new UnsupportedOperationException();
     }
 
@@ -75,12 +73,12 @@ public class FilterResource extends Resource {
     }
 
     @Override
-    public InputStream getInputStream() throws IOException {
+    public InputStream getInputStream() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ReadableByteChannel getReadableByteChannel() throws IOException {
+    public ReadableByteChannel getReadableByteChannel() {
         throw new UnsupportedOperationException();
     }
 
@@ -100,7 +98,7 @@ public class FilterResource extends Resource {
     }
 
     @Override
-    public Resource addPath(String path) throws IOException, MalformedURLException {
+    public Resource addPath(String path) {
         if (path.startsWith("/WEB-INF")) {
             return Resource.newClassPathResource("META-INF" + path.substring(8));
         }

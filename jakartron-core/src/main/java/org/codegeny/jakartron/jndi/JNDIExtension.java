@@ -2,7 +2,7 @@ package org.codegeny.jakartron.jndi;
 
 /*-
  * #%L
- * jakartron-jta
+ * jakartron-core
  * %%
  * Copyright (C) 2018 - 2020 Codegeny
  * %%
@@ -20,17 +20,20 @@ package org.codegeny.jakartron.jndi;
  * #L%
  */
 
+import org.kohsuke.MetaInfServices;
 
-import javax.enterprise.inject.spi.CDI;
-import javax.naming.Context;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-import java.util.Hashtable;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
 
-public class CDIInitialContextFactory implements InitialContextFactory {
+@MetaInfServices
+public class JNDIExtension implements Extension {
 
-    @Override
-    public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
-        return new CDIContext(CDI.current().getBeanManager());
+    public void addBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        event.addBean()
+                .types(Object.class)
+                .qualifiers(JNDI.Literal.of("java:comp/BeanManager"))
+                .createWith(context -> beanManager);
     }
 }

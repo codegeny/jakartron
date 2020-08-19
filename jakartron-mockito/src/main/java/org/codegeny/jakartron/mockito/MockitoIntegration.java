@@ -21,7 +21,6 @@ package org.codegeny.jakartron.mockito;
  */
 
 import org.codegeny.jakartron.BeanContract;
-import org.codegeny.jakartron.ProducesLiteral;
 import org.codegeny.jakartron.junit.TestScoped;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.annotation.Testable;

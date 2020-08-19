@@ -31,6 +31,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @EnableJTA
-@AdditionalClasses(JCAExtension.class)
+@AdditionalClasses(JCAManager.class)
 public @interface EnableJCA {
 }

@@ -34,7 +34,7 @@ public final class PriorityLiteral extends AnnotationLiteral<Priority> implement
 
     private final int value;
 
-    PriorityLiteral(int value) {
+    public PriorityLiteral(int value) {
         this.value = value;
     }
 

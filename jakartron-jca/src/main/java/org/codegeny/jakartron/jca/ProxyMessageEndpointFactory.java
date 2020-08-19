@@ -29,18 +29,22 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-class ProxyMessageEndpointFactory implements MessageEndpointFactory {
+class ProxyMessageEndpointFactory<T> implements MessageEndpointFactory {
 
-    private final Class<?> endpointClass;
+    public static <T> MessageEndpointFactory of(TransactionManager transactionManager, Instance<T> instance, Class<?> messageListenerInterface, Class<?> endpointClass) {
+        return new ProxyMessageEndpointFactory<>(transactionManager, instance, messageListenerInterface, endpointClass);
+    }
+
     private final Class<?> messageListenerInterface;
-    private final Instance<Object> endpointInstance;
+    private final Class<?> endpointClass;
+    private final Instance<T> instance;
     private final TransactionManager transactionManager;
 
-    public ProxyMessageEndpointFactory(TransactionManager transactionManager, Instance<Object> endpointInstance, Class<?> endpointClass, Class<?> messageListenerInterface) {
+    public ProxyMessageEndpointFactory(TransactionManager transactionManager, Instance<T> instance, Class<?> messageListenerInterface, Class<?> endpointClass) {
         this.transactionManager = transactionManager;
-        this.endpointInstance = endpointInstance;
-        this.endpointClass = endpointClass;
+        this.instance = instance;
         this.messageListenerInterface = messageListenerInterface;
+        this.endpointClass = endpointClass;
     }
 
     @Override
@@ -50,7 +54,7 @@ class ProxyMessageEndpointFactory implements MessageEndpointFactory {
 
     @Override
     public String getActivationName() {
-        return endpointClass.getName();
+        return toString();
     }
 
     @Override
@@ -60,7 +64,9 @@ class ProxyMessageEndpointFactory implements MessageEndpointFactory {
 
     @Override
     public MessageEndpoint createEndpoint(XAResource resource) {
-        return createEndpoint(resource, endpointClass);
+        T endpoint = instance.get();
+        MessageEndpoint messageEndpoint = new TransactedMessageEndpoint(transactionManager, resource, () -> instance.destroy(endpoint));
+        return (MessageEndpoint) Proxy.newProxyInstance(endpointClass.getClassLoader(), new Class[]{MessageEndpoint.class, messageListenerInterface}, (p, m, a) -> invoke(endpoint, messageEndpoint, m, a));
     }
 
     @Override
@@ -68,26 +74,11 @@ class ProxyMessageEndpointFactory implements MessageEndpointFactory {
         return true;
     }
 
-    private <T> MessageEndpoint createEndpoint(XAResource resource, Class<T> endpointClass) {
-        Instance<T> instance = endpointInstance.select(endpointClass);
-        T delegate = instance.get();
-        MessageEndpoint messageEndpoint = new TransactedMessageEndpoint(transactionManager, resource) {
-
-            @Override
-            public void release() {
-                endpointInstance.destroy(delegate);
-            }
-        };
-        return (MessageEndpoint) Proxy.newProxyInstance(
-                endpointClass.getClassLoader(),
-                new Class[] { MessageEndpoint.class, messageListenerInterface},
-                (proxy, method, args) -> {
-                    try {
-                        return method.invoke(method.getDeclaringClass().equals(MessageEndpoint.class) ? messageEndpoint : delegate, args);
-                    } catch (InvocationTargetException invocationTargetException) {
-                        throw invocationTargetException.getTargetException();
-                    }
-                }
-        );
+    private static Object invoke(Object delegate, MessageEndpoint messageEndpoint, Method method, Object... args) throws Throwable {
+        try {
+            return method.invoke(method.getDeclaringClass().equals(MessageEndpoint.class) ? messageEndpoint : delegate, args);
+        } catch (InvocationTargetException invocationTargetException) {
+            throw invocationTargetException.getTargetException();
+        }
     }
 }

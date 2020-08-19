@@ -20,12 +20,11 @@ package org.codegeny.jakartron.ejb;
  * #L%
  */
 
-import org.codegeny.jakartron.jca.JCAExtension;
+import org.codegeny.jakartron.jca.ConfigureResourceAdapter;
 import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Resource;
-import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJBContext;
 import javax.ejb.MessageDriven;
 import javax.ejb.Singleton;
@@ -38,7 +37,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.literal.InjectLiteral;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
@@ -49,7 +50,7 @@ import java.io.Externalizable;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -83,35 +84,41 @@ public final class EJBIntegration implements Extension {
         event.configureAnnotatedType().add(ApplicationScoped.Literal.INSTANCE);
     }
 
-    private final Set<Class<?>> messageDrivenBeans = new HashSet<>();
+    private final Set<AnnotatedType<?>> messageDrivenBeans = new HashSet<>();
 
-    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event, BeanManager beanManager) throws Exception {
+    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event, BeanManager beanManager) {
+        messageDrivenBeans.add(event.getAnnotatedType());
+    }
 
-        MessageDriven messageDriven = event.getAnnotatedType().getAnnotation(MessageDriven.class);
+    public void registerMDB(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        event.<ConfigureResourceAdapter>addObserverMethod()
+                .observedType(ConfigureResourceAdapter.class)
+                .notifyWith(e -> messageDrivenBeans.forEach(mdb -> {
+                    MessageDriven messageDriven = mdb.getAnnotation(MessageDriven.class);
+                    Class<?> listenerInterface;
+                    if (messageDriven.messageListenerInterface().equals(Object.class)) {
+                        Set<Class<?>> interfaces = getAllInterfaces(mdb.getJavaClass())
+                                .distinct()
+                                .filter(i -> !i.getPackage().getName().startsWith("javax.ejb"))
+                                .filter(i -> !Arrays.asList(Serializable.class, Externalizable.class).contains(i))
+                                .collect(Collectors.toSet());
+                        if (interfaces.size() != 1) {
+                            throw new RuntimeException("MDB must implement a single interface or specify @MessageDriven.listenerInterface()");
+                        }
+                        listenerInterface = interfaces.iterator().next();
+                    } else {
+                        listenerInterface = messageDriven.messageListenerInterface();
+                    }
 
-        Class<?> listenerInterface;
-        if (messageDriven.messageListenerInterface().equals(Object.class)) {
-            Set<Class<?>> interfaces = getAllInterfaces(event.getAnnotatedType().getJavaClass())
-                    .distinct()
-                    .filter(i -> !i.getPackage().getName().startsWith("javax.ejb"))
-                    .filter(i -> !Arrays.asList(Serializable.class, Externalizable.class).contains(i))
-                    .collect(Collectors.toSet());
-            if (interfaces.size() != 1) {
-                throw new RuntimeException("MDB must implement a single interface or specify @MessageDriven.listenerInterface()");
-            }
-            listenerInterface = interfaces.iterator().next();
-        } else {
-            listenerInterface = messageDriven.messageListenerInterface();
-        }
+                    Properties properties = new Properties();
+                    Stream.of(messageDriven.activationConfig()).forEach(a -> properties.setProperty(a.propertyName(), a.propertyValue()));
 
-        Map<String, String> activationConfiguration = Stream.of(messageDriven.activationConfig())
-                .collect(Collectors.toMap(ActivationConfigProperty::propertyName, ActivationConfigProperty::propertyValue));
-
-        beanManager.getExtension(JCAExtension.class).addListener(event.getAnnotatedType(), listenerInterface, activationConfiguration);
+                    e.getEvent().addMessageEndpoint(listenerInterface, beanManager.createInstance().select(mdb.getJavaClass()), properties, mdb.getJavaClass());
+                }));
     }
 
     private static Stream<Class<?>> getAllInterfaces(Class<?> klass) {
-        return klass == null ? Stream.empty() : Stream.<Stream<Class<?>>> of(
+        return klass == null ? Stream.empty() : Stream.<Stream<Class<?>>>of(
                 klass.isInterface() ? Stream.of(klass) : Stream.empty(),
                 getAllInterfaces(klass.getSuperclass()),
                 Stream.of(klass.getInterfaces()).flatMap(EJBIntegration::getAllInterfaces)

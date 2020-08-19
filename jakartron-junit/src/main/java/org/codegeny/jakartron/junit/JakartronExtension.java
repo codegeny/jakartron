@@ -57,10 +57,9 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        getStore(context).put(SeContainer.class, Jakartron.initialize(context.getRequiredTestClass())
+        getStore(context).put(SeContainer.class, Jakartron.initialize(Stream.concat(Stream.of(context.getRequiredTestClass()), ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).stream()))
                 .addExtensions(new TestExtension())
                 .addBeanClasses(context.getRequiredTestClass())
-                .addBeanClasses(ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).toArray(new Class<?>[0]))
                 .initialize()
         );
     }

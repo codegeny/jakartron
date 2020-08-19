@@ -35,8 +35,15 @@ import java.util.stream.Stream;
 
 public final class Jakartron {
 
-    public static SeContainerInitializer initialize(Class<?> klass) {
-        return scanAnnotations(klass, SeContainerInitializer.newInstance(), new HashSet<>());
+    public static SeContainerInitializer initialize(Class<?>... classes) {
+        return initialize(Stream.of(classes));
+    }
+
+    public static SeContainerInitializer initialize(Stream<Class<?>> classes) {
+        SeContainerInitializer initializer = SeContainerInitializer.newInstance();
+        Set<Class<?>> visited = new HashSet<>();
+        classes.forEach(c -> scanAnnotations(c, initializer, visited));
+        return initializer;
     }
 
     public static <T> void run(Class<T> klass, Consumer<T> application) {
@@ -57,29 +64,31 @@ public final class Jakartron {
             return initializer;
         }
 
+        if (Customizer.class.isAssignableFrom(type)) {
+            try {
+                type.asSubclass(Customizer.class).newInstance().customize(initializer);
+            } catch (Exception exception) {
+                throw new IllegalStateException("Can not instantiate `" + type.getName() + "'", exception);
+            }
+        } else if (Extension.class.isAssignableFrom(type)) {
+            initializer.addExtensions(type.asSubclass(Extension.class));
+        } else {
+            if (type.isAnnotationPresent(Interceptor.class)) {
+                initializer.enableInterceptors(type);
+            }
+            if (type.isAnnotationPresent(Decorator.class)) {
+                initializer.enableDecorators(type);
+            }
+            if (type.isAnnotationPresent(Alternative.class)) {
+                initializer.selectAlternatives(type);
+            }
+            initializer.addBeanClasses(type);
+        }
+
         AdditionalClasses additionalClasses = type.getAnnotation(AdditionalClasses.class);
         if (additionalClasses != null) {
             for (Class<?> additionalClass : additionalClasses.value()) {
-                if (Customizer.class.isAssignableFrom(additionalClass)) {
-                    try {
-                        additionalClass.asSubclass(Customizer.class).newInstance().customize(initializer);
-                    } catch (Exception exception) {
-                        throw new IllegalStateException("Can not instantiate `" + type.getName() + "'", exception);
-                    }
-                } else if (Extension.class.isAssignableFrom(additionalClass)) {
-                    initializer.addExtensions(additionalClass.asSubclass(Extension.class));
-                } else {
-                    if (additionalClass.isAnnotationPresent(Interceptor.class)) {
-                        initializer.enableInterceptors(additionalClass);
-                    }
-                    if (additionalClass.isAnnotationPresent(Decorator.class)) {
-                        initializer.enableDecorators(additionalClass);
-                    }
-                    if (additionalClass.isAnnotationPresent(Alternative.class)) {
-                        initializer.selectAlternatives(additionalClass);
-                    }
-                    initializer.addBeanClasses(additionalClass);
-                }
+                scanAnnotations(additionalClass, initializer, visited);
             }
         }
 
@@ -104,8 +113,8 @@ public final class Jakartron {
         }
 
         return Stream.<Stream<Class<?>>>of(
-                Stream.of(type.getSuperclass()),
-                Stream.of(type.getInterfaces()),
+//                Stream.of(type.getSuperclass()),
+//                Stream.of(type.getInterfaces()),
                 Stream.of(type.getAnnotations()).map(Annotation::annotationType)
         ).flatMap(Function.identity()).reduce(initializer, (i, t) -> scanAnnotations(t, i, visited), (a, b) -> null);
     }
