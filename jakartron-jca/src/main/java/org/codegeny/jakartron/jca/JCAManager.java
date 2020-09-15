@@ -50,7 +50,6 @@ public class JCAManager {
         public void addMessageEndpoint(Instance<?> messageEndpointProvider, Properties properties, Class<?> endpointClass) {
             activations.add(tm -> {
                 try {
-                    System.out.printf("configuring endpoint %s %s%n", endpointClass, properties);
                     ActivationSpec spec = activationSpecClass.newInstance();
                     for (String key : properties.stringPropertyNames()) {
                         BeanUtils.copyProperty(spec, key, properties.get(key));
@@ -99,7 +98,6 @@ public class JCAManager {
             Optional<ResourceAdapter> a = adapter.configure(tm);
             if (a.isPresent()) {
                 ResourceAdapter ra = a.get();
-                System.out.printf("starting ra %s%n", ra);
             }
         }
     }
