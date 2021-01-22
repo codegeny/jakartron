@@ -66,5 +66,6 @@ public final class JAXRSIntegration implements Extension {
         servlet.setInitParameter("javax.ws.rs.Application", applicationClass.getName());
         servlet.setInitParameter("resteasy.servlet.mapping.prefix", prefix);
         servlet.setMultipartConfig(new MultipartConfigElement(System.getProperty("java.io.tmpdir")));
+        servlet.setAsyncSupported(true);
     }
 }
