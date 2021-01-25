@@ -20,11 +20,19 @@ package org.codegeny.jakartron.jaxrs;
  * #L%
  */
 
+import org.codegeny.jakartron.servlet.Base;
+
 import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Disposes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import java.lang.annotation.Annotation;
+import java.net.URI;
 
 @Dependent
 public final class JAXRSProducer {
@@ -36,5 +44,11 @@ public final class JAXRSProducer {
 
     public void closeClient(@Disposes Client client) {
         client.close();
+    }
+
+    @Produces
+    @Base("")
+    public WebTarget newWebTarget(Client client, InjectionPoint injectionPoint, @Any Instance<URI> uriProvider) {
+        return client.target(uriProvider.select(injectionPoint.getQualifiers().toArray(new Annotation[0])).get());
     }
 }

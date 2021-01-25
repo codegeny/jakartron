@@ -81,7 +81,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.4.31.v20200723</version>
+            <version>9.4.36.v20210114</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>apache-jsp</artifactId>
-            <version>9.4.31.v20200723</version>
+            <version>9.4.36.v20210114</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.servlet</groupId>
@@ -142,7 +142,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>apache-jstl</artifactId>
-            <version>9.4.31.v20200723</version>
+            <version>9.4.36.v20210114</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.taglibs</groupId>
