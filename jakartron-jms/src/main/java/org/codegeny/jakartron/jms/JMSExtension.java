@@ -36,6 +36,7 @@ import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQDestination;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
+import org.apache.activemq.artemis.jms.client.ActiveMQTopic;
 import org.codegeny.jakartron.CoreExtension;
 import org.codegeny.jakartron.jndi.JNDI;
 import org.kohsuke.MetaInfServices;
@@ -55,14 +56,7 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.WithAnnotations;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Singleton;
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.JMSConnectionFactory;
-import javax.jms.JMSContext;
-import javax.jms.JMSDestinationDefinition;
-import javax.jms.Queue;
-import javax.jms.XAConnectionFactory;
-import javax.jms.XAJMSContext;
+import javax.jms.*;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
@@ -94,6 +88,7 @@ public class JMSExtension implements Extension  {
     private static final AtomicInteger SERVER_ID = new AtomicInteger();
 
     private final Set<String> queues = new HashSet<>();
+    private final Set<String> topics = new HashSet<>();
 
     public void configure(@Observes BeforeBeanDiscovery event) {
         event.configureQualifier(JMSConnectionFactory.class);
@@ -103,6 +98,10 @@ public class JMSExtension implements Extension  {
         event.configureAnnotatedType()
                 .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty() && Queue.class.isAssignableFrom(f.getJavaMember().getType()))
                 .forEach(f -> queues.add(f.getAnnotated().getAnnotation(Resource.class).lookup()));
+
+        event.configureAnnotatedType()
+                .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty() && Topic.class.isAssignableFrom(f.getJavaMember().getType()))
+                .forEach(f -> topics.add(f.getAnnotated().getAnnotation(Resource.class).lookup()));
     }
 
     public void addBeans(@Observes AfterBeanDiscovery event) {
@@ -131,6 +130,11 @@ public class JMSExtension implements Extension  {
                 .scope(ApplicationScoped.class)
                 .qualifiers(Any.Literal.INSTANCE, JNDI.Literal.of(name))
                 .createWith(context -> ActiveMQDestination.createQueue(name)));
+        topics.forEach(name -> event.addBean()
+                .types(Object.class, Destination.class, Topic.class, ActiveMQDestination.class, ActiveMQTopic.class)
+                .scope(ApplicationScoped.class)
+                .qualifiers(Any.Literal.INSTANCE, JNDI.Literal.of(name))
+                .createWith(context -> ActiveMQDestination.createTopic(name)));
     }
 
     private XAJMSContext xaJMSContext(Instance<Object> instance) {
@@ -179,6 +183,8 @@ public class JMSExtension implements Extension  {
         for (JMSDestinationDefinition definition : event.getAnnotatedType().getAnnotations(JMSDestinationDefinition.class)) {
             if (definition.interfaceName().equals(Queue.class.getName())) {
                 queues.add(definition.name());
+            } if (definition.interfaceName().equals(Topic.class.getName())) {
+                topics.add(definition.name());
             } else {
                 throw new IllegalArgumentException("Unsupported destination " + definition.interfaceName());
             }

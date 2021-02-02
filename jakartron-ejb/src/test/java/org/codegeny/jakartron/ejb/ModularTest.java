@@ -1,4 +1,5 @@
 package org.codegeny.jakartron.ejb;
+
 /*-
  * #%L
  * jakartron-ejb
