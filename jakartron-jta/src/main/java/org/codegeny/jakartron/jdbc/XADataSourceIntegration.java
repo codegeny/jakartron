@@ -40,10 +40,7 @@ import javax.sql.DataSource;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,22 +73,29 @@ public final class XADataSourceIntegration implements Extension {
         }
     }
 
+    private static <T> void addIfNot(Map<String, Object> map, String key, T value, T empty) {
+        if (!Objects.equals(value, empty)) {
+            map.put(key, value);
+        }
+    }
+
     private BasicDataSource createDataSource(DataSourceDefinition definition, Instance<Object> instance) {
 
         Map<String, Object> map = new HashMap<>();
+        addIfNot(map,"url", definition.url(), "");
+        addIfNot(map,"name", definition.name(), "");
+        addIfNot(map,"password", definition.password(), "");
+        addIfNot(map,"databaseName", definition.databaseName(), "");
+        addIfNot(map,"serverName", definition.serverName(), "");
+        addIfNot(map,"portNumber", definition.portNumber(), -1);
+        addIfNot(map,"loginTimeout", definition.loginTimeout(), 0);
+
         for (String property : definition.properties()) {
             int index = property.indexOf('=');
             if (index != -1) {
                 map.put(property.substring(0, index), property.substring(index + 1));
             }
         }
-        map.put("url", definition.url());
-        map.put("name", definition.name());
-        map.put("password", definition.password());
-        map.put("databaseName", definition.databaseName());
-        map.put("serverName", definition.serverName());
-        map.put("portNumber", definition.portNumber());
-        map.put("loginTimeout", definition.loginTimeout());
 
         try {
             Class<?> klass = Thread.currentThread().getContextClassLoader().loadClass(definition.className());
