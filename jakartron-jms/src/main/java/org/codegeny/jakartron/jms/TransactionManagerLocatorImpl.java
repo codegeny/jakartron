@@ -23,7 +23,6 @@ package org.codegeny.jakartron.jms;
 import org.apache.activemq.artemis.service.extensions.transactions.TransactionManagerLocator;
 import org.kohsuke.MetaInfServices;
 
-import javax.enterprise.inject.spi.CDI;
 import javax.transaction.TransactionManager;
 
 @MetaInfServices
@@ -31,6 +30,6 @@ public class TransactionManagerLocatorImpl implements TransactionManagerLocator 
 
     @Override
     public TransactionManager getTransactionManager() {
-        return CDI.current().select(TransactionManager.class).get();
+        return com.arjuna.ats.jta.TransactionManager.transactionManager();
     }
 }

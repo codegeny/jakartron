@@ -73,7 +73,7 @@ public final class XADataSourceIntegration implements Extension {
         }
     }
 
-    private static <T> void addIfNot(Map<String, Object> map, String key, T value, T empty) {
+    private static <T> void addIfNotEmpty(Map<String, Object> map, String key, T value, T empty) {
         if (!Objects.equals(value, empty)) {
             map.put(key, value);
         }
@@ -82,13 +82,13 @@ public final class XADataSourceIntegration implements Extension {
     private BasicDataSource createDataSource(DataSourceDefinition definition, Instance<Object> instance) {
 
         Map<String, Object> map = new HashMap<>();
-        addIfNot(map,"url", definition.url(), "");
-        addIfNot(map,"name", definition.name(), "");
-        addIfNot(map,"password", definition.password(), "");
-        addIfNot(map,"databaseName", definition.databaseName(), "");
-        addIfNot(map,"serverName", definition.serverName(), "");
-        addIfNot(map,"portNumber", definition.portNumber(), -1);
-        addIfNot(map,"loginTimeout", definition.loginTimeout(), 0);
+        addIfNotEmpty(map,"url", definition.url(), "");
+        addIfNotEmpty(map,"name", definition.name(), "");
+        addIfNotEmpty(map,"password", definition.password(), "");
+        addIfNotEmpty(map,"databaseName", definition.databaseName(), "");
+        addIfNotEmpty(map,"serverName", definition.serverName(), "");
+        addIfNotEmpty(map,"portNumber", definition.portNumber(), -1);
+        addIfNotEmpty(map,"loginTimeout", definition.loginTimeout(), 0);
 
         for (String property : definition.properties()) {
             int index = property.indexOf('=');
@@ -115,17 +115,11 @@ public final class XADataSourceIntegration implements Extension {
                 return pool;
             } else {
                 if (!DataSource.class.isAssignableFrom(klass)) {
-                    throw new RuntimeException("");
+                    throw new RuntimeException("The provided class does not implement DataSource");
                 }
                 DataSource dataSource = klass.asSubclass(DataSource.class).newInstance();
                 BeanUtils.copyProperties(dataSource, map);
-                BasicDataSource pool = new BasicDataSource() {
-
-                    @Override
-                    protected ConnectionFactory createConnectionFactory() {
-                        return new DataSourceConnectionFactory(dataSource);
-                    }
-                };
+                BasicDataSource pool = new SimpleBasicDataSource(dataSource);
                 pool.setMinIdle(definition.minPoolSize());
                 pool.setMaxIdle(definition.maxPoolSize());
                 pool.setInitialSize(definition.initialPoolSize());
@@ -135,6 +129,20 @@ public final class XADataSourceIntegration implements Extension {
             throw exception;
         } catch (Exception exception) {
             throw new RuntimeException("Can't create a data source for " + definition, exception);
+        }
+    }
+
+    private static class SimpleBasicDataSource extends BasicDataSource {
+
+        private final DataSource dataSource;
+
+        SimpleBasicDataSource(DataSource dataSource) {
+            this.dataSource = dataSource;
+        }
+
+        @Override
+        protected ConnectionFactory createConnectionFactory() {
+            return new DataSourceConnectionFactory(dataSource);
         }
     }
 }

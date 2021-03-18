@@ -33,11 +33,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
+@DataSourceDefinition(name = "java:/jdbc/mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
 @ExtendWithJakartron
 public class JDBCTest {
 
-    @Resource(lookup = "mydb")
+    @Resource(lookup = "java:/jdbc/mydb")
     private DataSource dataSource;
 
     @Inject

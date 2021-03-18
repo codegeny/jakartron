@@ -105,6 +105,41 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>30.1-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>1.10.22</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>1.10.22</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.9</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.13</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>4.5.13</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.jetty.toolchain</groupId>
+                <artifactId>jetty-schemas</artifactId>
+                <version>4.0.3</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jboss.logging</groupId>
                 <artifactId>jboss-logging</artifactId>
                 <version>3.4.1.Final</version>
@@ -132,7 +167,7 @@
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
-                <version>3.11</version>
+                <version>3.12.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -292,13 +327,10 @@
                     <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
                     <ignoredResourcePatterns>
                         <ignoredResourcePattern>about.html</ignoredResourcePattern>
+                        <ignoredResourcePattern>jms-version.properties</ignoredResourcePattern>
                         <ignoredResourcePattern>org/jboss/resteasy/client/jaxrs/i18n/Messages.i18n_en.properties</ignoredResourcePattern>
                         <ignoredResourcePattern>org/jboss/resteasy/client/jaxrs/i18n/Messages.i18n_xx.properties</ignoredResourcePattern>
                     </ignoredResourcePatterns>
-                    <ignoredClassPatterns>
-                        <!-- JSF api & impl are not separated: https://github.com/eclipse-ee4j/mojarra/issues/4480 -->
-                        <ignoredClassPattern>javax.faces.*</ignoredClassPattern>
-                    </ignoredClassPatterns>
                 </configuration>
                 <executions>
                     <execution>
@@ -323,8 +355,8 @@
                 </executions>
                 <configuration>
                     <rules>
-                        <!--                        <requireReleaseDeps/>-->
-                        <requireNoRepositories/>
+<!--                        <requireReleaseDeps/>-->
+<!--                        <requireNoRepositories/>-->
                         <reactorModuleConvergence/>
                         <dependencyConvergence/>
                         <requireUpperBoundDeps/>
@@ -338,13 +370,13 @@
                                 <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
                             </plugins>
                         </requireSameVersions>
-                        <!--                        <bannedDependencies>-->
-                        <!--                            <searchTransitive>true</searchTransitive>-->
-                        <!--                            <excludes>-->
-                        <!--                                <exclude>commons-logging:*</exclude>-->
-                        <!--                                <exclude>log4j:*</exclude>-->
-                        <!--                            </excludes>-->
-                        <!--                        </bannedDependencies>-->
+                        <bannedDependencies>
+                            <searchTransitive>true</searchTransitive>
+                            <excludes>
+                                <exclude>commons-logging:*</exclude>
+                                <exclude>log4j:*</exclude>
+                            </excludes>
+                        </bannedDependencies>
                     </rules>
                 </configuration>
             </plugin>

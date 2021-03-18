@@ -48,24 +48,15 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.WithAnnotations;
+import javax.enterprise.inject.spi.*;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Singleton;
+import javax.jms.Queue;
 import javax.jms.*;
 import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
 import javax.transaction.TransactionScoped;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @MetaInfServices
@@ -140,7 +131,7 @@ public class JMSExtension implements Extension  {
     private XAJMSContext xaJMSContext(Instance<Object> instance) {
         try {
             XAJMSContext context = instance.select(XAConnectionFactory.class).get().createXAContext();
-            instance.select(TransactionManager.class).get().getTransaction().enlistResource(context.getXAResource());
+            com.arjuna.ats.jta.TransactionManager.transactionManager().getTransaction().enlistResource(context.getXAResource());
             return context;
         } catch (SystemException | RollbackException exception) {
             throw new CreationException(exception);
