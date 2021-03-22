@@ -40,6 +40,7 @@ import javax.sql.DataSource;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
+import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +53,26 @@ public final class XADataSourceIntegration implements Extension {
     private final Set<DataSourceDefinition> dataSources = new HashSet<>();
 
     public void process(@Observes @WithAnnotations(DataSourceDefinition.class) ProcessAnnotatedType<?> event) {
-        dataSources.addAll(event.getAnnotatedType().getAnnotations(DataSourceDefinition.class));
+        dataSources.addAll(find(event.getAnnotatedType().getJavaClass(), DataSourceDefinition.class));
+    }
+
+    private <A extends Annotation> Set<A> find(Class<?> type, Class<A> annotationType) {
+        Set<A> result = new HashSet<>();
+        Set<Class<?>> processed = new HashSet<>();
+        Deque<Class<?>> queue = new ArrayDeque<>();
+        queue.add(type);
+        while (!queue.isEmpty()) {
+            Class<?> current = queue.removeFirst();
+            for (Annotation annotation : current.getAnnotations()) {
+                if (annotationType.equals(annotation.annotationType())) {
+                    result.add(annotationType.cast(annotation));
+                }
+                if (processed.add(annotation.annotationType())) {
+                    queue.add(annotation.annotationType());
+                }
+            }
+        }
+        return result;
     }
 
     public void makeDataSourceInjectable(@Observes AfterBeanDiscovery event) {

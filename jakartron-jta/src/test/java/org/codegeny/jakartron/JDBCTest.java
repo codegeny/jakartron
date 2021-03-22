@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Resource;
-import javax.annotation.sql.DataSourceDefinition;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
@@ -33,7 +32,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@DataSourceDefinition(name = "java:/jdbc/mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
+@ConfigureMyDataSource
 @ExtendWithJakartron
 public class JDBCTest {
 

@@ -21,17 +21,8 @@ package org.codegeny.jakartron.junit;
  */
 
 import org.codegeny.jakartron.Jakartron;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestInstanceFactory;
-import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.platform.commons.util.ReflectionUtils;
 
 import javax.enterprise.context.spi.CreationalContext;
@@ -57,7 +48,11 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
 
     @Override
     public void beforeAll(ExtensionContext context) {
-        getStore(context).put(SeContainer.class, Jakartron.initialize(Stream.concat(Stream.of(context.getRequiredTestClass()), ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).stream()))
+        Class<?>[] classes = Stream.concat(
+                Stream.of(context.getRequiredTestClass()),
+                ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).stream()
+        ).toArray(Class[]::new);
+        getStore(context).put(SeContainer.class, Jakartron.initialize(classes)
                 .addExtensions(new TestExtension())
                 .addBeanClasses(context.getRequiredTestClass())
                 .initialize()
