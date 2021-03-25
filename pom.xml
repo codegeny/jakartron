@@ -93,6 +93,7 @@
         <module>jakartron-servlet</module>
         <module>jakartron-jaxrs</module>
         <module>jakartron-bom</module>
+        <module>jakartron-dbunit</module>
     </modules>
 
     <dependencyManagement>
