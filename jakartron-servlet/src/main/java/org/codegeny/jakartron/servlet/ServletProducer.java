@@ -20,12 +20,14 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
+import org.apache.jasper.servlet.JspServlet;
 import org.codegeny.jakartron.CoreExtension;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.security.HashLoginService;
 import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
@@ -101,6 +103,8 @@ final class ServletProducer {
         webAppContext.addEventListener(listener);
         webAppContext.addEventListener(new WeldTerminalListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.getSecurityHandler().setLoginService(loginService);
+        webAppContext.addServlet(JspServlet.class, "*.jsp");
+        webAppContext.addServlet(DefaultServlet.class, "/");
         webAppContext.configure();
         return webAppContext;
     }

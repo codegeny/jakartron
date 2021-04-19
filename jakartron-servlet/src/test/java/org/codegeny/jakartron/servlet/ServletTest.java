@@ -55,7 +55,7 @@ public class ServletTest {
     }
 
     @Test
-    public void test(@Base("/test") URL servletURL, @Base("/page.jsp") URL jspURL, @Base("/jsp") URL jsp2URL) throws IOException {
+    public void test(@Base("/test") URL servletURL, @Base("/page.jsp") URL jspURL, @Base("/jsp") URL jsp2URL, @Base("foo.txt") URL foo) throws IOException {
         try (Scanner scanner = new Scanner(servletURL.openStream())) {
             Assertions.assertTrue(scanner.hasNextLine());
             Assertions.assertEquals("hello world!", scanner.nextLine());
@@ -69,6 +69,11 @@ public class ServletTest {
         try (Scanner scanner = new Scanner(jsp2URL.openStream())) {
             Assertions.assertTrue(scanner.hasNextLine());
             Assertions.assertEquals("<span>2</span>", scanner.nextLine());
+        }
+
+        try (Scanner scanner = new Scanner(foo.openStream())) {
+            Assertions.assertTrue(scanner.hasNextLine());
+            Assertions.assertEquals("foo", scanner.nextLine());
         }
     }
 }
