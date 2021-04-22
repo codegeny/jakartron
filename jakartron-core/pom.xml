@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.apache.tomcat</groupId>
             <artifactId>tomcat-jasper-el</artifactId>
-            <version>9.0.33</version>
+            <version>9.0.45</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.tomcat</groupId>
