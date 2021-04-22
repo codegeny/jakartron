@@ -354,7 +354,7 @@
                     <skip>${skipTests}</skip>
                     <includes>
                         <include>org.codegeny.jakartron.*</include>
-                    </includes>Se
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>
