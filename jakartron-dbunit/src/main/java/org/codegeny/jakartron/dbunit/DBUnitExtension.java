@@ -49,6 +49,7 @@ public class DBUnitExtension implements Extension {
     private final Set<DBUnitConnection> connections = new HashSet<>();
 
     public void processAnnotatedType(@Observes @WithAnnotations(DBUnitConnection.class) ProcessAnnotatedType<?> event) {
+
         connections.add(event.getAnnotatedType().getAnnotation(DBUnitConnection.class));
     }
 

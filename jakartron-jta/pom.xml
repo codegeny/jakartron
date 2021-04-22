@@ -64,6 +64,12 @@
             <groupId>org.jboss.narayana.jta</groupId>
             <artifactId>cdi</artifactId>
             <version>5.10.6.Final</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>sun.jdk</groupId>
+                    <artifactId>jconsole</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss</groupId>

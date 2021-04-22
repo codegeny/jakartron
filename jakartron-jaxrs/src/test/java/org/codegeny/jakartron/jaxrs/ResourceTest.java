@@ -58,9 +58,13 @@ public class ResourceTest {
     }
 
     @Test
-    public void test(@Base("api") String baseUri) {
+    public void test(@Base("api") String baseUri, @Base("baz.txt") String baz) {
         given().baseUri(baseUri)
                 .when().get("foo/bar")
                 .then().body(Matchers.is("hello world!"));
+
+        given().baseUri(baz)
+                .when().get()
+                .then().body(Matchers.is("baz"));
     }
 }

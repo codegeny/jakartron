@@ -33,6 +33,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @EnableJMS
 @EnableJCA
-@AdditionalClasses({JMSRAExtension.class, JMSRAProducer.class})
+@AdditionalClasses(JMSRAProducer.class)
 public @interface EnableJMSRA {
 }
