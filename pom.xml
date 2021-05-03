@@ -367,6 +367,10 @@
                         <ignoredResourcePattern>about.html</ignoredResourcePattern>
                         <ignoredResourcePattern>jms-version.properties</ignoredResourcePattern>
                     </ignoredResourcePatterns>
+                    <ignoredClassPatterns>
+                        <!-- JSF api & impl are not separated: https://github.com/eclipse-ee4j/mojarra/issues/4480 -->
+                        <ignoredClassPattern>javax.faces.*</ignoredClassPattern>
+                    </ignoredClassPatterns>
                 </configuration>
                 <executions>
                     <execution>
@@ -391,8 +395,13 @@
                 </executions>
                 <configuration>
                     <rules>
-<!--                        <requireReleaseDeps/>-->
-<!--                        <requireNoRepositories/>-->
+                        <requireReleaseDeps>
+                            <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                            <excludes>
+                                <exclude>org.codegeny.jakartron:*</exclude>
+                            </excludes>
+                        </requireReleaseDeps>
+                        <requireNoRepositories/>
                         <reactorModuleConvergence/>
                         <dependencyConvergence/>
                         <requireUpperBoundDeps/>
