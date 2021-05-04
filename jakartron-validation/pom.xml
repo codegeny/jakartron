@@ -37,7 +37,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jakartron-jta</artifactId>
+            <artifactId>jakartron-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

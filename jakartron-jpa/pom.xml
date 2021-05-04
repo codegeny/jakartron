@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>5.4.27.Final</version>
+            <version>5.4.31.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>javax.activation</groupId>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-hikaricp</artifactId>
-            <version>5.4.27.Final</version>
+            <version>5.4.31.Final</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
