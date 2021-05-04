@@ -57,6 +57,7 @@ public class FilterResource extends Resource {
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     @Override
     public URL getURL() {
         throw new UnsupportedOperationException();

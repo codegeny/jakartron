@@ -38,7 +38,6 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 import javax.xml.rpc.handler.MessageContext;
-import java.security.Identity;
 import java.security.Principal;
 import java.util.Map;
 import java.util.Properties;
@@ -98,14 +97,15 @@ public class EJBContextImpl implements EJBContext, SessionContext, MessageDriven
         throw new UnsupportedOperationException();
     }
 
+    @Deprecated
     @Override
     public Properties getEnvironment() {
         throw new UnsupportedOperationException();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public Identity getCallerIdentity() {
+    public java.security.Identity getCallerIdentity() {
         throw new UnsupportedOperationException();
     }
 
@@ -114,9 +114,9 @@ public class EJBContextImpl implements EJBContext, SessionContext, MessageDriven
         return securityContext.getCallerPrincipal();
     }
 
-    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
-    public boolean isCallerInRole(Identity role) {
+    public boolean isCallerInRole(java.security.Identity role) {
         throw new UnsupportedOperationException();
     }
 

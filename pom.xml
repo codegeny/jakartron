@@ -245,11 +245,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
-                    <configuration>
-                        <compilerArgs>
-                            <arg>-Xlint:-deprecation</arg>
-                        </compilerArgs>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -328,6 +323,7 @@
                 <version>0.13</version>
                 <configuration>
                     <consoleOutput>true</consoleOutput>
+					<parseSCMIgnoresAsExcludes>false</parseSCMIgnoresAsExcludes>
                     <includes>
                         <include>src/**/*</include>
                         <include>pom.xml</include>
@@ -338,7 +334,7 @@
                         <exclude>.git</exclude>
                         <exclude>.gitignore</exclude>
                     </excludes>
-                </configuration>
+				</configuration>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -431,15 +427,6 @@
                                 <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
                             </plugins>
                         </requireSameVersions>
-						<!--
-                        <bannedDependencies>
-                            <searchTransitive>true</searchTransitive>
-                            <excludes>
-                                <exclude>commons-logging:*</exclude>
-                                <exclude>log4j:*</exclude>
-                            </excludes>
-                        </bannedDependencies>
-						-->
                     </rules>
                 </configuration>
             </plugin>
