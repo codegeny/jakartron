@@ -33,8 +33,7 @@ import static javax.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCA
 @ExtendWithJakartron
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 1, maxPoolSize = 2, url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = President.class, properties = {
-        @Property(name = "javax.persistence.schema-generation.database.action", value = "create"),
-        @Property(name = "hibernate.show_sql", value = "true")
+        @Property(name = "javax.persistence.schema-generation.database.action", value = "create")
 //        @Property(name = "hibernate.dialect", value = "org.hibernate.dialect.H2Dialect")
 })
 public class JPADBTest {

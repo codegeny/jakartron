@@ -41,8 +41,7 @@ import static javax.persistence.spi.PersistenceUnitTransactionType.RESOURCE_LOCA
         @DBUnitConnection.Property(name = DatabaseConfig.PROPERTY_DATATYPE_FACTORY, value = "org.dbunit.ext.h2.H2DataTypeFactory"),
 })
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = President.class, properties = {
-        @PersistenceUnitDefinition.Property(name = "javax.persistence.schema-generation.database.action", value = "create"),
-        @PersistenceUnitDefinition.Property(name = "hibernate.show_sql", value = "true")
+        @PersistenceUnitDefinition.Property(name = "javax.persistence.schema-generation.database.action", value = "create")
 })
 public class JPADBUnitTest {
 

@@ -26,8 +26,8 @@ import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
-import javax.ejb.EJBException;
 import javax.ejb.MessageDriven;
+import javax.ejb.MessageDrivenContext;
 import javax.jms.JMSContext;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -50,10 +50,13 @@ public class FailingMDBTest {
     })
     public static class MyMDB implements MessageListener {
 
+        @Resource
+        private MessageDrivenContext context;
+
         @Override
         public void onMessage(Message message) {
             RECEIVED.incrementAndGet();
-            throw new EJBException();
+            context.setRollbackOnly();
         }
     }
 
