@@ -21,7 +21,6 @@ package org.codegeny.jakartron.jsf;
  */
 
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
-import org.codegeny.jakartron.servlet.Base;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
@@ -71,8 +70,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void test(@Base("my-bean.xhtml") WebDriver driver) {
-        MyPage page = FragmentablePageFactory.createPage(driver, MyPage.class);
+    public void test(@Page("my-bean.xhtml") MyPage page) {
         Assertions.assertEquals("hello", page.getMessage());
 
         page = page.getMyForm().submit("world");

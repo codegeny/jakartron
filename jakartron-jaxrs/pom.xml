@@ -34,18 +34,6 @@
     <artifactId>jakartron-jaxrs</artifactId>
     <packaging>jar</packaging>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.jboss.resteasy</groupId>
-                <artifactId>resteasy-bom</artifactId>
-                <version>4.6.0.Final</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -200,10 +188,6 @@
                 <exclusion>
                     <groupId>org.apache.sling</groupId>
                     <artifactId>org.apache.sling.javax.activation</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>

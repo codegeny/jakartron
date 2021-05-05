@@ -21,6 +21,7 @@ package org.codegeny.jakartron.servlet;
  */
 
 import org.apache.jasper.servlet.JspServlet;
+import org.apache.tomcat.util.scan.Constants;
 import org.codegeny.jakartron.CoreExtension;
 import org.eclipse.jetty.annotations.AnnotationConfiguration;
 import org.eclipse.jetty.security.HashLoginService;
@@ -53,6 +54,10 @@ import java.util.logging.Logger;
  * can be retrieved through regular injection.
  */
 final class ServletProducer {
+
+    static {
+        System.setProperty(Constants.SKIP_JARS_PROPERTY, "xalan-*.jar,serializer-*.jar");
+    }
 
     private static final Logger LOGGER = Logger.getLogger(ServletProducer.class.getName());
 
