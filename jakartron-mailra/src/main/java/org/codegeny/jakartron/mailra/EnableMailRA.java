@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.dbunit;
+package org.codegeny.jakartron.mailra;
 
 /*-
  * #%L
- * jakartron-dbunit
+ * jakartron-mailra
  * %%
  * Copyright (C) 2018 - 2021 Codegeny
  * %%
@@ -20,30 +20,17 @@ package org.codegeny.jakartron.dbunit;
  * #L%
  */
 
-import java.lang.annotation.Repeatable;
+import org.codegeny.jakartron.AdditionalClasses;
+import org.codegeny.jakartron.jca.EnableJCA;
+
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-@Retention(RUNTIME)
-@Target(TYPE)
-@Repeatable(DBUnitConnections.class)
-public @interface DBUnitConnection {
-
-    String name() default "";
-
-    String jndi();
-
-    String schema() default "";
-
-    Property[] properties() default {};
-
-    @interface Property {
-
-        String name();
-
-        String value();
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+@EnableJCA
+@AdditionalClasses(MailRAProducer.class)
+public @interface EnableMailRA {
 }

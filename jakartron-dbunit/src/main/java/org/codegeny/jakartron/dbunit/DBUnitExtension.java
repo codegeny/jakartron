@@ -48,9 +48,12 @@ public class DBUnitExtension implements Extension {
 
     private final Set<DBUnitConnection> connections = new HashSet<>();
 
-    public void processAnnotatedType(@Observes @WithAnnotations(DBUnitConnection.class) ProcessAnnotatedType<?> event) {
-
+    public void processDBUnitConnection(@Observes @WithAnnotations(DBUnitConnection.class) ProcessAnnotatedType<?> event) {
         connections.add(event.getAnnotatedType().getAnnotation(DBUnitConnection.class));
+    }
+
+    public void processDBUnitConnections(@Observes @WithAnnotations(DBUnitConnections.class) ProcessAnnotatedType<?> event) {
+        connections.addAll(event.getAnnotatedType().getAnnotations(DBUnitConnection.class));
     }
 
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager beanManager) {

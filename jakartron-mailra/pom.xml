@@ -31,36 +31,24 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>jakartron-jsf</artifactId>
+    <artifactId>jakartron-mailra</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>jakartron-servlet</artifactId>
+            <artifactId>jakartron-jca</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jakartron-validation</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.wildfly</groupId>
+            <artifactId>mail-ra-api</artifactId>
+            <version>1.0.0.Final</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>jakartron-junit</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.faces</artifactId>
-            <version>2.3.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>htmlunit-driver</artifactId>
-            <version>2.50.0</version>
-            <scope>test</scope>
+			<groupId>org.wildfly</groupId>
+			<artifactId>mail-ra-impl</artifactId>
+			<version>1.0.0.Final</version>
         </dependency>
     </dependencies>
 
