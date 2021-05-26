@@ -53,6 +53,8 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -111,10 +113,19 @@ public final class EJBIntegration implements Extension {
                     }
 
                     Properties properties = new Properties();
-                    Stream.of(messageDriven.activationConfig()).forEach(a -> properties.setProperty(a.propertyName(), a.propertyValue()));
+                    Stream.of(messageDriven.activationConfig()).forEach(a -> properties.setProperty(a.propertyName(), evaluate(a.propertyValue())));
 
                     e.getEvent().addMessageEndpoint(listenerInterface, beanManager.createInstance().select(mdb.getJavaClass()), properties, mdb.getJavaClass());
                 }));
+    }
+
+    private String evaluate(String value) {
+        StringBuffer buffer = new StringBuffer();
+        Matcher matcher = PLACEHOLDER.matcher(value);
+        while (matcher.find()) {
+            matcher.appendReplacement(buffer, System.getProperty(matcher.group(1)));
+        }
+        return matcher.appendTail(buffer).toString();
     }
 
     private static Stream<Class<?>> getAllInterfaces(Class<?> klass) {
@@ -131,4 +142,6 @@ public final class EJBIntegration implements Extension {
                 : Transactional.TxType.REQUIRED
         );
     }
+
+    private static final Pattern PLACEHOLDER =  Pattern.compile("\\$\\{([^}]+)}");
 }
