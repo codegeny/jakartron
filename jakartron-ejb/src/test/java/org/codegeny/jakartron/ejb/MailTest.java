@@ -20,12 +20,12 @@ package org.codegeny.jakartron.ejb;
  * #L%
  */
 
+import com.icegreen.greenmail.configuration.GreenMailConfiguration;
 import com.icegreen.greenmail.junit5.GreenMailExtension;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetupTest;
 import org.awaitility.Awaitility;
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.wildfly.mail.ra.MailListener;
@@ -33,16 +33,18 @@ import org.wildfly.mail.ra.MailListener;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJBException;
 import javax.ejb.MessageDriven;
+import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @ExtendWithJakartron
 public class MailTest {
-
-    @RegisterExtension
-    public static final GreenMailExtension GREEN_MAIL = new GreenMailExtension(ServerSetupTest.ALL);
 
     @MessageDriven(activationConfig = {
             @ActivationConfigProperty(propertyName = "mailServer", propertyValue = "localhost"),
@@ -54,23 +56,40 @@ public class MailTest {
     })
     public static class MyMDB implements MailListener {
 
-        private static volatile boolean received = false;
-
         @Override
         public void onMessage(Message message) {
             try {
-                Assertions.assertEquals("some body", message.getContent());
-                received = true;
+                Object content = message.getContent();
+                if (content instanceof Multipart) {
+                    Multipart multipart = (Multipart) content;
+                    for (int i = 0; i < multipart.getCount(); i++) {
+                        BodyPart body = multipart.getBodyPart(i);
+                        if ("some body".equals(body.getContent())) {
+                            RECEIVED.set(true);
+                            break;
+                        }
+                    }
+                }
             } catch (IOException | MessagingException exception) {
                 throw new EJBException(exception);
             }
         }
     }
 
+    @RegisterExtension
+    public static final GreenMailExtension GREEN_MAIL = new GreenMailExtension(ServerSetupTest.ALL)
+            .withConfiguration(new GreenMailConfiguration().withUser("bar@example.com", "bar@example.com", "secret-pwd"));
+
+    static final AtomicBoolean RECEIVED = new AtomicBoolean();
+
     @Test
-    public void test() {
-        GREEN_MAIL.setUser("bar@example.com", "bar@example.com", "secret-pwd");
-        GreenMailUtil.sendTextEmailTest("bar@example.com", "foo@example.com", "some subject", "some body");
-        Awaitility.await().atMost(5, TimeUnit.SECONDS).until(() -> MyMDB.received);
+    public void test() throws Exception {
+        MimeBodyPart text = new MimeBodyPart();
+        text.setText("some body");
+        MimeMultipart multipart = new MimeMultipart();
+        multipart.addBodyPart(text);
+        GreenMailUtil.sendMessageBody("bar@example.com", "foo@example.com", "some subject", multipart, null, ServerSetupTest.SMTP);
+
+        Awaitility.await().atMost(5, TimeUnit.SECONDS).untilTrue(RECEIVED);
     }
 }
