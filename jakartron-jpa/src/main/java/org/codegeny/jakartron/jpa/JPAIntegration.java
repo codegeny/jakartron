@@ -26,6 +26,7 @@ import org.kohsuke.MetaInfServices;
 import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.literal.InjectLiteral;
@@ -61,7 +62,6 @@ public final class JPAIntegration implements Extension {
     private final Set<QualifierInstance<PersistenceUnit>> persistenceUnits = new HashSet<>();
     private final Set<QualifierInstance<PersistenceContext>> persistenceContexts = new HashSet<>();
     private final Set<PersistenceUnitInfo> persistenceUnitInfos = new HashSet<>();
-
     public void addQualifiers(@Observes BeforeBeanDiscovery event) {
         event.addQualifier(PersistenceUnit.class);
         event.configureQualifier(PersistenceContext.class)
@@ -138,7 +138,9 @@ public final class JPAIntegration implements Extension {
     private static Class<? extends Annotation> toScope(PersistenceContextType type) {
         switch (type) {
             case TRANSACTION:
-                return TransactionScoped.class;
+                //EntityManagers DO NOT require a tx for reading
+                //return TransactionScoped.class;
+                return RequestScoped.class;
             case EXTENDED:
                 return Dependent.class;
             default:

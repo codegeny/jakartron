@@ -55,9 +55,9 @@ public class JPAJTADBTest {
     @Test
     public void test() throws Exception {
 
-        transaction.begin();
+//        transaction.begin();
         Assertions.assertEquals(0, entityManager.createNamedQuery("countPresidents", Number.class).getSingleResult().intValue());
-        transaction.rollback();
+//        transaction.rollback();
 
         transaction.begin();
         entityManager.persist(new President("G. Washington"));

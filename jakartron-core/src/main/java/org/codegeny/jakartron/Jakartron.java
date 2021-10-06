@@ -81,7 +81,9 @@ public final class Jakartron {
                 initializer.enableDecorators(type);
             }
             if (type.isAnnotationPresent(Alternative.class)) {
-                initializer.selectAlternatives(type);
+                if (!type.isAnnotation()) {
+                    initializer.selectAlternatives(type);
+                }
             }
             initializer.addBeanClasses(type);
         }

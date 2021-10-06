@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.jboss.narayana.jta</groupId>
             <artifactId>cdi</artifactId>
-            <version>5.11.2.Final</version>
+            <version>5.12.1.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>sun.jdk</groupId>

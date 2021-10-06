@@ -30,7 +30,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
@@ -38,13 +40,12 @@ import static io.restassured.RestAssured.given;
 @ExtendWithJakartron
 public class ResourceTest {
 
-    @Path("foo")
-    public static class MyResource {
+    @Path("foo/bar")
+    public static class Bar {
 
-        @Path("bar")
         @GET
-        public Response ok() {
-            return Response.ok("hello world!").build();
+        public Response bar() {
+            return Response.ok("bar").build();
         }
     }
 
@@ -53,18 +54,12 @@ public class ResourceTest {
 
         @Override
         public Set<Class<?>> getClasses() {
-            return Collections.singleton(MyResource.class);
+            return Collections.singleton(Bar.class);
         }
     }
 
     @Test
-    public void test(@Base("api") String baseUri, @Base("baz.txt") String baz) {
-        given().baseUri(baseUri)
-                .when().get("foo/bar")
-                .then().body(Matchers.is("hello world!"));
-
-        given().baseUri(baz)
-                .when().get()
-                .then().body(Matchers.is("baz"));
+    public void test(@Base("api") String base) {
+        given().baseUri(base).when().get("foo/bar").then().body(Matchers.is("bar"));
     }
 }

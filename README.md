@@ -1,3 +1,5 @@
+[![Java CI](https://github.com/codegeny/jakartron/actions/workflows/build.yaml/badge.svg)](https://github.com/codegeny/jakartron/actions/workflows/build.yaml)
+
 # Jakartron
 
 Jakartron is a small library built on top of CDI-SE and heavily inspired by CDI-Unit.
@@ -51,7 +53,7 @@ In your `pom.xml`, import the module you need in your application:
 ```
 In your test:
 ```java
-@EnableCDI
+@ExtendWithJakartron
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", minPoolSize = 5, maxPoolSize = 25, url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", nonJtaDataSourceName = "mydb", transactionType = RESOURCE_LOCAL, managedClasses = JPADBTest.President.class, properties = {
         @Property(name = "javax.persistence.schema-generation.database.action", value = "create")

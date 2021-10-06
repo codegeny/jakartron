@@ -1,7 +1,9 @@
 *
 !/.gitignore
-!/.travis.yml
+!/.github
+!/.github/**
 !/README.md
+!/LICENSE
 !/jakartron-*
 !**/src
 !**/src/**
