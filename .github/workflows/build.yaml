@@ -27,4 +27,4 @@ jobs:
 #      - name: Deploy artifacts to Sonatype Nexus
 #        run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
       - name: Publish documentation to GitHub Pages
-        run: mvn site site:stage --settings ./settings.xml --activate-profiles publish --batch-mode
+        run: mvn site site:stage scm-publish:publish-scm --settings ./settings.xml --activate-profiles publish --batch-mode

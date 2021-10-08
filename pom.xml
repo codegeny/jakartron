@@ -546,15 +546,6 @@
                             <scmBranch>gh-pages</scmBranch>
                             <serverId>github</serverId>
                         </configuration>
-                        <executions>
-                            <execution>
-                                <id>publish-documentation</id>
-                                <phase>site</phase>
-                                <goals>
-                                    <goal>publish-scm</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
