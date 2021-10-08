@@ -13,6 +13,12 @@ jobs:
         with:
           java-version: '8'
           distribution: 'adopt'
+      - uses: actions/cache@v1
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Configure environment
         run: |
           git config --global user.name "${{ github.event.head_commit.committer.name }}"
