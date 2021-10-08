@@ -34,6 +34,8 @@
     <artifactId>jakartron-validation</artifactId>
     <packaging>jar</packaging>
 
+    <url>https://codegeny.org/jakartron/jakartron-validation</url>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

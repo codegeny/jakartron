@@ -1,8 +1,13 @@
 name: Java CI
 on:
-  push:
-    branches:
-      - master
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release version'
+        required: true
+      developmentVersion:
+        description: 'Development version'
+        required: true
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,16 +20,23 @@ jobs:
           distribution: 'adopt'
       - name: Configure environment
         run: |
-          git config --global user.name "${{ github.event.head_commit.committer.name }}"
-          git config --global user.email "${{ github.event.head_commit.committer.email }}"
           echo -n "$SECRET_KEY_RING" | gpg --import > ./gpg.logs
           echo -n "$MAVEN_SETTINGS" > ./settings.xml
         env:
           SECRET_KEY_RING: ${{ secrets.SECRET_KEY_RING }}
           MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
+      - name: Set release version
+        run: mvn versions:set -DnewVersion=$RELEASE_VERSION
+        env:
+          RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}
       - name: Build artifacts with Maven
         run: mvn verify --batch-mode --update-snapshots
-#      - name: Deploy artifacts to Sonatype Nexus
-#        run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
+      - name: Deploy artifacts to Sonatype Nexus
+        run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
       - name: Publish documentation to GitHub Pages
         run: mvn site site:stage --settings ./settings.xml --activate-profiles publish --batch-mode
+      - name: Set development version
+        run: mvn versions:set -DnewVersion=$DEVELOPMENT_VERSION
+        env:
+          DEVELOPMENT_VERSION: ${{ github.event.inputs.developmentVersion }}
+

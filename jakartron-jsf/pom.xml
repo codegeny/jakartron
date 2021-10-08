@@ -34,6 +34,8 @@
     <artifactId>jakartron-jsf</artifactId>
     <packaging>jar</packaging>
 
+    <url>https://codegeny.org/jakartron/jakartron-jsf</url>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>

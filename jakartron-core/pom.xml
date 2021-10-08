@@ -34,6 +34,8 @@
     <artifactId>jakartron-core</artifactId>
     <packaging>jar</packaging>
 
+    <url>https://codegeny.org/jakartron/jakartron-core</url>
+
     <dependencies>
         <dependency>
             <groupId>org.jboss.weld</groupId>

@@ -34,6 +34,8 @@
     <artifactId>jakartron-servlet</artifactId>
     <packaging>jar</packaging>
 
+    <url>https://codegeny.org/jakartron/jakartron-servlet</url>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
