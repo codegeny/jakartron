@@ -9,7 +9,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content="Apache Maven Doxia Site Renderer 1.9.2" />
-    <title>jakartron-junit &#x2013; Project Dependencies</title>
+    <title>jakartron-mockito &#x2013; Project Dependencies</title>
     <link rel="stylesheet" href="./css/maven-base.css" />
     <link rel="stylesheet" href="./css/maven-theme.css" />
     <link rel="stylesheet" href="./css/site.css" />
@@ -17,7 +17,7 @@
   </head>
   <body class="composite">
     <div id="banner">
-<div id="bannerLeft">jakartron-junit
+<div id="bannerLeft">jakartron-mockito
 </div>
       <div class="clear">
         <hr/>
@@ -28,7 +28,7 @@
         <span id="publishDate">Last Published: 2021-10-08</span>
           &#xA0;| <span id="projectVersion">Version: 0.1-SNAPSHOT</span>
       </div>
-      <div class="xright"><a href="./" title="jakartron-junit">jakartron-junit</a>      </div>
+      <div class="xright"><a href="./" title="jakartron-mockito">jakartron-mockito</a>      </div>
       <div class="clear">
         <hr/>
       </div>
@@ -78,16 +78,16 @@
 <th>Licenses</th></tr>
 <tr class="b">
 <td>org.codegeny.jakartron</td>
-<td><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-core">jakartron-core</a></td>
+<td><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-junit">jakartron-junit</a></td>
 <td>0.1-SNAPSHOT</td>
 <td>jar</td>
 <td><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
 <tr class="a">
-<td>org.junit.jupiter</td>
-<td><a class="externalLink" href="https://junit.org/junit5/">junit-jupiter-engine</a></td>
-<td>5.8.1</td>
+<td>org.mockito</td>
+<td><a class="externalLink" href="https://github.com/mockito/mockito">mockito-core</a></td>
+<td>3.12.4</td>
 <td>jar</td>
-<td><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></td></tr></table></section><a name="Project_Dependencies_test"></a><section>
+<td><a class="externalLink" href="https://github.com/mockito/mockito/blob/main/LICENSE">The MIT License</a></td></tr></table></section><a name="Project_Dependencies_test"></a><section>
 <h3><a name="test"></a>test</h3>
 <p>The following is a list of test dependencies for this project. These dependencies are only required to compile and run unit tests for the application:</p>
 <table border="0" class="bodyTable">
@@ -154,6 +154,18 @@
 <th>Type</th>
 <th>Licenses</th></tr>
 <tr class="b">
+<td>net.bytebuddy</td>
+<td><a class="externalLink" href="https://bytebuddy.net/byte-buddy">byte-buddy</a></td>
+<td>1.11.19</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.bytebuddy</td>
+<td><a class="externalLink" href="https://bytebuddy.net/byte-buddy-agent">byte-buddy-agent</a></td>
+<td>1.11.19</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
 <td>org.apache.tomcat</td>
 <td><a class="externalLink" href="https://tomcat.apache.org/">tomcat-jasper-el</a></td>
 <td>9.0.45</td>
@@ -166,56 +178,68 @@
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></td></tr>
 <tr class="b">
+<td>org.codegeny.jakartron</td>
+<td><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-core">jakartron-core</a></td>
+<td>0.1-SNAPSHOT</td>
+<td>jar</td>
+<td><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
 <td>org.jboss.classfilewriter</td>
 <td><a class="externalLink" href="https://github.com/jbossas/jboss-classfilewriter">jboss-classfilewriter</a></td>
 <td>1.2.4.Final</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, version 2.0</a></td></tr>
-<tr class="a">
+<tr class="b">
 <td>org.jboss.logging</td>
 <td><a class="externalLink" href="http://www.jboss.org">jboss-logging</a></td>
 <td>3.4.2.Final</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, version 2.0</a></td></tr>
-<tr class="b">
+<tr class="a">
 <td>org.jboss.weld</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org">weld-api</a></td>
 <td>3.1.SP4</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></td></tr>
-<tr class="a">
+<tr class="b">
 <td>org.jboss.weld</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org">weld-core-impl</a></td>
 <td>3.1.7.SP1</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></td></tr>
-<tr class="b">
+<tr class="a">
 <td>org.jboss.weld</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org">weld-spi</a></td>
 <td>3.1.SP4</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></td></tr>
-<tr class="a">
+<tr class="b">
 <td>org.jboss.weld.environment</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org">weld-environment-common</a></td>
 <td>3.1.7.SP1</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></td></tr>
-<tr class="b">
+<tr class="a">
 <td>org.jboss.weld.probe</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org/weld-core-parent/weld-probe-parent/weld-probe-core">weld-probe-core</a></td>
 <td>3.1.7.SP1</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></td></tr>
-<tr class="a">
+<tr class="b">
 <td>org.jboss.weld.se</td>
 <td><a class="externalLink" href="http://weld.cdi-spec.org">weld-se-core</a></td>
 <td>3.1.7.SP1</td>
 <td>jar</td>
 <td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></td></tr>
-<tr class="b">
+<tr class="a">
 <td>org.junit.jupiter</td>
 <td><a class="externalLink" href="https://junit.org/junit5/">junit-jupiter-api</a></td>
+<td>5.8.1</td>
+<td>jar</td>
+<td><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></td></tr>
+<tr class="b">
+<td>org.junit.jupiter</td>
+<td><a class="externalLink" href="https://junit.org/junit5/">junit-jupiter-engine</a></td>
 <td>5.8.1</td>
 <td>jar</td>
 <td><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></td></tr>
@@ -232,6 +256,12 @@
 <td>jar</td>
 <td><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></td></tr>
 <tr class="a">
+<td>org.objenesis</td>
+<td><a class="externalLink" href="http://objenesis.org/objenesis">objenesis</a></td>
+<td>3.2</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
 <td>org.opentest4j</td>
 <td><a class="externalLink" href="https://github.com/ota4j-team/opentest4j">opentest4j</a></td>
 <td>1.2.0</td>
@@ -287,7 +317,17 @@
 <a name="Dependency_Tree"></a><section>
 <h3><a name="Dependency_Tree"></a>Dependency Tree</h3>
 <ul>
-<li>org.codegeny.jakartron:jakartron-junit:jar:0.1-SNAPSHOT <img id="_img1" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep0', '_img1' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep0" style="display:none">
+<li>org.codegeny.jakartron:jakartron-mockito:jar:0.1-SNAPSHOT <img id="_img1" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep0', '_img1' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep0" style="display:none">
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>jakartron-mockito</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>Bootstrap your Jakarta EE application/tests with annotations</p>
+<p><b>URL: </b><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-mockito">http://codegeny.org/jakartron/jakartron-mockito</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
+<ul>
+<li>org.codegeny.jakartron:jakartron-junit:jar:0.1-SNAPSHOT (compile) <img id="_img3" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep2', '_img3' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep2" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>jakartron-junit</th></tr>
@@ -297,7 +337,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-junit">http://codegeny.org/jakartron/jakartron-junit</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.codegeny.jakartron:jakartron-core:jar:0.1-SNAPSHOT (compile) <img id="_img3" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep2', '_img3' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep2" style="display:none">
+<li>org.codegeny.jakartron:jakartron-core:jar:0.1-SNAPSHOT (compile) <img id="_img5" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep4', '_img5' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep4" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>jakartron-core</th></tr>
@@ -307,7 +347,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://codegeny.org/jakartron/jakartron-core">http://codegeny.org/jakartron/jakartron-core</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.jboss.weld:weld-core-impl:jar:3.1.7.SP1 (compile) <img id="_img5" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep4', '_img5' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep4" style="display:none">
+<li>org.jboss.weld:weld-core-impl:jar:3.1.7.SP1 (compile) <img id="_img7" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep6', '_img7' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep6" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld Implementation (Core)</th></tr>
@@ -317,7 +357,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org">http://weld.cdi-spec.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.jboss.weld:weld-api:jar:3.1.SP4 (compile) <img id="_img7" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep6', '_img7' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep6" style="display:none">
+<li>org.jboss.weld:weld-api:jar:3.1.SP4 (compile) <img id="_img9" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep8', '_img9' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep8" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld APIs</th></tr>
@@ -326,7 +366,7 @@
 <p><b>Description: </b>Weld specifc extensions to the CDI API</p>
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org">http://weld.cdi-spec.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.jboss.weld:weld-spi:jar:3.1.SP4 (compile) <img id="_img9" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep8', '_img9' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep8" style="display:none">
+<li>org.jboss.weld:weld-spi:jar:3.1.SP4 (compile) <img id="_img11" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep10', '_img11' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep10" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld SPIs for container integration</th></tr>
@@ -335,7 +375,7 @@
 <p><b>Description: </b>APIs for Weld, the reference implementation of Contexts and Dependency Injection for Java EE</p>
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org">http://weld.cdi-spec.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.jboss.classfilewriter:jboss-classfilewriter:jar:1.2.4.Final (compile) <img id="_img11" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep10', '_img11' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep10" style="display:none">
+<li>org.jboss.classfilewriter:jboss-classfilewriter:jar:1.2.4.Final (compile) <img id="_img13" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep12', '_img13' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep12" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>classfilewriter</th></tr>
@@ -344,7 +384,7 @@
 <p><b>Description: </b>A bytecode writer that creates .class files at runtime</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/jbossas/jboss-classfilewriter">https://github.com/jbossas/jboss-classfilewriter</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, version 2.0</a></p></td></tr></table></div></li>
-<li>org.jboss.logging:jboss-logging:jar:3.4.2.Final (compile) <img id="_img13" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep12', '_img13' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep12" style="display:none">
+<li>org.jboss.logging:jboss-logging:jar:3.4.2.Final (compile) <img id="_img15" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep14', '_img15' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep14" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JBoss Logging 3</th></tr>
@@ -353,7 +393,7 @@
 <p><b>Description: </b>The JBoss Logging Framework</p>
 <p><b>URL: </b><a class="externalLink" href="http://www.jboss.org">http://www.jboss.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>org.jboss.weld.se:weld-se-core:jar:3.1.7.SP1 (compile) <img id="_img15" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep14', '_img15' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep14" style="display:none">
+<li>org.jboss.weld.se:weld-se-core:jar:3.1.7.SP1 (compile) <img id="_img17" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep16', '_img17' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep16" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld SE (Core)</th></tr>
@@ -363,7 +403,7 @@
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org">http://weld.cdi-spec.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.jboss.weld.environment:weld-environment-common:jar:3.1.7.SP1 (compile) <img id="_img17" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep16', '_img17' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep16" style="display:none">
+<li>org.jboss.weld.environment:weld-environment-common:jar:3.1.7.SP1 (compile) <img id="_img19" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep18', '_img19' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep18" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld Environment Common</th></tr>
@@ -372,7 +412,7 @@
 <p><b>Description: </b>Common tools for non-standard Weld environments (SE, Servlet containers)</p>
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org">http://weld.cdi-spec.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.jboss.weld.probe:weld-probe-core:jar:3.1.7.SP1 (compile) <img id="_img19" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep18', '_img19' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep18" style="display:none">
+<li>org.jboss.weld.probe:weld-probe-core:jar:3.1.7.SP1 (compile) <img id="_img21" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep20', '_img21' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep20" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Weld Probe Core</th></tr>
@@ -381,7 +421,7 @@
 <p><b>Description: </b>Weld's inspection and debugging support</p>
 <p><b>URL: </b><a class="externalLink" href="http://weld.cdi-spec.org/weld-core-parent/weld-probe-parent/weld-probe-core">http://weld.cdi-spec.org/weld-core-parent/weld-probe-parent/weld-probe-core</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>org.apache.tomcat:tomcat-jasper-el:jar:9.0.45 (compile) <img id="_img21" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep20', '_img21' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep20" style="display:none">
+<li>org.apache.tomcat:tomcat-jasper-el:jar:9.0.45 (compile) <img id="_img23" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep22', '_img23' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep22" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>tomcat-jasper-el</th></tr>
@@ -390,7 +430,7 @@
 <p><b>Description: </b>Jasper Expression Language Impl</p>
 <p><b>URL: </b><a class="externalLink" href="https://tomcat.apache.org/">https://tomcat.apache.org/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>org.junit.jupiter:junit-jupiter-engine:jar:5.8.1 (compile) <img id="_img23" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep22', '_img23' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep22" style="display:none">
+<li>org.junit.jupiter:junit-jupiter-engine:jar:5.8.1 (compile) <img id="_img25" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep24', '_img25' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep24" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JUnit Jupiter Engine</th></tr>
@@ -400,7 +440,7 @@
 <p><b>URL: </b><a class="externalLink" href="https://junit.org/junit5/">https://junit.org/junit5/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.junit.platform:junit-platform-engine:jar:1.8.1 (compile) <img id="_img25" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep24', '_img25' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep24" style="display:none">
+<li>org.junit.platform:junit-platform-engine:jar:1.8.1 (compile) <img id="_img27" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep26', '_img27' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep26" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JUnit Platform Engine API</th></tr>
@@ -410,7 +450,7 @@
 <p><b>URL: </b><a class="externalLink" href="https://junit.org/junit5/">https://junit.org/junit5/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.opentest4j:opentest4j:jar:1.2.0 (compile) <img id="_img27" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep26', '_img27' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep26" style="display:none">
+<li>org.opentest4j:opentest4j:jar:1.2.0 (compile) <img id="_img29" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep28', '_img29' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep28" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>org.opentest4j:opentest4j</th></tr>
@@ -419,7 +459,7 @@
 <p><b>Description: </b>Open Test Alliance for the JVM</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/ota4j-team/opentest4j">https://github.com/ota4j-team/opentest4j</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.junit.platform:junit-platform-commons:jar:1.8.1 (compile) <img id="_img29" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep28', '_img29' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep28" style="display:none">
+<li>org.junit.platform:junit-platform-commons:jar:1.8.1 (compile) <img id="_img31" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep30', '_img31' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep30" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JUnit Platform Commons</th></tr>
@@ -428,7 +468,7 @@
 <p><b>Description: </b>Module &quot;junit-platform-commons&quot; of JUnit 5.</p>
 <p><b>URL: </b><a class="externalLink" href="https://junit.org/junit5/">https://junit.org/junit5/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></p></td></tr></table></div></li></ul></li>
-<li>org.junit.jupiter:junit-jupiter-api:jar:5.8.1 (compile) <img id="_img31" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep30', '_img31' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep30" style="display:none">
+<li>org.junit.jupiter:junit-jupiter-api:jar:5.8.1 (compile) <img id="_img33" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep32', '_img33' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep32" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>JUnit Jupiter API</th></tr>
@@ -437,7 +477,7 @@
 <p><b>Description: </b>Module &quot;junit-jupiter-api&quot; of JUnit 5.</p>
 <p><b>URL: </b><a class="externalLink" href="https://junit.org/junit5/">https://junit.org/junit5/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.eclipse.org/legal/epl-v20.html">Eclipse Public License v2.0</a></p></td></tr></table></div></li>
-<li>org.apiguardian:apiguardian-api:jar:1.1.2 (compile) <img id="_img33" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep32', '_img33' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep32" style="display:none">
+<li>org.apiguardian:apiguardian-api:jar:1.1.2 (compile) <img id="_img35" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep34', '_img35' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep34" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>org.apiguardian:apiguardian-api</th></tr>
@@ -445,8 +485,46 @@
 <td>
 <p><b>Description: </b>@API Guardian</p>
 <p><b>URL: </b><a class="externalLink" href="https://github.com/apiguardian-team/apiguardian">https://github.com/apiguardian-team/apiguardian</a></p>
-<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>jakarta.platform:jakarta.jakartaee-api:jar:8.0.0 (provided) <img id="_img35" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep34', '_img35' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep34" style="display:none">
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li></ul></li>
+<li>org.mockito:mockito-core:jar:3.12.4 (compile) <img id="_img37" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep36', '_img37' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep36" style="display:none">
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>mockito-core</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>Mockito mock objects library core API and implementation</p>
+<p><b>URL: </b><a class="externalLink" href="https://github.com/mockito/mockito">https://github.com/mockito/mockito</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="https://github.com/mockito/mockito/blob/main/LICENSE">The MIT License</a></p></td></tr></table></div>
+<ul>
+<li>net.bytebuddy:byte-buddy:jar:1.11.19 (compile) <img id="_img39" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep38', '_img39' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep38" style="display:none">
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>Byte Buddy (without dependencies)</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>Byte Buddy is a Java library for creating Java classes at run time.
+        This artifact is a build of Byte Buddy with all ASM dependencies repackaged into its own name space.</p>
+<p><b>URL: </b><a class="externalLink" href="https://bytebuddy.net/byte-buddy">https://bytebuddy.net/byte-buddy</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li>
+<li>net.bytebuddy:byte-buddy-agent:jar:1.11.19 (compile) <img id="_img41" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep40', '_img41' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep40" style="display:none">
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>Byte Buddy agent</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>The Byte Buddy agent offers convenience for attaching an agent to the local or a remote VM.</p>
+<p><b>URL: </b><a class="externalLink" href="https://bytebuddy.net/byte-buddy-agent">https://bytebuddy.net/byte-buddy-agent</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li>
+<li>org.objenesis:objenesis:jar:3.2 (compile) <img id="_img43" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep42', '_img43' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep42" style="display:none">
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>Objenesis</th></tr>
+<tr class="b">
+<td>
+<p><b>Description: </b>A library for instantiating Java objects</p>
+<p><b>URL: </b><a class="externalLink" href="http://objenesis.org/objenesis">http://objenesis.org/objenesis</a></p>
+<p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
+<li>jakarta.platform:jakarta.jakartaee-api:jar:8.0.0 (provided) <img id="_img45" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep44', '_img45' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep44" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>jakarta.jakartaee-api</th></tr>
@@ -457,7 +535,7 @@
         that enable development, deployment, and management of server-side and cloud-native applications.</p>
 <p><b>URL: </b><a class="externalLink" href="https://projects.eclipse.org/projects/ee4j/jakarta.jakartaee-api">https://projects.eclipse.org/projects/ee4j/jakarta.jakartaee-api</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.eclipse.org/org/documents/epl-2.0/EPL-2.0.txt">Eclipse Public License v. 2.0</a>, <a class="externalLink" href="https://www.gnu.org/software/classpath/license.html">GNU General Public License, version 2 with the GNU Classpath Exception</a></p></td></tr></table></div></li>
-<li>org.kohsuke.metainf-services:metainf-services:jar:1.8 (provided) <img id="_img37" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep36', '_img37' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep36" style="display:none">
+<li>org.kohsuke.metainf-services:metainf-services:jar:1.8 (provided) <img id="_img47" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep46', '_img47' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep46" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>META-INF/services generator</th></tr>
@@ -466,7 +544,7 @@
 <p><b>Description: </b>Annotation-driven META-INF/services auto-generation</p>
 <p><b>URL: </b><a class="externalLink" href="http://metainf-services.kohsuke.org/">http://metainf-services.kohsuke.org/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT license</a></p></td></tr></table></div></li>
-<li>org.apache.logging.log4j:log4j-core:jar:2.14.1 (test) <img id="_img39" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep38', '_img39' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep38" style="display:none">
+<li>org.apache.logging.log4j:log4j-core:jar:2.14.1 (test) <img id="_img49" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep48', '_img49' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep48" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Log4j Core</th></tr>
@@ -476,7 +554,7 @@
 <p><b>URL: </b><a class="externalLink" href="https://logging.apache.org/log4j/2.x/log4j-core/">https://logging.apache.org/log4j/2.x/log4j-core/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.apache.logging.log4j:log4j-api:jar:2.14.1 (test) <img id="_img41" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep40', '_img41' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep40" style="display:none">
+<li>org.apache.logging.log4j:log4j-api:jar:2.14.1 (test) <img id="_img51" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep50', '_img51' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep50" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Log4j API</th></tr>
@@ -485,7 +563,7 @@
 <p><b>Description: </b>The Apache Log4j API</p>
 <p><b>URL: </b><a class="externalLink" href="https://logging.apache.org/log4j/2.x/log4j-api/">https://logging.apache.org/log4j/2.x/log4j-api/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li></ul></li>
-<li>org.apache.logging.log4j:log4j-slf4j-impl:jar:2.14.1 (test) <img id="_img43" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep42', '_img43' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep42" style="display:none">
+<li>org.apache.logging.log4j:log4j-slf4j-impl:jar:2.14.1 (test) <img id="_img53" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep52', '_img53' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep52" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Log4j SLF4J Binding</th></tr>
@@ -495,7 +573,7 @@
 <p><b>URL: </b><a class="externalLink" href="https://logging.apache.org/log4j/2.x/log4j-slf4j-impl/">https://logging.apache.org/log4j/2.x/log4j-slf4j-impl/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>org.slf4j:slf4j-api:jar:1.7.30 (test) <img id="_img45" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep44', '_img45' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep44" style="display:none">
+<li>org.slf4j:slf4j-api:jar:1.7.30 (test) <img id="_img55" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep54', '_img55' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep54" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>SLF4J API Module</th></tr>
@@ -504,7 +582,7 @@
 <p><b>Description: </b>The slf4j API</p>
 <p><b>URL: </b><a class="externalLink" href="http://www.slf4j.org">http://www.slf4j.org</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></p></td></tr></table></div></li></ul></li>
-<li>org.apache.logging.log4j:log4j-jul:jar:2.14.1 (test) <img id="_img47" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep46', '_img47' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep46" style="display:none">
+<li>org.apache.logging.log4j:log4j-jul:jar:2.14.1 (test) <img id="_img57" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep56', '_img57' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep56" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Log4j JUL Adapter</th></tr>
@@ -513,7 +591,7 @@
 <p><b>Description: </b>The Apache Log4j implementation of java.util.logging</p>
 <p><b>URL: </b><a class="externalLink" href="https://logging.apache.org/log4j/2.x/log4j-jul/">https://logging.apache.org/log4j/2.x/log4j-jul/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div></li>
-<li>org.apache.logging.log4j:log4j-jcl:jar:2.14.1 (test) <img id="_img49" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep48', '_img49' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep48" style="display:none">
+<li>org.apache.logging.log4j:log4j-jcl:jar:2.14.1 (test) <img id="_img59" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep58', '_img59' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep58" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Log4j Commons Logging Bridge</th></tr>
@@ -523,7 +601,7 @@
 <p><b>URL: </b><a class="externalLink" href="https://logging.apache.org/log4j/2.x/log4j-jcl/">https://logging.apache.org/log4j/2.x/log4j-jcl/</a></p>
 <p><b>Project Licenses: </b><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></p></td></tr></table></div>
 <ul>
-<li>commons-logging:commons-logging:jar:1.2 (test) <img id="_img51" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep50', '_img51' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep50" style="display:none">
+<li>commons-logging:commons-logging:jar:1.2 (test) <img id="_img61" src="./images/icon_info_sml.gif" alt="[Information]" onclick="toggleDependencyDetails( '_dep60', '_img61' );" style="cursor: pointer; vertical-align: text-bottom;"></img><div id="_dep60" style="display:none">
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Apache Commons Logging</th></tr>
@@ -538,8 +616,9 @@
 <p><b>Eclipse Public License v. 2.0: </b>jakarta.jakartaee-api</p>
 <p><b>The Apache License, Version 2.0: </b>org.apiguardian:apiguardian-api, org.opentest4j:opentest4j</p>
 <p><b>GNU General Public License, version 2 with the GNU Classpath Exception: </b>jakarta.jakartaee-api</p>
+<p><b>The MIT License: </b>mockito-core</p>
 <p><b>MIT License: </b>SLF4J API Module</p>
-<p><b>Apache License, Version 2.0: </b>Apache Log4j API, Apache Log4j Commons Logging Bridge, Apache Log4j Core, Apache Log4j JUL Adapter, Apache Log4j SLF4J Binding, Weld APIs, Weld Environment Common, Weld Implementation (Core), Weld Probe Core, Weld SE (Core), Weld SPIs for container integration, jakartron-core, jakartron-junit, tomcat-jasper-el</p>
+<p><b>Apache License, Version 2.0: </b>Apache Log4j API, Apache Log4j Commons Logging Bridge, Apache Log4j Core, Apache Log4j JUL Adapter, Apache Log4j SLF4J Binding, Byte Buddy (without dependencies), Byte Buddy agent, Objenesis, Weld APIs, Weld Environment Common, Weld Implementation (Core), Weld Probe Core, Weld SE (Core), Weld SPIs for container integration, jakartron-core, jakartron-junit, jakartron-mockito, tomcat-jasper-el</p>
 <p><b>Eclipse Public License v2.0: </b>JUnit Jupiter API, JUnit Jupiter Engine, JUnit Platform Commons, JUnit Platform Engine API</p>
 <p><b>MIT license: </b>META-INF/services generator</p>
 <p><b>The Apache Software License, Version 2.0: </b>Apache Commons Logging</p></section><a name="Dependency_File_Details"></a><section>
@@ -568,6 +647,22 @@
 <td>2249</td>
 <td>134</td>
 <td>1.8</td>
+<td>Yes</td></tr>
+<tr class="b">
+<td>byte-buddy-1.11.19.jar</td>
+<td>3.7 MB</td>
+<td>2619</td>
+<td>2563</td>
+<td>38</td>
+<td>-</td>
+<td>Yes</td></tr>
+<tr class="a">
+<td>byte-buddy-agent-1.11.19.jar</td>
+<td>252.3 kB</td>
+<td>81</td>
+<td>63</td>
+<td>2</td>
+<td>-</td>
 <td>Yes</td></tr>
 <tr class="b">
 <td>log4j-api-2.14.1.jar</td>
@@ -634,6 +729,14 @@
 <td>1.8</td>
 <td>Yes</td></tr>
 <tr class="b">
+<td>jakartron-junit-0.1-SNAPSHOT.jar</td>
+<td>10.4 kB</td>
+<td>17</td>
+<td>5</td>
+<td>1</td>
+<td>1.8</td>
+<td>Yes</td></tr>
+<tr class="a">
 <td>jboss-classfilewriter-1.2.4.Final.jar</td>
 <td>120.7 kB</td>
 <td>90</td>
@@ -641,7 +744,7 @@
 <td>6</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>jboss-logging-3.4.2.Final.jar</td>
 <td>60.9 kB</td>
 <td>47</td>
@@ -649,7 +752,7 @@
 <td>1</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>weld-api-3.1.SP4.jar</td>
 <td>32.6 kB</td>
 <td>68</td>
@@ -657,7 +760,7 @@
 <td>12</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>weld-core-impl-3.1.7.SP1.jar</td>
 <td>1.7 MB</td>
 <td>1190</td>
@@ -665,7 +768,7 @@
 <td>60</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>weld-spi-3.1.SP4.jar</td>
 <td>84.9 kB</td>
 <td>153</td>
@@ -673,7 +776,7 @@
 <td>23</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>weld-environment-common-3.1.7.SP1.jar</td>
 <td>86.5 kB</td>
 <td>73</td>
@@ -681,7 +784,7 @@
 <td>6</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>weld-probe-core-3.1.7.SP1.jar</td>
 <td>817.6 kB</td>
 <td>123</td>
@@ -689,7 +792,7 @@
 <td>1</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>weld-se-core-3.1.7.SP1.jar</td>
 <td>72.4 kB</td>
 <td>71</td>
@@ -697,7 +800,7 @@
 <td>8</td>
 <td>1.8</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>junit-jupiter-api-5.8.1.jar</td>
 <td>193.5 kB</td>
 <td>183</td>
@@ -705,7 +808,7 @@
 <td>8</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>junit-jupiter-engine-5.8.1.jar</td>
 <td>229.7 kB</td>
 <td>140</td>
@@ -713,7 +816,7 @@
 <td>9</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>junit-platform-commons-1.8.1.jar</td>
 <td>100.5 kB</td>
 <td>63</td>
@@ -721,7 +824,7 @@
 <td>7</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <td>junit-platform-engine-1.8.1.jar</td>
 <td>185.8 kB</td>
 <td>142</td>
@@ -729,7 +832,7 @@
 <td>9</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>metainf-services-1.8.jar</td>
 <td>7.5 kB</td>
 <td>14</td>
@@ -737,7 +840,23 @@
 <td>2</td>
 <td>1.6</td>
 <td>Yes</td></tr>
+<tr class="b">
+<td>mockito-core-3.12.4.jar</td>
+<td>682.3 kB</td>
+<td>670</td>
+<td>596</td>
+<td>66</td>
+<td>1.8</td>
+<td>Yes</td></tr>
 <tr class="a">
+<td>objenesis-3.2.jar</td>
+<td>49.4 kB</td>
+<td>59</td>
+<td>43</td>
+<td>10</td>
+<td>1.8</td>
+<td>Yes</td></tr>
+<tr class="b">
 <td>opentest4j-1.2.0.jar</td>
 <td>7.7 kB</td>
 <td>11</td>
@@ -745,7 +864,7 @@
 <td>2</td>
 <td>-</td>
 <td>Yes</td></tr>
-<tr class="b">
+<tr class="a">
 <td>slf4j-api-1.7.30.jar</td>
 <td>41.5 kB</td>
 <td>46</td>
@@ -753,7 +872,7 @@
 <td>4</td>
 <td>1.5</td>
 <td>Yes</td></tr>
-<tr class="a">
+<tr class="b">
 <th>Total</th>
 <th>Size</th>
 <th>Entries</th>
@@ -761,23 +880,23 @@
 <th>Packages</th>
 <th>Java Version</th>
 <th>Debug Information</th></tr>
-<tr class="b">
-<td>25</td>
-<td>8 MB</td>
-<td>6494</td>
-<td>5751</td>
-<td>368</td>
-<td>1.8</td>
-<td>25</td></tr>
 <tr class="a">
-<td>compile: 16</td>
-<td>compile: 3.9 MB</td>
-<td>compile: 2520</td>
-<td>compile: 2143</td>
-<td>compile: 162</td>
-<td>-</td>
-<td>compile: 16</td></tr>
+<td>30</td>
+<td>12.7 MB</td>
+<td>9940</td>
+<td>9021</td>
+<td>485</td>
+<td>1.8</td>
+<td>30</td></tr>
 <tr class="b">
+<td>compile: 21</td>
+<td>compile: 8.5 MB</td>
+<td>compile: 5966</td>
+<td>compile: 5413</td>
+<td>compile: 279</td>
+<td>-</td>
+<td>compile: 21</td></tr>
+<tr class="a">
 <td>test: 7</td>
 <td>test: 2.2 MB</td>
 <td>test: 1557</td>
@@ -785,7 +904,7 @@
 <td>test: 70</td>
 <td>-</td>
 <td>test: 7</td></tr>
-<tr class="a">
+<tr class="b">
 <td>provided: 2</td>
 <td>provided: 2 MB</td>
 <td>provided: 2417</td>
