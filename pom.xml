@@ -97,7 +97,7 @@
         <module>jakartron-jca</module>
         <module>jakartron-jms</module>
         <module>jakartron-jmsra</module>
-		<module>jakartron-mailra</module>
+        <module>jakartron-mailra</module>
         <module>jakartron-ejb</module>
         <module>jakartron-servlet</module>
         <module>jakartron-jaxrs</module>
@@ -215,7 +215,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-			<dependency>
+            <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-bom</artifactId>
                 <version>2.14.1</version>
@@ -280,8 +280,9 @@
                     <version>3.0.0-M4</version>
                     <configuration>
                         <useSystemClassLoader>false</useSystemClassLoader>
-						<systemPropertyVariables>
-                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
+                        <systemPropertyVariables>
+                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager
+                            </java.util.logging.manager>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -291,8 +292,9 @@
                     <version>3.0.0-M4</version>
                     <configuration>
                         <useSystemClassLoader>false</useSystemClassLoader>
-						<systemPropertyVariables>
-                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
+                        <systemPropertyVariables>
+                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager
+                            </java.util.logging.manager>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -354,7 +356,7 @@
                 <version>0.13</version>
                 <configuration>
                     <consoleOutput>true</consoleOutput>
-					<parseSCMIgnoresAsExcludes>false</parseSCMIgnoresAsExcludes>
+                    <parseSCMIgnoresAsExcludes>false</parseSCMIgnoresAsExcludes>
                     <includes>
                         <include>src/**/*</include>
                         <include>pom.xml</include>
@@ -365,7 +367,7 @@
                         <exclude>.git</exclude>
                         <exclude>.gitignore</exclude>
                     </excludes>
-				</configuration>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>verify</phase>
@@ -528,14 +530,31 @@
                             </execution>
                         </executions>
                     </plugin>
+<!--                    <plugin>-->
+<!--                        <groupId>org.apache.maven.plugins</groupId>-->
+<!--                        <artifactId>maven-scm-publish-plugin</artifactId>-->
+<!--                        <version>3.1.0</version>-->
+<!--                        <configuration>-->
+<!--                            <scmBranch>gh-pages</scmBranch>-->
+<!--                            <serverId>github</serverId>-->
+<!--                        </configuration>-->
+<!--                    </plugin>-->
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-scm-publish-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <version>0.12</version>
                         <configuration>
-                            <scmBranch>gh-pages</scmBranch>
-                            <serverId>github</serverId>
+                            <server>github</server>
+                            <message>Creating site for ${project.version}</message>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <phase>site</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

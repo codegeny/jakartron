@@ -22,7 +22,8 @@ jobs:
         run: |
           echo -n "$SECRET_KEY_RING" | gpg --import > ./gpg.logs
           echo -n "$MAVEN_SETTINGS" > ./settings.xml
-          mvn deploy site site:stage scm-publish:publish-scm --settings ./settings.xml --batch-mode --update-snapshots -DskipTests=true
+          mvn deploy site --settings ./settings.xml --batch-mode --update-snapshots -DskipTests=true
+#          mvn deploy site site:stage scm-publish:publish-scm --settings ./settings.xml --batch-mode --update-snapshots -DskipTests=true
         env:
           SECRET_KEY_RING: ${{secrets.SECRET_KEY_RING}}
           MAVEN_SETTINGS: ${{secrets.MAVEN_SETTINGS}}
