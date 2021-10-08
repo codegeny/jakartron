@@ -71,7 +71,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-core</artifactId>
-            <version>4.6.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.spec.javax.ws.rs</groupId>
@@ -98,7 +97,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-cdi</artifactId>
-            <version>4.6.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.jboss.weld</groupId>
@@ -131,7 +129,6 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-json-binding-provider</artifactId>
-            <version>4.6.0.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.eclipse</groupId>

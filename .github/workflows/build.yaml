@@ -30,7 +30,5 @@ jobs:
           MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
       - name: Build artifacts with Maven
         run: mvn verify --batch-mode --update-snapshots
-#      - name: Deploy artifacts to Sonatype Nexus
-#        run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
-      - name: Publish documentation to GitHub Pages
-        run: mvn install site site:stage scm-publish:publish-scm --settings ./settings.xml --activate-profiles publish --batch-mode -DskipTests=true
+      - name: Deploy artifacts to Sonatype Nexus
+        run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
