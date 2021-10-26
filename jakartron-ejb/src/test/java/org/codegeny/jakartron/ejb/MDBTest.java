@@ -9,9 +9,9 @@ package org.codegeny.jakartron.ejb;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,14 +29,7 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
 import javax.ejb.MessageDrivenContext;
 import javax.inject.Inject;
-import javax.jms.Destination;
-import javax.jms.JMSContext;
-import javax.jms.JMSDestinationDefinition;
-import javax.jms.JMSException;
-import javax.jms.JMSRuntimeException;
-import javax.jms.Message;
-import javax.jms.MessageListener;
-import javax.jms.Queue;
+import javax.jms.*;
 
 @ExtendWithJakartron
 @JMSDestinationDefinition(name = MDBTest.QUEUE_NAME, interfaceName = "javax.jms.Queue")
@@ -71,9 +64,15 @@ public class MDBTest {
     private Queue queue;
 
     @Test
-    public void testProxy(JMSContext context) {
-        Destination temporaryQueue = context.createTemporaryQueue();
-        context.createProducer().setJMSReplyTo(temporaryQueue).send(queue, "ping");
-        Assertions.assertEquals("pong", context.createConsumer(temporaryQueue).receiveBody(String.class, 5000));
+    public void testPingPong(JMSContext context) throws JMSException {
+        TemporaryQueue temporaryQueue = context.createTemporaryQueue();
+        try {
+            context.createProducer().setJMSReplyTo(temporaryQueue).send(queue, "ping");
+            try (JMSConsumer consumer = context.createConsumer(temporaryQueue)) {
+                Assertions.assertEquals("pong", consumer.receiveBody(String.class, 5000));
+            }
+        } finally {
+            temporaryQueue.delete();
+        }
     }
 }

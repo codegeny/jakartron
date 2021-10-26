@@ -22,18 +22,26 @@ package org.codegeny.jakartron.jndi;
 
 import org.kohsuke.MetaInfServices;
 
+import javax.annotation.Resource;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.literal.InjectLiteral;
+import javax.enterprise.inject.spi.*;
 
 @MetaInfServices
 public class JNDIExtension implements Extension {
 
+    public static final String BEAN_MANAGER_JNDI_NAME = "java:comp/BeanManager";
+
     public void addBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
         event.addBean()
                 .types(Object.class)
-                .qualifiers(JNDI.Literal.of("java:comp/BeanManager"))
+                .qualifiers(JNDI.Literal.of(BEAN_MANAGER_JNDI_NAME))
                 .createWith(context -> beanManager);
+    }
+
+    public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
+        event.configureAnnotatedType()
+                .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty())
+                .forEach(f -> f.add(InjectLiteral.INSTANCE).add(JNDI.Literal.of(f.getAnnotated().getAnnotation(Resource.class).lookup())));
     }
 }

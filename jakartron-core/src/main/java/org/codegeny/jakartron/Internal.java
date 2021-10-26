@@ -1,17 +1,17 @@
-package org.codegeny.jakartron.junit;
+package org.codegeny.jakartron;
 
 /*-
  * #%L
- * jakartron-junit
+ * jakartron-core
  * %%
  * Copyright (C) 2018 - 2021 Codegeny
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,21 +20,11 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
-import org.codegeny.jakartron.AdditionalClasses;
-import org.codegeny.jakartron.CoreExtension;
-import org.codegeny.jakartron.concurrent.ConcurrenceProducer;
-import org.codegeny.jakartron.jndi.JNDIExtension;
-import org.codegeny.jakartron.logging.LoggerProducer;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import java.lang.annotation.ElementType;
+import javax.inject.Qualifier;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@ExtendWith(JakartronExtension.class)
-@AdditionalClasses({CoreExtension.class, JNDIExtension.class, LoggerProducer.class, ConcurrenceProducer.class})
-public @interface ExtendWithJakartron {
+@Qualifier
+public @interface Internal {
 }

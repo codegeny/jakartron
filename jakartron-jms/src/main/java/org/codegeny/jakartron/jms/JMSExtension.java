@@ -174,7 +174,7 @@ public class JMSExtension implements Extension  {
         for (JMSDestinationDefinition definition : event.getAnnotatedType().getAnnotations(JMSDestinationDefinition.class)) {
             if (definition.interfaceName().equals(Queue.class.getName())) {
                 queues.add(definition.name());
-            } if (definition.interfaceName().equals(Topic.class.getName())) {
+            } else if (definition.interfaceName().equals(Topic.class.getName())) {
                 topics.add(definition.name());
             } else {
                 throw new IllegalArgumentException("Unsupported destination " + definition.interfaceName());
