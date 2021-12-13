@@ -20,11 +20,6 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
-import org.codegeny.jakartron.AdditionalClasses;
-import org.codegeny.jakartron.CoreExtension;
-import org.codegeny.jakartron.concurrent.ConcurrenceProducer;
-import org.codegeny.jakartron.jndi.JNDIExtension;
-import org.codegeny.jakartron.logging.LoggerProducer;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.ElementType;
@@ -35,6 +30,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @ExtendWith(JakartronExtension.class)
-@AdditionalClasses({CoreExtension.class, JNDIExtension.class, LoggerProducer.class, ConcurrenceProducer.class})
 public @interface ExtendWithJakartron {
 }

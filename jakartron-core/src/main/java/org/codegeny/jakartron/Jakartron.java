@@ -20,6 +20,10 @@ package org.codegeny.jakartron;
  * #L%
  */
 
+import org.codegeny.jakartron.concurrent.ConcurrenceProducer;
+import org.codegeny.jakartron.jndi.JNDIExtension;
+import org.codegeny.jakartron.logging.LoggerProducer;
+
 import javax.decorator.Decorator;
 import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.se.SeContainer;
@@ -41,7 +45,9 @@ public final class Jakartron {
     }
 
     public static SeContainerInitializer initialize(Stream<Class<?>> classes) {
-        SeContainerInitializer initializer = SeContainerInitializer.newInstance();
+        SeContainerInitializer initializer = SeContainerInitializer.newInstance()
+                .addExtensions(CoreExtension.class, JNDIExtension.class)
+                .addBeanClasses(ConcurrenceProducer.class, LoggerProducer.class);
         Set<Class<?>> visited = new HashSet<>();
         classes.forEach(c -> scanAnnotations(c, initializer, visited));
         return initializer;
