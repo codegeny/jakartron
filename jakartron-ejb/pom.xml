@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.codegeny.jakartron</groupId>
         <artifactId>jakartron</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -74,7 +74,7 @@
         <dependency>
             <groupId>com.icegreen</groupId>
             <artifactId>greenmail-junit5</artifactId>
-            <version>1.6.4</version>
+            <version>1.6.5</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -83,7 +83,7 @@
                 </exclusion>
                 <exclusion>
                     <groupId>junit</groupId>
-                    <artifactId>junit</artifactId>
+                    <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
