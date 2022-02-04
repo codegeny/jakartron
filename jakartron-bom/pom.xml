@@ -34,6 +34,7 @@
     <artifactId>jakartron-bom</artifactId>
     <packaging>pom</packaging>
 
+    <name>Jakartron BOM</name>
     <url>https://codegeny.org/jakartron/jakartron-bom</url>
 
     <dependencyManagement>

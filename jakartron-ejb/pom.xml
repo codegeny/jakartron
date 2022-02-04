@@ -34,6 +34,7 @@
     <artifactId>jakartron-ejb</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron EJB</name>
     <url>https://codegeny.org/jakartron/jakartron-ejb</url>
 
     <dependencies>

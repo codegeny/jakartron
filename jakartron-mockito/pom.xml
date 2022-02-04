@@ -34,6 +34,7 @@
     <artifactId>jakartron-mockito</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron Mockito</name>
     <url>https://codegeny.org/jakartron/jakartron-mockito</url>
 
     <dependencies>

@@ -34,6 +34,7 @@
     <artifactId>jakartron-dbunit</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron DBUnit</name>
     <url>https://codegeny.org/jakartron/jakartron-dbunit</url>
 
     <dependencies>

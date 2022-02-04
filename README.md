@@ -13,19 +13,12 @@ Jakartron is split in multiple modules which represent sub-specifications of the
 
 In your `pom.xml`, import the module you need in your application:
 ```xml
-<repositories>
-    <repository>
-        <id>sonatype.snapshots</id>
-        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </repository>
-</repositories>
-
 <dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-bom</artifactId>
-            <version>0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
@@ -102,7 +95,7 @@ public class JPATest {
 
 ## Annotations
 
-Jakartron annotations follow closely the semantics of the initializing methods present on the `SeContainerInitialize` class from CDI-SE and must be put on your bootstrap class (or test class).
+Jakartron annotations follow closely the semantics of the initializing methods present on the `SeContainerInitializer` class from CDI-SE and must be put on your bootstrap class (or test class).
 
 `@AdditionalClasses` allows adding beans/interceptors/decorators/extensions classes that are not automatically discovered (either because `bean-discovery-mode="none"` is used or `@DisableDiscovery` is present).
 
@@ -171,7 +164,7 @@ This module depends on Weld.
 
 ### JUnit 5
 
-Use `@EnableCDI` on your test class (or a meta-annotation) to register the Jakartron JUnit 5 extension.
+Use `@ExtendWithJakartron` on your test class (or a meta-annotation) to register the Jakartron JUnit 5 extension.
 
 This extension will make sure your test class annotations are scanned and added to the CDI application definition.
 This extension allows parameter injection in your JUnit test methods.
@@ -184,7 +177,7 @@ This module depends on JUnit 5.
 
 TODO
 
-This module depends on Bitronix JTA Transaction Manager.
+This module depends on Narayana JTA Transaction Manager.
 
 ### JPA
 
@@ -196,9 +189,13 @@ This module depends on Hibernate ORM.
 
 TODO
 
+This module depends on ActiveMQ Artemis.
+
 ### EJB
 
 TODO
+
+Most of EJB features have been re-implemented using CDI constructs.
 
 ### Servlet
 
@@ -210,10 +207,16 @@ This module depends on Jetty.
 
 TODO
 
-This module depends on Resteasy.
+This module depends on RESTEasy.
 
 ### Validation
 
 TODO
 
 This module depends on Hibernate Validator.
+
+### JSF
+
+TODO
+
+This module depends on the JSF Reference Implementation.

@@ -34,6 +34,7 @@
     <artifactId>jakartron-mailra</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron Mail-RA</name>
     <url>https://codegeny.org/jakartron/jakartron-mailra</url>
 
     <dependencies>

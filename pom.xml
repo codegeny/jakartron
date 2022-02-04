@@ -28,6 +28,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <name>Jakartron</name>
     <url>https://codegeny.org/jakartron</url>
     <description>Bootstrap your Jakarta EE application/tests with annotations</description>
     <inceptionYear>2018</inceptionYear>

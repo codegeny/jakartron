@@ -34,6 +34,7 @@
     <artifactId>jakartron-jms</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron JMS</name>
     <url>https://codegeny.org/jakartron/jakartron-jms</url>
 
     <dependencies>

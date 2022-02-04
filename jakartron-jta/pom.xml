@@ -34,6 +34,7 @@
     <artifactId>jakartron-jta</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron JTA</name>
     <url>https://codegeny.org/jakartron/jakartron-jta</url>
 
     <dependencies>

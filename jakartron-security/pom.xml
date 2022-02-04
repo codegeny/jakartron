@@ -34,6 +34,7 @@
     <artifactId>jakartron-security</artifactId>
     <packaging>jar</packaging>
 
+    <name>Jakartron Security</name>
     <url>https://codegeny.org/jakartron/jakartron-security</url>
 
     <dependencies>
