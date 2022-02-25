@@ -99,17 +99,19 @@ final class ServletProducer {
     }
 
     @Produces
-    private WebAppContext webAppContext(BeanManager beanManager, BridgingServletContextListener listener, LoginService loginService) throws Exception {
+    private WebAppContext webAppContext(BeanManager beanManager, BridgingServletContextListener listener, LoginService loginService, Event<WebAppContext> contextEvent) throws Exception {
         //WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("META-INF/resources"), "/");
         WebAppContext webAppContext = new WebAppContext(System.getProperty("java.io.tmpdir"), "/");
         webAppContext.setBaseResource(new FilterResource());
         webAppContext.setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN, ".*taglibs-standard-impl-.*\\.jar$");
         webAppContext.addEventListener(new WeldInitialListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.addEventListener(listener);
-        webAppContext.addEventListener(new WeldTerminalListener(BeanManagerProxy.unwrap(beanManager)));
+        //webAppContext.addEventListener(new WeldTerminalListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.getSecurityHandler().setLoginService(loginService);
         webAppContext.addServlet(JspServlet.class, "*.jsp");
         webAppContext.addServlet(DefaultServlet.class, "/");
+        contextEvent.fire(webAppContext);
+        webAppContext.addEventListener(new WeldTerminalListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.configure();
         return webAppContext;
     }

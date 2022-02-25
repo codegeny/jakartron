@@ -27,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.MessageDriven;
-import javax.ejb.MessageDrivenContext;
 import javax.inject.Inject;
 import javax.jms.*;
 
@@ -45,9 +44,6 @@ public class MDBTest {
 
         @Inject
         private JMSContext context;
-
-        @Resource
-        private MessageDrivenContext messageDrivenContext;
 
         @Override
         public void onMessage(Message message) {

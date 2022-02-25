@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jaxrs;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,7 +22,6 @@ package org.codegeny.jakartron.jaxrs;
 
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.servlet.Base;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 
 import javax.ws.rs.ApplicationPath;
@@ -30,10 +29,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
-import java.util.Collections;
 import java.util.Set;
 
 import static io.restassured.RestAssured.given;
+import static java.util.Collections.singleton;
+import static org.hamcrest.Matchers.is;
 
 @ExtendWithJakartron
 public class ResourceTest {
@@ -52,12 +52,12 @@ public class ResourceTest {
 
         @Override
         public Set<Class<?>> getClasses() {
-            return Collections.singleton(Bar.class);
+            return singleton(Bar.class);
         }
     }
 
     @Test
     public void test(@Base("api") String base) {
-        given().baseUri(base).when().get("foo/bar").then().body(Matchers.is("bar"));
+        given().baseUri(base).when().get("foo/bar").then().body(is("bar"));
     }
 }

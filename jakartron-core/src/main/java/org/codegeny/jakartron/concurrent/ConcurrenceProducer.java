@@ -23,18 +23,13 @@ package org.codegeny.jakartron.concurrent;
 import org.codegeny.jakartron.Internal;
 import org.codegeny.jakartron.jndi.JNDI;
 
-import javax.enterprise.concurrent.ManageableThread;
-import javax.enterprise.concurrent.ManagedExecutorService;
-import javax.enterprise.concurrent.ManagedThreadFactory;
+import javax.enterprise.concurrent.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 @Dependent
@@ -55,23 +50,34 @@ public class ConcurrenceProducer {
     @Produces
     @JNDI(MANAGED_EXECUTOR_SERVICE_JNDI_NAME)
     @ApplicationScoped
-    public ManagedExecutorService createManagedExecutorService(ManagedThreadFactory managedThreadFactory) {
-        System.out.println("create ManagedThreadFactory");
-        return new ManagedExecutorServiceImpl(managedThreadFactory);
+    public ManagedScheduledExecutorService createManagedScheduledExecutorService(ManagedThreadFactory managedThreadFactory) {
+        return new ManagedScheduledExecutorServiceImpl(managedThreadFactory);
     }
 
     public void destroyManagedExecutorService(@Disposes @JNDI(MANAGED_EXECUTOR_SERVICE_JNDI_NAME) ManagedExecutorService managedExecutorService) throws InterruptedException {
-        System.out.println("shutdown ManagedThreadFactory");
         managedExecutorService.shutdown();
         if (!managedExecutorService.awaitTermination(10, TimeUnit.SECONDS)) {
             logger.warning("Could not shut down ManagedExecutorService properly");
         }
     }
 
-    private static final class ManagedExecutorServiceImpl extends ThreadPoolExecutor implements ManagedExecutorService {
+    private static final class ManagedScheduledExecutorServiceImpl extends ScheduledThreadPoolExecutor implements ManagedScheduledExecutorService {
 
-        ManagedExecutorServiceImpl(ThreadFactory threadFactory) {
-            super(1, 5, 30, TimeUnit.SECONDS, new SynchronousQueue<>(), threadFactory);
+        ManagedScheduledExecutorServiceImpl(ThreadFactory threadFactory) {
+            super(5, threadFactory);
+        }
+
+        @Override
+        public ScheduledFuture<?> schedule(Runnable command, Trigger trigger) {
+            return schedule(() -> {
+                command.run();
+                return null;
+            }, trigger);
+        }
+
+        @Override
+        public <V> ScheduledFuture<V> schedule(Callable<V> callable, Trigger trigger) {
+            throw new UnsupportedOperationException();
         }
     }
 

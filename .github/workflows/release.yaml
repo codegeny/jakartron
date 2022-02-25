@@ -34,9 +34,17 @@ jobs:
       - name: Deploy artifacts to Sonatype Nexus
         run: mvn deploy --settings ./settings.xml --activate-profiles deploy --batch-mode
       - name: Publish documentation to GitHub Pages
-        run: mvn install site site:stage scm-publish:publish-scm --settings ./settings.xml --activate-profiles publish --batch-mode -DskipTests=true
+        run: |
+          git config --global user.name "${{ github.event.head_commit.committer.name }}"
+          git config --global user.email "${{ github.event.head_commit.committer.email }}"
+          mvn install site site:stage scm-publish:publish-scm --settings ./settings.xml --activate-profiles publish --batch-mode -DskipTests=true
       - name: Set development version
-        run: mvn versions:set -DnewVersion=$DEVELOPMENT_VERSION
+        run: |
+          git commit -am "Release $RELEASE_VERSION"
+          mvn versions:set -DnewVersion=$DEVELOPMENT_VERSION
+          git commit -am "Prepare $DEVELOPMENT_VERSION"
+          git push
         env:
-          DEVELOPMENT_VERSION: ${{ github.event.inputs.developmentVersion }}
+          RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}
+          DEVELOPMENT_VERSION: ${{ github.event.inputs.developmentVersion }}-SNAPSHOT
 

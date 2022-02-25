@@ -40,9 +40,6 @@ public final class JTAIntegration implements Extension {
     public static final String TRANSACTION_SYNCHRONIZATION_REGISTRY_JNDI_NAME = "java:/TransactionSynchronizationRegistry";
 
     public void addTransactionContextAndProducer(@Observes AfterBeanDiscovery event) {
-//        event.addObserverMethod().observedType(Object.class).qualifiers(Initialized.Literal.of(TransactionScoped.class)).notifyWith(context -> System.out.println("<TX>"));
-//        event.addObserverMethod().observedType(Object.class).qualifiers(Destroyed.Literal.of(TransactionScoped.class)).notifyWith(context -> System.out.println("</TX>"));
-
         event.addBean()
                 .scope(ApplicationScoped.class)
                 .qualifiers(JNDI.Literal.of(TRANSACTION_MANAGER_JNDI_NAME))

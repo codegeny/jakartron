@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codegeny.jakartron</groupId>
     <artifactId>jakartron</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Jakartron</name>
@@ -93,8 +93,10 @@
         <module>jakartron-mailra</module>
         <module>jakartron-ejb</module>
         <module>jakartron-servlet</module>
+		<module>jakartron-jaxws</module>
         <module>jakartron-jaxrs</module>
         <module>jakartron-dbunit</module>
+        <module>jakartron-mp-config</module>
         <module>jakartron-bom</module>
     </modules>
 

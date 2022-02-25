@@ -31,6 +31,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.sse.SseEventSource;
 import java.lang.annotation.Annotation;
 import java.net.URI;
 
@@ -47,8 +48,20 @@ public final class JAXRSProducer {
     }
 
     @Produces
-    @Base("")
+    @Base
     public WebTarget newWebTarget(Client client, InjectionPoint injectionPoint, @Any Instance<URI> uriProvider) {
         return client.target(uriProvider.select(injectionPoint.getQualifiers().toArray(new Annotation[0])).get());
+    }
+
+    @Produces
+    @Base
+    public SseEventSource newSseEventSource(InjectionPoint injectionPoint, @Any Instance<WebTarget> targetProvider) {
+        return SseEventSource.target(targetProvider.select(injectionPoint.getQualifiers().toArray(new Annotation[0])).get()).build();
+    }
+
+    public void closeSseEventSource(@Disposes @Base SseEventSource sseEventSource) {
+        if (sseEventSource.isOpen()) {
+            sseEventSource.close();
+        }
     }
 }

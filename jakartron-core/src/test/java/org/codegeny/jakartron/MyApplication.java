@@ -30,7 +30,7 @@ public class MyApplication implements Runnable {
 
     @Override
     public void run() {
-        System.out.println(service.echo("hello world!"));
+        service.echo("hello world!");
     }
 
     public static void main(String[] args) {

@@ -67,7 +67,6 @@ public class JMSTest {
         public void send(String message) throws Exception {
              context.createProducer().send(queue, "hello world!");
              Thread.sleep(1000);
-             System.out.println("end of tx");
         }
     }
 
