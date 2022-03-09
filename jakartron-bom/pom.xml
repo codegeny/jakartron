@@ -40,176 +40,176 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-core</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-junit</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-mockito</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-security</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-validation</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jta</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jsf</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jpa</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jca</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jms</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jmsra</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-mailra</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-ejb</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-servlet</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jaxws</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-jaxrs</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-dbunit</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>org.codegeny.jakartron</groupId>
                 <artifactId>jakartron-mp-config</artifactId>
-                <version>${project.version}</version>
+                <version>0.0.2-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-junit</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-mockito</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-security</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-validation</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jta</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jsf</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jca</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jms</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jmsra</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-mailra</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-ejb</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-servlet</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jaxws</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-jaxrs</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-dbunit</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.codegeny.jakartron</groupId>
             <artifactId>jakartron-mp-config</artifactId>
         </dependency>
     </dependencies>
