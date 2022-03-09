@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jdbc;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ import org.kohsuke.MetaInfServices;
 
 import javax.annotation.sql.DataSourceDefinition;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
@@ -102,13 +103,13 @@ public final class XADataSourceIntegration implements Extension {
     private BasicDataSource createDataSource(DataSourceDefinition definition, Instance<Object> instance) {
 
         Map<String, Object> map = new HashMap<>();
-        addIfNotEmpty(map,"url", definition.url(), "");
-        addIfNotEmpty(map,"name", definition.name(), "");
-        addIfNotEmpty(map,"password", definition.password(), "");
-        addIfNotEmpty(map,"databaseName", definition.databaseName(), "");
-        addIfNotEmpty(map,"serverName", definition.serverName(), "");
-        addIfNotEmpty(map,"portNumber", definition.portNumber(), -1);
-        addIfNotEmpty(map,"loginTimeout", definition.loginTimeout(), 0);
+        addIfNotEmpty(map, "url", definition.url(), "");
+        addIfNotEmpty(map, "name", definition.name(), "");
+        addIfNotEmpty(map, "password", definition.password(), "");
+        addIfNotEmpty(map, "databaseName", definition.databaseName(), "");
+        addIfNotEmpty(map, "serverName", definition.serverName(), "");
+        addIfNotEmpty(map, "portNumber", definition.portNumber(), -1);
+        addIfNotEmpty(map, "loginTimeout", definition.loginTimeout(), 0);
 
         for (String property : definition.properties()) {
             int index = property.indexOf('=');
@@ -119,40 +120,41 @@ public final class XADataSourceIntegration implements Extension {
 
         try {
             Class<?> klass = Thread.currentThread().getContextClassLoader().loadClass(definition.className());
+            BasicDataSource pool;
             if (definition.transactional()) {
                 if (!XADataSource.class.isAssignableFrom(klass)) {
-                    throw new RuntimeException("DataSource is transactional but does not implement XADataSource");
+                    throw new CreationException("DataSource is transactional but does not implement XADataSource");
                 }
                 XADataSource xaDataSource = klass.asSubclass(XADataSource.class).newInstance();
                 BeanUtils.copyProperties(xaDataSource, map);
-                BasicManagedDataSource pool = new BasicManagedDataSource();
-                pool.setXaDataSourceInstance(xaDataSource);
-                pool.setTransactionManager(instance.select(TransactionManager.class).get());
-                pool.setTransactionSynchronizationRegistry(instance.select(TransactionSynchronizationRegistry.class).get());
-                pool.setMinIdle(definition.minPoolSize());
-                pool.setMaxIdle(definition.maxPoolSize());
-                pool.setInitialSize(definition.initialPoolSize());
-                return pool;
+                BasicManagedDataSource managedPool = new BasicManagedDataSource();
+                managedPool.setXaDataSourceInstance(xaDataSource);
+                managedPool.setTransactionManager(instance.select(TransactionManager.class).get());
+                managedPool.setTransactionSynchronizationRegistry(instance.select(TransactionSynchronizationRegistry.class).get());
+                managedPool.setMinIdle(definition.minPoolSize());
+                managedPool.setMaxIdle(definition.maxPoolSize());
+                managedPool.setInitialSize(definition.initialPoolSize());
+                pool = managedPool;
             } else {
                 if (!DataSource.class.isAssignableFrom(klass)) {
-                    throw new RuntimeException("The provided class does not implement DataSource");
+                    throw new CreationException("The provided class does not implement DataSource");
                 }
                 DataSource dataSource = klass.asSubclass(DataSource.class).newInstance();
                 BeanUtils.copyProperties(dataSource, map);
-                BasicDataSource pool = new SimpleBasicDataSource(dataSource);
-                pool.setMinIdle(definition.minPoolSize());
-                pool.setMaxIdle(definition.maxPoolSize());
-                pool.setInitialSize(definition.initialPoolSize());
-                return pool;
+                pool = new SimpleBasicDataSource(dataSource);
             }
+            pool.setMinIdle(definition.minPoolSize());
+            pool.setMaxIdle(definition.maxPoolSize());
+            pool.setInitialSize(definition.initialPoolSize());
+            return pool;
         } catch (RuntimeException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new RuntimeException("Can't create a data source for " + definition, exception);
+            throw new CreationException("Can't create a data source for " + definition, exception);
         }
     }
 
-    private static class SimpleBasicDataSource extends BasicDataSource {
+    private static final class SimpleBasicDataSource extends BasicDataSource {
 
         private final DataSource dataSource;
 

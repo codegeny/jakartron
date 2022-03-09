@@ -27,7 +27,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
-@WebService(name = "EchoPort", targetNamespace = "urn:echo")
+@WebService(name = "EchoWebService", targetNamespace = "urn:echo", serviceName = "EchoService", portName = "EchoPort")
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 @XmlSeeAlso(ObjectFactory.class)
 public interface EchoPort {

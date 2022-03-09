@@ -21,6 +21,7 @@ package org.codegeny.jakartron;
  */
 
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -37,6 +38,10 @@ public final class BeanContract {
         this.type = type;
         this.qualifiers = qualifiers;
         this.qualifierInstances = qualifiers.stream().map(a -> new QualifierInstance<>(a, beanManager)).collect(Collectors.toSet());
+    }
+
+    public BeanContract(InjectionPoint injectionPoint, BeanManager beanManager) {
+        this(injectionPoint.getType(), injectionPoint.getQualifiers(), beanManager);
     }
 
     @Override
@@ -59,6 +64,10 @@ public final class BeanContract {
 
     public Set<Annotation> getQualifiers() {
         return qualifiers;
+    }
+
+    public Annotation[] getQualifiersAsArray() {
+        return qualifiers.toArray(new Annotation[0]);
     }
 
     @Override

@@ -24,44 +24,43 @@ import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.servlet.Base;
 import org.junit.jupiter.api.Test;
 
+import javax.inject.Inject;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
-import javax.jws.soap.SOAPBinding;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
+import javax.xml.ws.WebServiceRef;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWithJakartron
 public class WrappedTest {
 
-    @WebService(name = "EchoWebService", targetNamespace = "urn:echo", serviceName = "EchoService", portName = "EchoPort")
-    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
+    private static final String NAMESPACE = "urn:echo";
+
+    @WebService(name = "EchoWebService", targetNamespace = NAMESPACE, serviceName = "EchoService", portName = "EchoPort")
     public static class EchoWebService {
 
         @WebMethod
         @WebResult(name = "message")
-        @RequestWrapper(localName = "echoRequest", targetNamespace = "urn:echo")
-        @ResponseWrapper(localName = "echoResponse", targetNamespace = "urn:echo")
+        @RequestWrapper(localName = "echoRequest", targetNamespace = NAMESPACE)
+        @ResponseWrapper(localName = "echoResponse", targetNamespace = NAMESPACE)
         public String echo(@WebParam(name = "message") String message) {
             return "ECHO " + message;
         }
     }
 
+    @Inject
+    @Base("EchoWebService")
+    @WebServiceRef(EchoService.class)
+    private EchoPort port;
+
     @Test
-    public void test(@Base("EchoWebService") String uri) {
-        EchoService service = new EchoService();
-        EchoPort port = service.getEchoPort();
-
-        BindingProvider provider = (BindingProvider) port;
-        provider.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, uri);
-
+    public void test() {
         EchoRequest request = new EchoRequest();
         request.setMessage("HELLO!!!");
-
         EchoResponse response = port.echo(request);
         assertEquals("ECHO HELLO!!!", response.getMessage());
     }

@@ -69,7 +69,7 @@ public final class JAXWSProducer {
 
         WSEndpoint<?> endpoint = WSEndpoint.create(
                 implementorClass,
-                true,
+                true, // TODO reimplement handlers processing (so they can be managed by CDI)
                 new BeanInvoker(beanManager),
                 new QName(webService.targetNamespace(), webService.serviceName()),
                 new QName(webService.targetNamespace(), webService.portName()),
