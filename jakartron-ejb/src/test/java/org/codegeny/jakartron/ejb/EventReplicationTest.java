@@ -39,6 +39,7 @@ import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.is;
@@ -52,6 +53,7 @@ public class EventReplicationTest {
     }
 
     private static final String TOPIC_NAME = "eventTopic";
+    private static final Logger LOGGER = Logger.getLogger(EventReplicationTest.class.getName());
 
     public static class EventMessage implements Serializable {
 
@@ -84,6 +86,7 @@ public class EventReplicationTest {
         @Override
         public void onMessage(Message message) {
             try {
+                LOGGER.severe("Re-firing event");
                 EventMessage eventMessage = message.getBody(EventMessage.class);
                 event.select(eventMessage.getQualifiers()).fire(eventMessage.getEvent());
             } catch (JMSException jmsException) {
@@ -102,6 +105,7 @@ public class EventReplicationTest {
         private Topic topic;
 
         public void observer(@Observes @Clustered Serializable event, EventMetadata metadata) {
+            LOGGER.severe("Bridging event");
             jmsContext.createProducer().send(topic, new EventMessage(event, metadata.getQualifiers().stream().filter(q -> !(q instanceof Clustered)).toArray(Annotation[]::new)));
         }
     }
@@ -110,12 +114,14 @@ public class EventReplicationTest {
 
     @Test
     public void test(@Clustered Event<Integer> event) {
+        LOGGER.severe("Firing event");
         event.fire(42);
         // wait for the event to be received twice: one normally, one through the MDB
         await().untilAtomic(counter, is(2));
     }
 
     public void observes(@Observes Integer event) {
+        LOGGER.severe("Observing event");
         counter.incrementAndGet();
     }
 }
