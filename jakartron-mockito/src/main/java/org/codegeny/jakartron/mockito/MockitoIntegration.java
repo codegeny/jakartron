@@ -9,9 +9,9 @@ package org.codegeny.jakartron.mockito;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,26 +29,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 
-import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterTypeDiscovery;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.WithAnnotations;
-import javax.interceptor.Interceptor;
-import java.lang.annotation.Annotation;
+import javax.enterprise.inject.spi.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @MetaInfServices
 public final class MockitoIntegration implements Extension {
-
-    @Priority(Interceptor.Priority.PLATFORM_BEFORE - 1000)
-    public static class MockitoBean {}
 
     private final Set<BeanContract> mocks = new HashSet<>();
     private final Set<BeanContract> spies = new HashSet<>();
@@ -71,12 +59,11 @@ public final class MockitoIntegration implements Extension {
     }
 
     public void addAlternative(@Observes AfterTypeDiscovery event) {
-        event.getAlternatives().add(MockitoBean.class);
+        event.getAlternatives().add(getClass());
     }
 
     public void registerBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
         mocks.forEach(contract -> event.addBean()
-                .beanClass(MockitoBean.class)
                 .alternative(true)
                 .types(contract.getType())
                 .qualifiers(contract.getQualifiers())
@@ -84,15 +71,14 @@ public final class MockitoIntegration implements Extension {
                 .createWith(context -> Mockito.mock((Class<?>) contract.getType()))
         );
         spies.forEach(contract -> event.addBean()
-                .beanClass(MockitoBean.class)
                 .alternative(true)
                 .types(contract.getType())
                 .qualifiers(contract.getQualifiers())
                 .scope(TestScoped.class)
                 .createWith(context -> {
-                    Set<Bean<?>> beans = new HashSet<>(beanManager.getBeans(contract.getType(), contract.getQualifiers().toArray(new Annotation[0])));
-                    beans.removeIf(bean -> MockitoBean.class.equals(bean.getBeanClass()));
-                    Bean<?> bean = beanManager.resolve(beans);
+                    Bean<?> bean = beanManager.getBeans(contract.getType(), contract.getQualifiersAsArray()).stream()
+                            .filter(b -> !getClass().equals(b.getBeanClass()))
+                            .collect(Collectors.collectingAndThen(Collectors.toSet(), beanManager::resolve));
                     return Mockito.spy(beanManager.getReference(bean, contract.getType(), beanManager.createCreationalContext(bean)));
                 })
         );
