@@ -279,6 +279,7 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <systemPropertyVariables>
                             <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
@@ -290,6 +291,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.0.0-M5</version>
                     <configuration>
+                        <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <systemPropertyVariables>
                             <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>

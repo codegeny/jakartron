@@ -58,6 +58,7 @@ import javax.transaction.SystemException;
 import javax.transaction.TransactionScoped;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 @MetaInfServices
 public class JMSExtension implements Extension  {
@@ -77,6 +78,7 @@ public class JMSExtension implements Extension  {
     }
 
     private static final AtomicInteger SERVER_ID = new AtomicInteger();
+    private static final Logger LOGGER = Logger.getLogger(JMSExtension.class.getName());
 
     private final Set<String> queues = new HashSet<>();
     private final Set<String> topics = new HashSet<>();
@@ -166,6 +168,7 @@ public class JMSExtension implements Extension  {
                         throw new RuntimeException(exception);
                     }
                     beanManager.getExtension(CoreExtension.class).addShutdownHook(server::stop);
+                    LOGGER.info(() -> String.format("Started broker #%s", serverId));
                     return server;
                 });
    }

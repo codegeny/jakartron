@@ -86,7 +86,7 @@ public class EventReplicationTest {
         @Override
         public void onMessage(Message message) {
             try {
-                LOGGER.severe("Re-firing event");
+                LOGGER.info("Re-firing event");
                 EventMessage eventMessage = message.getBody(EventMessage.class);
                 event.select(eventMessage.getQualifiers()).fire(eventMessage.getEvent());
             } catch (JMSException jmsException) {
@@ -105,7 +105,7 @@ public class EventReplicationTest {
         private Topic topic;
 
         public void observer(@Observes @Clustered Serializable event, EventMetadata metadata) {
-            LOGGER.severe("Bridging event");
+            LOGGER.info("Bridging event");
             jmsContext.createProducer().send(topic, new EventMessage(event, metadata.getQualifiers().stream().filter(q -> !(q instanceof Clustered)).toArray(Annotation[]::new)));
         }
     }
@@ -114,14 +114,14 @@ public class EventReplicationTest {
 
     @Test
     public void test(@Clustered Event<Integer> event) {
-        LOGGER.severe("Firing event");
+        LOGGER.info("Firing event");
         event.fire(42);
         // wait for the event to be received twice: one normally, one through the MDB
         await().untilAtomic(counter, is(2));
     }
 
     public void observes(@Observes Integer event) {
-        LOGGER.severe("Observing event");
+        LOGGER.info("Observing event");
         counter.incrementAndGet();
     }
 }
