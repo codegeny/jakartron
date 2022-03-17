@@ -27,14 +27,11 @@ import org.junit.platform.commons.util.ReflectionUtils;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.se.SeContainer;
-import javax.enterprise.inject.spi.AnnotatedMethod;
-import javax.enterprise.inject.spi.AnnotatedParameter;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.*;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-public final class JakartronExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver {
+public final class JakartronExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver, TestInstancePreDestroyCallback {
 
     private static final Namespace NAMESPACE = Namespace.create(JakartronExtension.class);
 
@@ -42,34 +39,30 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
     public void afterAll(ExtensionContext context) {
         getBeanManager(context).fireEvent(context, TestEvent.Literal.of(TestPhase.AFTER_ALL));
         SeContainer container = getStore(context).get(SeContainer.class, SeContainer.class);
-        if (container != null) {
-            container.close();
-        }
+        container.close();
     }
 
     @Override
-    public void beforeAll(ExtensionContext context) {
-        getStore(context).put(SeContainer.class, Jakartron.initialize(Stream.concat(Stream.of(context.getRequiredTestClass()), ReflectionUtils.findNestedClasses(context.getRequiredTestClass(), t -> true).stream()))
+    public void beforeAll(ExtensionContext extensionContext) {
+        SeContainer container = Jakartron.initialize(Stream.concat(Stream.of(extensionContext.getRequiredTestClass()), ReflectionUtils.findNestedClasses(extensionContext.getRequiredTestClass(), t -> true).stream()))
                 .addExtensions(new TestExtension())
-                .addBeanClasses(context.getRequiredTestClass())
-                .initialize()
-        );
-        getBeanManager(context).fireEvent(context, TestEvent.Literal.of(TestPhase.BEFORE_ALL));
+                .addBeanClasses(extensionContext.getRequiredTestClass())
+                .initialize();
+        getStore(extensionContext).put(SeContainer.class, container);
+        getStore(extensionContext).put(AnnotatedType.class, container.getBeanManager().createAnnotatedType(extensionContext.getRequiredTestClass()));
+        container.getBeanManager().fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.BEFORE_ALL));
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext) {
-        getStore(extensionContext).get(CreationalContext.class, CreationalContext.class).release();
-        BeanManager beanManager = getBeanManager(extensionContext);
-        beanManager.fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.AFTER_EACH));
-        beanManager.getExtension(TestExtension.class).reset();
+        getBeanManager(extensionContext).fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.AFTER_EACH));
     }
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
         BeanManager beanManager = getBeanManager(extensionContext);
-        getStore(extensionContext).put(CreationalContext.class, getBeanManager(extensionContext).createCreationalContext(null));
-        beanManager.createAnnotatedType(extensionContext.getRequiredTestClass()).getMethods().stream()
+        AnnotatedType<?> annotatedType = getStore(extensionContext).get(AnnotatedType.class, AnnotatedType.class);
+        annotatedType.getMethods().stream()
                 .filter(m -> m.getJavaMember().equals(extensionContext.getRequiredTestMethod()))
                 .findFirst()
                 .ifPresent(m -> getStore(extensionContext).put(AnnotatedMethod.class, m));
@@ -78,7 +71,17 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
 
     @Override
     public Object createTestInstance(TestInstanceFactoryContext testInstanceFactoryContext, ExtensionContext extensionContext) {
-        return getBeanManager(extensionContext).createInstance().select(extensionContext.getRequiredTestClass()).get();
+        BeanManager beanManager = getBeanManager(extensionContext);
+        CreationalContext<?> creationalContext = beanManager.createCreationalContext(null);
+        getStore(extensionContext).put(CreationalContext.class, creationalContext);
+        Bean<?> testBean = beanManager.resolve(beanManager.getBeans(extensionContext.getRequiredTestClass()));
+        return beanManager.getReference(testBean, extensionContext.getRequiredTestClass(), creationalContext);
+    }
+
+    @Override
+    public void preDestroyTestInstance(ExtensionContext extensionContext) {
+        getBeanManager(extensionContext).getExtension(TestExtension.class).reset();
+        getStore(extensionContext).get(CreationalContext.class, CreationalContext.class).release();
     }
 
     public static BeanManager getBeanManager(ExtensionContext extensionContext) {
@@ -103,7 +106,7 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
         return beanManager.getInjectableReference(injectionPoint, getStore(extensionContext).get(CreationalContext.class, CreationalContext.class));
     }
 
-    private InjectionPoint injectionPoint(ParameterContext parameterContext, ExtensionContext extensionContext, BeanManager beanManager) {
+    private static InjectionPoint injectionPoint(ParameterContext parameterContext, ExtensionContext extensionContext, BeanManager beanManager) {
         AnnotatedMethod<?> annotatedMethod = getStore(extensionContext).get(AnnotatedMethod.class, AnnotatedMethod.class);
         AnnotatedParameter<?> annotatedParameter = annotatedMethod.getParameters().get(parameterContext.getIndex());
         return beanManager.createInjectionPoint(annotatedParameter);

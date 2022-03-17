@@ -6,7 +6,7 @@ on:
         description: 'Release version'
         required: true
       developmentVersion:
-        description: 'Development version'
+        description: 'Development version (-SNAPSHOT suffix will be added automatically)'
         required: true
 jobs:
   build:

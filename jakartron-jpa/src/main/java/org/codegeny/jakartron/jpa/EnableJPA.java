@@ -22,6 +22,7 @@ package org.codegeny.jakartron.jpa;
 
 import org.codegeny.jakartron.AdditionalClasses;
 import org.codegeny.jakartron.jdbc.EnableJDBC;
+import org.codegeny.jakartron.jta.EnableJTA;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -32,5 +33,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @AdditionalClasses(JPAIntegration.class)
 @EnableJDBC
+@EnableJTA
 public @interface EnableJPA {
 }

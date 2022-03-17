@@ -25,12 +25,7 @@ import org.junit.platform.commons.annotation.Testable;
 
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.ProcessBeanAttributes;
-import javax.enterprise.inject.spi.WithAnnotations;
-import javax.inject.Singleton;
+import javax.enterprise.inject.spi.*;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +43,7 @@ public final class TestExtension implements Extension {
     public void processTestAttributes(@Observes ProcessBeanAttributes<?> attributes) {
         if (attributes.getBeanAttributes().getTypes().stream().anyMatch(testTypes::contains)) {
             attributes.configureBeanAttributes()
-                    .scope(Singleton.class)
+                    .scope(TestScoped.class)
                     .alternative(true);
         }
     }
