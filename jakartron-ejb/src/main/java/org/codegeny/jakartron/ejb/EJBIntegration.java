@@ -25,25 +25,12 @@ import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Resource;
-import javax.ejb.EJBContext;
-import javax.ejb.MessageDriven;
-import javax.ejb.Singleton;
-import javax.ejb.Stateful;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
+import javax.ejb.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.literal.InjectLiteral;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
-import javax.enterprise.inject.spi.WithAnnotations;
+import javax.enterprise.inject.spi.*;
 import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
 import javax.transaction.Transactional;
 import java.io.Externalizable;
@@ -88,7 +75,7 @@ public final class EJBIntegration implements Extension {
 
     private final Set<AnnotatedType<?>> messageDrivenBeans = new HashSet<>();
 
-    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event, BeanManager beanManager) {
+    public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event) {
         messageDrivenBeans.add(event.getAnnotatedType());
     }
 
@@ -114,7 +101,6 @@ public final class EJBIntegration implements Extension {
 
                     Properties properties = new Properties();
                     Stream.of(messageDriven.activationConfig()).forEach(a -> properties.setProperty(a.propertyName(), evaluate(a.propertyValue())));
-
                     e.getEvent().addMessageEndpoint(listenerInterface, beanManager.createInstance().select(mdb.getJavaClass()), properties, mdb.getJavaClass());
                 }));
     }

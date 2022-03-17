@@ -30,14 +30,18 @@ import org.codegeny.jakartron.jca.ConfigureResourceAdapter;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
 import javax.jms.MessageListener;
+import java.util.logging.Logger;
 
 @Dependent
 public class JMSRAProducer {
+
+    private static final Logger LOGGER = Logger.getLogger(JMSRAProducer.class.getName());
 
     public void registerAdapter(@Observes ConfigureResourceAdapter event, ActiveMQServer server) {
         ActiveMQResourceAdapter resourceAdapter = new ActiveMQResourceAdapter();
         resourceAdapter.setConnectorClassName(InVMConnectorFactory.class.getName());
         resourceAdapter.setConnectionParameters(String.format("%s=%s", TransportConstants.SERVER_ID_PROP_NAME, server.getIdentity()));
         event.setResourceAdapter(MessageListener.class, resourceAdapter, ActiveMQActivationSpec.class);
+        LOGGER.info(() -> "Registered JMS-RA (broker #" + server.getIdentity() + " adapter=" + resourceAdapter + ")");
     }
 }
