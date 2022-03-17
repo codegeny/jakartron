@@ -112,8 +112,12 @@ public class EventReplicationTest {
 
     private final AtomicInteger counter = new AtomicInteger();
 
+    @Inject
+    @Clustered
+    private Event<Integer> event;
+
     @Test
-    public void test(@Clustered Event<Integer> event) {
+    public void test() {
         LOGGER.info("Firing event");
         event.fire(42);
         // wait for the event to be received twice: one normally, one through the MDB

@@ -43,12 +43,12 @@ public class MocksTest {
     }
 
     @Test
-    public void foo(Principal principal) {
+    public void foo() {
         Assertions.assertEquals("John", principal.getName());
     }
 
     @Test
-    public void bar(Principal principal) {
+    public void bar() {
         Assertions.assertEquals("John", principal.getName());
     }
 }

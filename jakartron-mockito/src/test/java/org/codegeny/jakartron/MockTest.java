@@ -58,14 +58,17 @@ public class MockTest {
     @Spy
     MyService service;
 
+    @Inject
+    Root root;
+
     @Test
-    public void test(Root root) {
+    public void test() {
         root.run();
         Mockito.verify(service, Mockito.atMostOnce()).echo();
     }
 
     @Test
-    public void test2(Root root) {
+    public void test2() {
         root.run();
         Mockito.verify(service, Mockito.atMostOnce()).echo();
     }
