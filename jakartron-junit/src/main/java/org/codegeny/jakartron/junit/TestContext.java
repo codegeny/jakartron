@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class TestContext implements AlterableContext {
 
-    private final Map<Contextual<?>, Instance<?>> map = new ConcurrentHashMap<>();
+    private final Map<Contextual<?>, BeanInstance<?>> map = new ConcurrentHashMap<>();
 
     @Override
     public Class<TestScoped> getScope() {
@@ -38,13 +38,14 @@ public final class TestContext implements AlterableContext {
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Contextual<T> contextual, CreationalContext<T> context) {
-        return (T) map.computeIfAbsent(contextual, c -> Instance.of(contextual, context)).get();
+        return (T) map.computeIfAbsent(contextual, c -> new BeanInstance<T>(contextual, context)).get();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> T get(Contextual<T> contextual) {
-        return (T) map.getOrDefault(contextual, Instance.NULL).get();
+        BeanInstance<?> instance = map.get(contextual);
+        return instance == null ? null : (T) instance.get();
     }
 
     @Override
@@ -54,38 +55,39 @@ public final class TestContext implements AlterableContext {
 
     @Override
     public void destroy(Contextual<?> contextual) {
-        map.computeIfPresent(contextual, (key, instance) -> instance.destroy());
+        map.computeIfPresent(contextual, (key, instance) -> {
+            instance.destroy();
+            return null;
+        });
     }
 
     public void reset() {
-        map.values().forEach(Instance::destroy);
+        map.values().forEach(BeanInstance::destroy);
         map.clear();
     }
 
-    private static final class Instance<T> {
+    private static final class BeanInstance<T> {
 
-        static <T> Instance<T> of(Contextual<T> contextual, CreationalContext<T> context) {
-            T instance = contextual.create(context);
-            return new Instance<>(instance, () -> contextual.destroy(instance, context));
+        // Lazy creating the instance because I had deadlocks in the map.computeIfAbsent()
+        private volatile T instance;
+        private final Contextual<T> contextual;
+        private final CreationalContext<T> context;
+
+        BeanInstance(Contextual<T> contextual, CreationalContext<T> context) {
+            this.contextual = contextual;
+            this.context = context;
         }
 
-        static final Instance<?> NULL = new Instance<>(null, () -> {
-        });
-
-        private final T instance;
-        private final Runnable destroyer;
-
-        Instance(T instance, Runnable destroyer) {
-            this.instance = instance;
-            this.destroyer = destroyer;
+        synchronized void destroy() {
+            if (instance != null) {
+                contextual.destroy(instance, context);
+            }
         }
 
-        Instance<?> destroy() {
-            destroyer.run();
-            return null;
-        }
-
-        T get() {
+        synchronized T get() {
+            if (instance == null) {
+                instance = contextual.create(context);
+            }
             return this.instance;
         }
     }

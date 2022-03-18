@@ -22,8 +22,6 @@ package org.codegeny.jakartron.mockito;
 
 import org.codegeny.jakartron.BeanContract;
 import org.codegeny.jakartron.junit.TestScoped;
-import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.annotation.Testable;
 import org.kohsuke.MetaInfServices;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -41,20 +39,12 @@ public final class MockitoIntegration implements Extension {
     private final Set<BeanContract> mocks = new HashSet<>();
     private final Set<BeanContract> spies = new HashSet<>();
 
-    public void process(@Observes @WithAnnotations(Testable.class) ProcessAnnotatedType<?> event, BeanManager beanManager) {
-        event.getAnnotatedType().getMethods().stream()
-                .filter(m -> m.isAnnotationPresent(Test.class))
-                .forEach(m -> m.getParameters().forEach(p -> process(beanManager.createInjectionPoint(p), beanManager)));
-        event.getAnnotatedType().getFields()
-                .forEach(f -> process(beanManager.createInjectionPoint(f), beanManager));
-    }
-
-    private void process(InjectionPoint injectionPoint, BeanManager beanManager) {
-        if (injectionPoint.getAnnotated().isAnnotationPresent(Mock.class)) {
-            mocks.add(new BeanContract(injectionPoint.getType(), injectionPoint.getQualifiers(), beanManager));
+    public void process(@Observes ProcessInjectionPoint<?, ?> event, BeanManager beanManager) {
+        if (event.getInjectionPoint().getAnnotated().isAnnotationPresent(Mock.class)) {
+            mocks.add(new BeanContract(event.getInjectionPoint(), beanManager));
         }
-        if (injectionPoint.getAnnotated().isAnnotationPresent(Spy.class)) {
-            spies.add(new BeanContract(injectionPoint.getType(), injectionPoint.getQualifiers(), beanManager));
+        if (event.getInjectionPoint().getAnnotated().isAnnotationPresent(Spy.class)) {
+            spies.add(new BeanContract(event.getInjectionPoint(), beanManager));
         }
     }
 
@@ -79,7 +69,7 @@ public final class MockitoIntegration implements Extension {
                     Bean<?> bean = beanManager.getBeans(contract.getType(), contract.getQualifiersAsArray()).stream()
                             .filter(b -> !getClass().equals(b.getBeanClass()))
                             .collect(Collectors.collectingAndThen(Collectors.toSet(), beanManager::resolve));
-                    return Mockito.spy(beanManager.getReference(bean, contract.getType(), beanManager.createCreationalContext(bean)));
+                    return Mockito.spy(beanManager.getReference(bean, contract.getType(), context));
                 })
         );
     }

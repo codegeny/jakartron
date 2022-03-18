@@ -24,13 +24,11 @@ import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.mockito.EnableAutoMocks;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-@ExtendWith(LifecycleExtension.class)
 @ExtendWithJakartron
 @EnableAutoMocks
 public class AutoMockTest {
