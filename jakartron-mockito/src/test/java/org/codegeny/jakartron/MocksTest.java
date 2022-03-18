@@ -24,12 +24,14 @@ import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import javax.inject.Inject;
 import java.security.Principal;
 
+@ExtendWith(LifecycleExtension.class)
 @ExtendWithJakartron
 public class MocksTest {
 

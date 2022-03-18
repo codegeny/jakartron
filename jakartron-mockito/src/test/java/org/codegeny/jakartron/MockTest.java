@@ -23,11 +23,13 @@ package org.codegeny.jakartron;
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.mockito.EnableMockito;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 
 import javax.inject.Inject;
 
+@ExtendWith(LifecycleExtension.class)
 @DisableDiscovery
 @ExtendWithJakartron
 @EnableMockito
