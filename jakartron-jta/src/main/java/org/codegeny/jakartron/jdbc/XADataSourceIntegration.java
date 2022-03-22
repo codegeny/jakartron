@@ -25,10 +25,12 @@ import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.ConnectionFactory;
 import org.apache.commons.dbcp2.DataSourceConnectionFactory;
 import org.apache.commons.dbcp2.managed.BasicManagedDataSource;
+import org.codegeny.jakartron.Annotations;
 import org.codegeny.jakartron.jndi.JNDI;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.sql.DataSourceDefinition;
+import javax.annotation.sql.DataSourceDefinitions;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.Instance;
@@ -41,7 +43,6 @@ import javax.sql.DataSource;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionSynchronizationRegistry;
-import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,27 +54,8 @@ public final class XADataSourceIntegration implements Extension {
 
     private final Set<DataSourceDefinition> dataSources = new HashSet<>();
 
-    public void process(@Observes @WithAnnotations(DataSourceDefinition.class) ProcessAnnotatedType<?> event) {
-        dataSources.addAll(find(event.getAnnotatedType().getJavaClass(), DataSourceDefinition.class));
-    }
-
-    private <A extends Annotation> Set<A> find(Class<?> type, Class<A> annotationType) {
-        Set<A> result = new HashSet<>();
-        Set<Class<?>> processed = new HashSet<>();
-        Deque<Class<?>> queue = new ArrayDeque<>();
-        queue.add(type);
-        while (!queue.isEmpty()) {
-            Class<?> current = queue.removeFirst();
-            for (Annotation annotation : current.getAnnotations()) {
-                if (annotationType.equals(annotation.annotationType())) {
-                    result.add(annotationType.cast(annotation));
-                }
-                if (processed.add(annotation.annotationType())) {
-                    queue.add(annotation.annotationType());
-                }
-            }
-        }
-        return result;
+    public void process(@Observes @WithAnnotations({DataSourceDefinition.class, DataSourceDefinitions.class}) ProcessAnnotatedType<?> event) {
+        Annotations.findAnnotations(event.getAnnotatedType().getJavaClass(), DataSourceDefinition.class, Annotations.Mode.SUPER_CLASS, Annotations.Mode.META_ANNOTATIONS).forEach(dataSources::add);
     }
 
     public void makeDataSourceInjectable(@Observes AfterBeanDiscovery event) {

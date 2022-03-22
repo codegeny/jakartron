@@ -27,10 +27,7 @@ import org.mockito.Mockito;
 import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.CreationException;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessInjectionPoint;
+import javax.enterprise.inject.spi.*;
 import javax.interceptor.Interceptor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -50,11 +47,16 @@ public final class AutoMockExtension implements Extension {
         contracts.add(new BeanContract(event.getInjectionPoint(), beanManager));
     }
 
+    public void registerAlternative(@Observes @Priority(100) AfterTypeDiscovery event) {
+        event.getAlternatives().add(getClass());
+    }
+
     public void createMocks(@Observes @Priority(Interceptor.Priority.LIBRARY_AFTER) AfterBeanDiscovery event, BeanManager beanManager) {
         // create a mock for all non-resolvable injection point
         contracts.stream()
                 .filter(contract -> beanManager.resolve(beanManager.getBeans(contract.getType(), contract.getQualifiersAsArray())) == null)
                 .forEach(contract -> event.addBean()
+                        .alternative(true)
                         .scope(TestScoped.class)
                         .qualifiers(contract.getQualifiers())
                         .types(contract.getType())

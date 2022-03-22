@@ -79,6 +79,10 @@ public final class JPAIntegration implements Extension {
                 .forEach(f ->makeInjectable(f, beanManager));
     }
 
+    public void registerAlternative(@Observes @Priority(50) AfterTypeDiscovery event) {
+        event.getAlternatives().add(getClass());
+    }
+
     private void makeInjectable(AnnotatedFieldConfigurator<?> fieldConfigurator, BeanManager beanManager) {
         PersistenceContext persistenceContext = fieldConfigurator.getAnnotated().getAnnotation(PersistenceContext.class);
         PersistenceUnit persistenceUnit = fieldConfigurator.getAnnotated().getAnnotation(PersistenceUnit.class);
@@ -104,6 +108,7 @@ public final class JPAIntegration implements Extension {
 
     private void addPersistenceUnit(PersistenceUnit persistenceUnit, AfterBeanDiscovery event, BeanManager beanManager) {
         event.<EntityManagerFactory>addBean()
+                .alternative(true)
                 .createWith(context -> createEntityManagerFactory(persistenceUnit, beanManager))
                 .destroyWith((entityManagerFactory, context) -> entityManagerFactory.close())
                 .scope(ApplicationScoped.class)
@@ -128,6 +133,7 @@ public final class JPAIntegration implements Extension {
     private void addPersistenceContext(PersistenceContext persistenceContext, AfterBeanDiscovery event) {
         Map<?, ?> properties = Stream.of(persistenceContext.properties()).collect(Collectors.toMap(PersistenceProperty::name, PersistenceProperty::value));
         event.<EntityManager>addBean()
+                .alternative(true)
                 .produceWith(instance -> instance.select(EntityManagerFactory.class, new PersistenceUnitLiteral(persistenceContext)).get().createEntityManager(properties))
                 .disposeWith((entityManager, instance) -> entityManager.close())
                 .scope(toScope(persistenceContext.type()))
