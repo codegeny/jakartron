@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jaxrs;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +20,10 @@ package org.codegeny.jakartron.jaxrs;
  * #L%
  */
 
+import org.codegeny.jakartron.Internal;
 import org.codegeny.jakartron.servlet.Base;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Disposes;
@@ -39,17 +41,19 @@ import java.net.URI;
 public final class JAXRSProducer {
 
     @Produces
+    @ApplicationScoped
+    @Internal
     public Client newClient() {
         return ClientBuilder.newClient();
     }
 
-    public void closeClient(@Disposes Client client) {
+    public void closeClient(@Disposes @Internal Client client) {
         client.close();
     }
 
     @Produces
     @Base
-    public WebTarget newWebTarget(Client client, InjectionPoint injectionPoint, @Any Instance<URI> uriProvider) {
+    public WebTarget newWebTarget(@Internal Client client, InjectionPoint injectionPoint, @Any Instance<URI> uriProvider) {
         return client.target(uriProvider.select(injectionPoint.getQualifiers().toArray(new Annotation[0])).get());
     }
 

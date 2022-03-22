@@ -23,7 +23,12 @@ package org.codegeny.jakartron;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -51,6 +56,27 @@ public abstract class Annotations {
             @Override
             Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
                 return Stream.of(annotatedElement.getAnnotations()).map(Annotation::annotationType);
+            }
+        },
+        OVERRIDES {
+            @Override
+            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
+                if (annotatedElement instanceof Method) {
+                    Method method = (Method) annotatedElement;
+                    if (!Modifier.isStatic(method.getModifiers()) && !Modifier.isPrivate(method.getModifiers())) {
+                        Class<?> declaringClass = method.getDeclaringClass();
+                        Class<?> superClass = declaringClass.getSuperclass();
+                        return Stream.concat(
+                                superClass == null ? Stream.empty() : Stream.of(superClass),
+                                Stream.of(declaringClass.getInterfaces())
+                        ).flatMap(type -> Stream.of(type.getMethods())
+                                .filter(m -> !Modifier.isStatic(m.getModifiers()) && !Modifier.isPrivate(m.getModifiers()) && !Modifier.isFinal(m.getModifiers()))
+                                .filter(m -> m.getName().equals(method.getName()))
+                                .filter(m -> Arrays.equals(m.getParameterTypes(), method.getParameterTypes()))
+                        );
+                    }
+                }
+                return Stream.empty();
             }
         },
         PACKAGE {
@@ -81,34 +107,59 @@ public abstract class Annotations {
         abstract Stream<AnnotatedElement> get(AnnotatedElement annotatedElement);
     }
 
-    private static Stream<AnnotatedElement> expand(AnnotatedElement element, Set<Mode> modes) {
-        return StreamSupport.stream(Spliterators.spliterator(new AnnotatedElementIterator(element, modes), Long.MAX_VALUE, 0), false);
-    }
-
-    private static <A extends Annotation> Stream<A> getAnnotations(AnnotatedElement current, Class<A> annotationType) {
-        return Stream.concat(
-                current.isAnnotationPresent(annotationType) ? Stream.of(current.getAnnotation(annotationType)) : Stream.empty(),
-                Stream.of(current.getAnnotationsByType(annotationType))
-        );
+    public static Stream<AnnotatedElement> expand(AnnotatedElement element, Mode... modes) {
+        return StreamSupport.stream(spliterator(element, new LinkedHashSet<>(Arrays.asList(modes))), false);
     }
 
     public static <A extends Annotation> Stream<A> findAnnotations(AnnotatedElement element, Class<A> annotationType, Mode... modes) {
-        return expand(element, new LinkedHashSet<>(Arrays.asList(modes))).flatMap(current -> getAnnotations(current, annotationType));
+        return findAnnotations(element, annotationType::isInstance, modes).map(annotationType::cast);
     }
 
-    private Annotations() {
-        throw new InternalError("Can't instantiate utility class");
+    public static Stream<Annotation> findAnnotations(AnnotatedElement element, Predicate<? super Annotation> predicate, Mode... modes) {
+        return expand(element, modes).flatMap(current -> getAnnotations(current, predicate));
     }
 
-    private static class AnnotatedElementIterator implements Iterator<AnnotatedElement> {
+    private static Stream<Annotation> getAnnotations(AnnotatedElement current, Predicate<? super Annotation> predicate) {
+        return Stream.of(current.getAnnotations()).filter(predicate);
+    }
 
-        private final Set<Mode> modes;
-        private final Deque<AnnotatedElement> deque = new ArrayDeque<>();
-        private final Set<AnnotatedElement> visited = new HashSet<>();
+    private static Spliterator<AnnotatedElement> spliterator(AnnotatedElement element, Set<Mode> modes) {
+        return new GraphIterator<AnnotatedElement>(element, next -> modes.stream().flatMap(mode -> mode.get(next))).asSpliterator();
+    }
 
-        AnnotatedElementIterator(AnnotatedElement seed, Set<Mode> modes) {
-            this.modes = modes;
+    private static final class GraphIterator<T> implements Iterator<T> {
+
+        enum SearchMode {
+
+            BREADTH_FIRST {
+                @Override
+                <T> Consumer<T> forDeque(Deque<T> deque) {
+                    return deque::add;
+                }
+            },
+            DEPTH_FIRST {
+                @Override
+                <T> Consumer<T> forDeque(Deque<T> deque) {
+                    return deque::addFirst;
+                }
+            };
+
+            abstract <T> Consumer<T> forDeque(Deque<T> deque);
+        }
+
+        private final Function<T, Stream<? extends T>> expander;
+        private final Deque<T> deque = new ArrayDeque<>();
+        private final Set<T> visited = new HashSet<>();
+        private final Consumer<T> consumer;
+
+        GraphIterator(T seed, Function<T, Stream<? extends T>> expander) {
+            this(seed, expander, SearchMode.BREADTH_FIRST);
+        }
+
+        GraphIterator(T seed, Function<T, Stream<? extends T>> expander, SearchMode mode) {
+            this.expander = expander;
             this.deque.add(seed);
+            this.consumer = mode.forDeque(deque);
         }
 
         @Override
@@ -117,13 +168,18 @@ public abstract class Annotations {
         }
 
         @Override
-        public AnnotatedElement next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            AnnotatedElement next = deque.remove();
-            modes.stream().flatMap(mode -> mode.get(next)).filter(visited::add).forEach(deque::add);
+        public T next() {
+            T next = deque.remove();
+            expander.apply(next).filter(visited::add).forEach(consumer);
             return next;
         }
+
+        public Spliterator<T> asSpliterator() {
+            return Spliterators.spliterator(this, Long.MAX_VALUE, 0);
+        }
+    }
+
+    private Annotations() {
+        throw new InternalError("Can't instantiate utility class");
     }
 }
