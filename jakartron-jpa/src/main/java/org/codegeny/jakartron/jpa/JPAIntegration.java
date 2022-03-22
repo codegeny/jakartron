@@ -80,7 +80,7 @@ public final class JPAIntegration implements Extension {
     }
 
     public void registerAlternative(@Observes @Priority(50) AfterTypeDiscovery event) {
-        event.getAlternatives().add(getClass());
+        event.getAlternatives().add(0, getClass());
     }
 
     private void makeInjectable(AnnotatedFieldConfigurator<?> fieldConfigurator, BeanManager beanManager) {
@@ -101,9 +101,9 @@ public final class JPAIntegration implements Extension {
 
     public void fireConfigurationEvent(@Observes @Priority(100) AfterDeploymentValidation event, BeanManager beanManager) {
         beanManager.getEvent().select(PersistenceUnitDefinitionEvent.class).fire(persistenceUnitInfos::add);
-        if (!persistenceUnits.stream().allMatch(q -> beanManager.createInstance().select(EntityManagerFactory.class, q.getQualifier()).get().isOpen())) {
-            event.addDeploymentProblem(new Exception("Cannot initialize some EMF"));
-        }
+        persistenceUnits.stream()
+                .filter(q -> !beanManager.createInstance().select(EntityManagerFactory.class, q.getQualifier()).get().isOpen())
+                .forEach(q -> event.addDeploymentProblem(new Exception("Cannot initialize EntityManagerFactory " + q.getQualifier())));
     }
 
     private void addPersistenceUnit(PersistenceUnit persistenceUnit, AfterBeanDiscovery event, BeanManager beanManager) {

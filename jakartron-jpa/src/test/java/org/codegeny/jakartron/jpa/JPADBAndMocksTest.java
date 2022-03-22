@@ -24,6 +24,7 @@ import org.codegeny.jakartron.DisableDiscovery;
 import org.codegeny.jakartron.jpa.PersistenceUnitDefinition.Property;
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
 import org.codegeny.jakartron.mockito.EnableAutoMocks;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.sql.DataSourceDefinition;
@@ -53,8 +54,8 @@ public class JPADBAndMocksTest {
         @PersistenceContext(unitName = "tests")
         private EntityManager entityManager;
 
-        public void save(President president) {
-            entityManager.persist(president);
+        public President save(President president) {
+            return entityManager.merge(president);
         }
     }
 
@@ -63,6 +64,6 @@ public class JPADBAndMocksTest {
 
     @Test
     public void test() {
-        repository.save(new President("G. Washington"));
+        Assertions.assertNotNull(repository.save(new President("G. Washington")).getId());
     }
 }
