@@ -47,8 +47,8 @@ public final class AutoMockExtension implements Extension {
         contracts.add(new BeanContract(event.getInjectionPoint(), beanManager));
     }
 
-    public void registerAlternative(@Observes @Priority(100) AfterTypeDiscovery event) {
-        event.getAlternatives().add(0, getClass());
+    public void registerAlternative(@Observes @Priority(-100) AfterTypeDiscovery event) {
+        event.getAlternatives().add(getClass());
     }
 
     public void createMocks(@Observes @Priority(Interceptor.Priority.LIBRARY_AFTER) AfterBeanDiscovery event, BeanManager beanManager) {

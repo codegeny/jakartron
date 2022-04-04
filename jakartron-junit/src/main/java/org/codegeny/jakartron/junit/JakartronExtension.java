@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.platform.commons.util.ReflectionUtils;
 
+import javax.enterprise.context.control.RequestContextController;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.*;
@@ -45,7 +46,7 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
     @Override
     public void beforeAll(ExtensionContext extensionContext) {
         SeContainer container = Jakartron.initialize(Stream.concat(Stream.of(extensionContext.getRequiredTestClass()), ReflectionUtils.findNestedClasses(extensionContext.getRequiredTestClass(), t -> true).stream()))
-                .addExtensions(new TestExtension())
+                .addExtensions(new TestExtension(extensionContext.getRequiredTestClass()))
                 .addBeanClasses(extensionContext.getRequiredTestClass())
                 .initialize();
         getStore(extensionContext).put(SeContainer.class, container);
@@ -56,12 +57,16 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
     @Override
     public void afterEach(ExtensionContext extensionContext) {
         getBeanManager(extensionContext)
-                .ifPresent(beanManager -> beanManager.fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.AFTER_EACH)));
+                .ifPresent(beanManager -> {
+                    beanManager.fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.AFTER_EACH));
+                    beanManager.createInstance().select(RequestContextController.class).get().deactivate();
+                });
     }
 
     @Override
     public void beforeEach(ExtensionContext extensionContext) {
         getBeanManager(extensionContext).ifPresent(beanManager -> {
+            beanManager.createInstance().select(RequestContextController.class).get().activate();
             AnnotatedType<?> annotatedType = getStore(extensionContext).get(AnnotatedType.class, AnnotatedType.class);
             annotatedType.getMethods().stream()
                     .filter(m -> m.getJavaMember().equals(extensionContext.getRequiredTestMethod()))

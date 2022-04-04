@@ -28,138 +28,71 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class Annotations {
 
-    public enum Mode {
+    @FunctionalInterface
+    public interface Expander {
 
-        SUPER_CLASS {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return annotatedElement instanceof Class<?>
-                        ? Stream.<AnnotatedElement>of(((Class<?>) annotatedElement).getSuperclass()).filter(Objects::nonNull)
-                        : Stream.empty();
-            }
-        },
-        INTERFACES {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return annotatedElement instanceof Class<?>
-                        ? Stream.<AnnotatedElement>of(((Class<?>) annotatedElement).getInterfaces()).filter(Objects::nonNull)
-                        : Stream.empty();
-            }
-        },
-        META_ANNOTATIONS {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return Stream.of(annotatedElement.getAnnotations()).map(Annotation::annotationType);
-            }
-        },
-        OVERRIDES {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                if (annotatedElement instanceof Method) {
-                    Method method = (Method) annotatedElement;
-                    if (!Modifier.isStatic(method.getModifiers()) && !Modifier.isPrivate(method.getModifiers())) {
-                        Class<?> declaringClass = method.getDeclaringClass();
-                        Class<?> superClass = declaringClass.getSuperclass();
-                        return Stream.concat(
-                                superClass == null ? Stream.empty() : Stream.of(superClass),
-                                Stream.of(declaringClass.getInterfaces())
-                        ).flatMap(type -> Stream.of(type.getMethods())
-                                .filter(m -> !Modifier.isStatic(m.getModifiers()) && !Modifier.isPrivate(m.getModifiers()) && !Modifier.isFinal(m.getModifiers()))
-                                .filter(m -> m.getName().equals(method.getName()))
-                                .filter(m -> Arrays.equals(m.getParameterTypes(), method.getParameterTypes()))
-                        );
-                    }
-                }
-                return Stream.empty();
-            }
-        },
-        PACKAGE {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return annotatedElement instanceof Class<?>
-                        ? Stream.of(((Class<?>) annotatedElement).getPackage())
-                        : Stream.empty();
-            }
-        },
-        ENCLOSING {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return annotatedElement instanceof Class<?>
-                        ? Stream.of(((Class<?>) annotatedElement).getEnclosingClass())
-                        : Stream.empty();
-            }
-        },
-        DECLARING {
-            @Override
-            Stream<AnnotatedElement> get(AnnotatedElement annotatedElement) {
-                return annotatedElement instanceof Member
-                        ? Stream.of(((Member) annotatedElement).getDeclaringClass())
-                        : Stream.empty();
-            }
-        };
+        Expander SUPER_CLASS = annotated -> Stream.of(annotated).flatMap(asStream(Class.class)).map(Class::getSuperclass).filter(Objects::nonNull);
+        Expander INTERFACES = annotated -> Stream.of(annotated).flatMap(asStream(Class.class)).map(Class::getInterfaces).flatMap(Stream::of);
+        Expander PACKAGE = annotated -> Stream.of(annotated).flatMap(asStream(Class.class)).map(Class::getPackage);
+        Expander ENCLOSING = annotated -> Stream.of(annotated).flatMap(asStream(Class.class)).map(Class::getEnclosingClass).filter(Objects::nonNull);
+        Expander DECLARING = annotated -> Stream.of(annotated).flatMap(asStream(Member.class)).map(Member::getDeclaringClass);
+        Expander META_ANNOTATIONS = annotated -> Stream.of(annotated.getAnnotations()).map(Annotation::annotationType);
+        Expander OVERRIDES = annotated -> Stream.of(annotated).flatMap(asStream(Method.class))
+                .filter(method -> !Modifier.isStatic(method.getModifiers()) && !Modifier.isPrivate(method.getModifiers()))
+                .flatMap(method -> Stream.concat(
+                                        Stream.of(method.getDeclaringClass().getSuperclass()).filter(Objects::nonNull),
+                                        Stream.of(method.getDeclaringClass().getInterfaces())
+                                )
+                                .flatMap(type -> Stream.of(type.getMethods())
+                                        .filter(m -> !Modifier.isStatic(m.getModifiers()) && !Modifier.isPrivate(m.getModifiers()) && !Modifier.isFinal(m.getModifiers()))
+                                        .filter(m -> m.getName().equals(method.getName()))
+                                        .filter(m -> Arrays.equals(m.getParameterTypes(), method.getParameterTypes()))
+                                )
+                );
 
-        abstract Stream<AnnotatedElement> get(AnnotatedElement annotatedElement);
+        static Expander of(Expander... expanders) {
+            return Stream.of(expanders).reduce((a, b) -> annotatedElement -> Stream.concat(a.expand(annotatedElement), b.expand(annotatedElement))).orElseGet(() -> annotatedElement -> Stream.empty());
+        }
+
+        Stream<? extends AnnotatedElement> expand(AnnotatedElement annotatedElement);
     }
 
-    public static Stream<AnnotatedElement> expand(AnnotatedElement element, Mode... modes) {
-        return StreamSupport.stream(spliterator(element, new LinkedHashSet<>(Arrays.asList(modes))), false);
+    public static Stream<AnnotatedElement> expand(AnnotatedElement element, Expander... expanders) {
+        return StreamSupport.stream(spliterator(element, Expander.of(expanders)), false);
     }
 
-    public static <A extends Annotation> Stream<A> findAnnotations(AnnotatedElement element, Class<A> annotationType, Mode... modes) {
-        return findAnnotations(element, annotationType::isInstance, modes).map(annotationType::cast);
+    public static <A extends Annotation> Stream<A> findAnnotations(AnnotatedElement element, Class<A> annotationType, Expander... expanders) {
+        return expand(element, expanders).flatMap(current -> Stream.of(current.getAnnotationsByType(annotationType)));
     }
 
-    public static Stream<Annotation> findAnnotations(AnnotatedElement element, Predicate<? super Annotation> predicate, Mode... modes) {
-        return expand(element, modes).flatMap(current -> getAnnotations(current, predicate));
-    }
-
-    private static Stream<Annotation> getAnnotations(AnnotatedElement current, Predicate<? super Annotation> predicate) {
-        return Stream.of(current.getAnnotations()).filter(predicate);
-    }
-
-    private static Spliterator<AnnotatedElement> spliterator(AnnotatedElement element, Set<Mode> modes) {
-        return new GraphIterator<AnnotatedElement>(element, next -> modes.stream().flatMap(mode -> mode.get(next))).asSpliterator();
+    private static Spliterator<AnnotatedElement> spliterator(AnnotatedElement element, Expander expander) {
+        return GraphIterator.breadthFirst(element, expander::expand).asSpliterator();
     }
 
     private static final class GraphIterator<T> implements Iterator<T> {
 
-        enum SearchMode {
-
-            BREADTH_FIRST {
-                @Override
-                <T> Consumer<T> forDeque(Deque<T> deque) {
-                    return deque::add;
-                }
-            },
-            DEPTH_FIRST {
-                @Override
-                <T> Consumer<T> forDeque(Deque<T> deque) {
-                    return deque::addFirst;
-                }
-            };
-
-            abstract <T> Consumer<T> forDeque(Deque<T> deque);
+        public static <T> GraphIterator<T> breadthFirst(T seed, Function<? super T, ? extends Stream<? extends T>> expander) {
+            return new GraphIterator<>(seed, expander, true);
         }
 
-        private final Function<T, Stream<? extends T>> expander;
+        public static <T> GraphIterator<T> depthFirst(T seed, Function<? super T, ? extends Stream<? extends T>> expander) {
+            return new GraphIterator<>(seed, expander, false);
+        }
+
+        private final Function<? super T, ? extends Stream<? extends T>> expander;
         private final Deque<T> deque = new ArrayDeque<>();
-        private final Set<T> visited = new HashSet<>();
-        private final Consumer<T> consumer;
+        private final Set<? super T> processed = new HashSet<>();
+        private final Consumer<? super T> consumer;
 
-        GraphIterator(T seed, Function<T, Stream<? extends T>> expander) {
-            this(seed, expander, SearchMode.BREADTH_FIRST);
-        }
-
-        GraphIterator(T seed, Function<T, Stream<? extends T>> expander, SearchMode mode) {
+        private GraphIterator(T seed, Function<? super T, ? extends Stream<? extends T>> expander, boolean breadthFirst) {
             this.expander = expander;
-            this.deque.add(seed);
-            this.consumer = mode.forDeque(deque);
+            this.consumer = breadthFirst ? deque::addLast : deque::addFirst;
+            this.consumer.accept(seed);
         }
 
         @Override
@@ -170,13 +103,25 @@ public abstract class Annotations {
         @Override
         public T next() {
             T next = deque.remove();
-            expander.apply(next).filter(visited::add).forEach(consumer);
+            expander.apply(next).filter(processed::add).forEach(consumer);
             return next;
         }
 
         public Spliterator<T> asSpliterator() {
             return Spliterators.spliterator(this, Long.MAX_VALUE, 0);
         }
+    }
+
+    public static <S, T> Function<S, T> as(Class<T> klass) {
+        return source -> klass.isInstance(source) ? klass.cast(source) : null;
+    }
+
+    public static <S, T> Function<S, Stream<T>> asStream(Class<T> klass) {
+        return source -> Stream.of(source).filter(klass::isInstance).map(klass::cast);
+    }
+
+    public static <S, T> Function<S, Optional<T>> asOptional(Class<T> klass) {
+        return source -> Optional.of(source).filter(klass::isInstance).map(klass::cast);
     }
 
     private Annotations() {

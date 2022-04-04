@@ -55,7 +55,7 @@ public final class XADataSourceIntegration implements Extension {
     private final Set<DataSourceDefinition> dataSources = new HashSet<>();
 
     public void process(@Observes @WithAnnotations({DataSourceDefinition.class, DataSourceDefinitions.class}) ProcessAnnotatedType<?> event) {
-        Annotations.findAnnotations(event.getAnnotatedType().getJavaClass(), DataSourceDefinition.class, Annotations.Mode.SUPER_CLASS, Annotations.Mode.META_ANNOTATIONS).forEach(dataSources::add);
+        Annotations.findAnnotations(event.getAnnotatedType().getJavaClass(), DataSourceDefinition.class, Annotations.Expander.SUPER_CLASS, Annotations.Expander.META_ANNOTATIONS).forEach(dataSources::add);
     }
 
     public void makeDataSourceInjectable(@Observes AfterBeanDiscovery event) {

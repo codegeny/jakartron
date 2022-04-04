@@ -79,8 +79,8 @@ public final class JPAIntegration implements Extension {
                 .forEach(f ->makeInjectable(f, beanManager));
     }
 
-    public void registerAlternative(@Observes @Priority(50) AfterTypeDiscovery event) {
-        event.getAlternatives().add(0, getClass());
+    public void registerAlternative(@Observes @Priority(-50) AfterTypeDiscovery event) {
+        event.getAlternatives().add(getClass());
     }
 
     private void makeInjectable(AnnotatedFieldConfigurator<?> fieldConfigurator, BeanManager beanManager) {
