@@ -79,11 +79,11 @@ public class JCAManager {
                         BeanUtils.copyProperty(spec, key, properties.get(key));
                     }
                     spec.setResourceAdapter(resourceAdapter);
-                    LOGGER.info(() -> "Activating JCA endpoint " + endpointClass + " with spec " + spec);
+                    LOGGER.fine(() -> "Activating JCA endpoint " + endpointClass + " with spec " + spec);
                     MessageEndpointFactory factory = ProxyMessageEndpointFactory.of(tm, messageEndpointProvider, messageListenerInterface, endpointClass);
                     resourceAdapter.endpointActivation(factory, spec);
                     deactivations.add(() -> {
-                        LOGGER.info(() -> "Deactivating JCA endpoint " + endpointClass + " with spec " + spec);
+                        LOGGER.fine(() -> "Deactivating JCA endpoint " + endpointClass + " with spec " + spec);
                         resourceAdapter.endpointDeactivation(factory, spec);
                     });
                 } catch (ResourceException | InstantiationException | IllegalAccessException | InvocationTargetException exception) {
@@ -92,17 +92,16 @@ public class JCAManager {
             });
         }
 
-        public Optional<ResourceAdapter> configure(TransactionManager tm) {
+        public void configure(TransactionManager tm) {
             if (activations.isEmpty() || resourceAdapter == null) {
-                return Optional.empty();
+                return;
             }
             activations.forEach(c -> c.accept(tm));
-            return Optional.of(resourceAdapter);
         }
 
         public void stop() {
             deactivations.forEach(Runnable::run);
-            LOGGER.info(() -> "Stopping " + resourceAdapter);
+            LOGGER.fine(() -> "Stopping " + resourceAdapter);
             resourceAdapter.stop();
         }
     }
@@ -137,10 +136,7 @@ public class JCAManager {
         for (Adapter adapter : adapters.values()) {
             adapter.resourceAdapter.start(bootstrapContext);
             bm.getExtension(CoreExtension.class).addShutdownHook(adapter::stop);
-            Optional<ResourceAdapter> a = adapter.configure(tm);
-            if (a.isPresent()) {
-                ResourceAdapter ra = a.get();
-            }
+            adapter.configure(tm);
         }
     }
 }

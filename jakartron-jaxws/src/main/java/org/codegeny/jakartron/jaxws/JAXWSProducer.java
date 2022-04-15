@@ -31,14 +31,15 @@ import com.sun.xml.ws.transport.http.servlet.ServletAdapterList;
 import com.sun.xml.ws.transport.http.servlet.WSServlet;
 import com.sun.xml.ws.transport.http.servlet.WSServletDelegate;
 import com.sun.xml.ws.util.xml.XmlUtil;
+import org.codegeny.jakartron.servlet.Initialized;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRegistration.Dynamic;
 import javax.xml.namespace.QName;
 import java.lang.reflect.Modifier;
@@ -49,7 +50,8 @@ import java.util.stream.Collectors;
 @Dependent
 public final class JAXWSProducer {
 
-    private void configureEndpoints(@Observes @Initialized(ApplicationScoped.class) ServletContext context, BeanManager beanManager) {
+    private void configureEndpoints(@Observes @Initialized ServletContextEvent event, BeanManager beanManager) {
+        ServletContext context = event.getServletContext();
         Dynamic registration = context.addServlet(WSServlet.class.getName(), WSServlet.class);
 
         List<ServletAdapter> adapters = beanManager.getExtension(JAXWSIntegration.class).getImplementorClasses().stream()

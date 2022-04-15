@@ -27,7 +27,7 @@ import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJBException;
 import javax.ejb.MessageDriven;
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.EventMetadata;
@@ -86,7 +86,7 @@ public class EventReplicationTest {
         @Override
         public void onMessage(Message message) {
             try {
-                LOGGER.info("Re-firing event");
+                LOGGER.fine("Re-firing event");
                 EventMessage eventMessage = message.getBody(EventMessage.class);
                 event.select(eventMessage.getQualifiers()).fire(eventMessage.getEvent());
             } catch (JMSException jmsException) {
@@ -95,7 +95,7 @@ public class EventReplicationTest {
         }
     }
 
-    @ApplicationScoped
+    @Dependent // Could be @ApplicationScoped but then, the @Dependent jmsContext would outlive the JMS broker and generate warnings
     public static class EventListener {
 
         @Inject
@@ -105,7 +105,7 @@ public class EventReplicationTest {
         private Topic topic;
 
         public void observer(@Observes @Clustered Serializable event, EventMetadata metadata) {
-            LOGGER.info("Bridging event");
+            LOGGER.fine("Bridging event");
             jmsContext.createProducer().send(topic, new EventMessage(event, metadata.getQualifiers().stream().filter(q -> !(q instanceof Clustered)).toArray(Annotation[]::new)));
         }
     }
@@ -118,14 +118,14 @@ public class EventReplicationTest {
 
     @Test
     public void test() {
-        LOGGER.info("Firing event");
+        LOGGER.fine("Firing event");
         event.fire(42);
         // wait for the event to be received twice: one normally, one through the MDB
         await().untilAtomic(counter, is(2));
     }
 
     public void observes(@Observes Integer event) {
-        LOGGER.info("Observing event");
+        LOGGER.fine("Observing event");
         counter.incrementAndGet();
     }
 }

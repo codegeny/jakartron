@@ -43,7 +43,7 @@ import static javax.persistence.spi.PersistenceUnitTransactionType.JTA;
 @DataSourceDefinition(name = "mydb", className = "org.h2.jdbcx.JdbcDataSource", url = "jdbc:h2:mem:mydb")
 @PersistenceUnitDefinition(unitName = "tests", jtaDataSourceName = "mydb", transactionType = JTA, managedClasses = President.class, properties = {
         @Property(name = "javax.persistence.schema-generation.database.action", value = "create"),
-        @Property(name = "hibernate.show_sql", value = "true")
+        @Property(name = "hibernate.show_sql", value = "false")
 })
 public class JPADBAndMocksTest {
 

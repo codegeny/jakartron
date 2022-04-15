@@ -42,6 +42,6 @@ public class JMSRAProducer {
         resourceAdapter.setConnectorClassName(InVMConnectorFactory.class.getName());
         resourceAdapter.setConnectionParameters(String.format("%s=%s", TransportConstants.SERVER_ID_PROP_NAME, server.getIdentity()));
         event.setResourceAdapter(MessageListener.class, resourceAdapter, ActiveMQActivationSpec.class);
-        LOGGER.info(() -> "Registered JMS-RA (broker #" + server.getIdentity() + " adapter=" + resourceAdapter + ")");
+        LOGGER.fine(() -> "Registered JMS-RA (broker #" + server.getIdentity() + " adapter=" + resourceAdapter + ")");
     }
 }

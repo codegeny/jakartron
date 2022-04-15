@@ -168,7 +168,7 @@ public class JMSExtension implements Extension  {
                         throw new RuntimeException(exception);
                     }
                     beanManager.getExtension(CoreExtension.class).addShutdownHook(server::stop);
-                    LOGGER.info(() -> String.format("Started broker #%s", serverId));
+                    LOGGER.fine(() -> String.format("Started broker #%s", serverId));
                     return server;
                 });
    }

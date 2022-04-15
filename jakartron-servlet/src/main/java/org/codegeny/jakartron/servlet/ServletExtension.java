@@ -22,7 +22,6 @@ package org.codegeny.jakartron.servlet;
 
 import org.kohsuke.MetaInfServices;
 
-import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.*;
 import javax.servlet.*;
@@ -66,33 +65,33 @@ public final class ServletExtension implements Extension {
         filters.add(event.getAnnotatedType().getJavaClass());
     }
 
-    public void addObserver(@Observes AfterBeanDiscovery event) {
-        event.<ServletContext>addObserverMethod()
+    public void addObserver(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        event.<ServletContextEvent>addObserverMethod()
                 .priority(Integer.MIN_VALUE)
-                .observedType(ServletContext.class)
-                .qualifiers(Initialized.Literal.APPLICATION)
-                .notifyWith(e -> register(e.getEvent()));
+                .observedType(ServletContextEvent.class)
+                .qualifiers(Initialized.Literal.INSTANCE)
+                .notifyWith(e -> register(e.getEvent().getServletContext(), beanManager));
     }
 
-    private void register(ServletContext servletContext) throws ServletException {
+    private void register(ServletContext servletContext, BeanManager beanManager) throws ServletException {
         for (Map.Entry<ServletContainerInitializer, Set<Class<?>>> entry : initializers.entrySet()) {
             entry.getKey().onStartup(entry.getValue(), servletContext);
         }
-        servlets.forEach(servlet -> registerServlet(servletContext, servlet));
-        filters.forEach(filter -> registerFilter(servletContext, filter));
+        servlets.forEach(servlet -> registerServlet(servletContext, servlet, beanManager));
+        filters.forEach(filter -> registerFilter(servletContext, filter, beanManager));
     }
 
-    private void registerServlet(ServletContext servletContext, Class<? extends Servlet> servlet) {
+    private void registerServlet(ServletContext servletContext, Class<? extends Servlet> servlet, BeanManager beanManager) {
         WebServlet webServlet = servlet.getAnnotation(WebServlet.class);
-        ServletRegistration.Dynamic dynamic = servletContext.addServlet(webServlet.name(), servlet);
+        ServletRegistration.Dynamic dynamic = servletContext.addServlet(webServlet.name(), beanManager.createInstance().select(servlet).get());
         dynamic.addMapping(webServlet.urlPatterns());
         dynamic.setAsyncSupported(webServlet.asyncSupported());
         Stream.of(webServlet.initParams()).forEach(p -> dynamic.setInitParameter(p.name(), p.value()));
     }
 
-    private void registerFilter(ServletContext servletContext, Class<? extends Filter> filter) {
+    private void registerFilter(ServletContext servletContext, Class<? extends Filter> filter, BeanManager beanManager) {
         WebFilter webFilter = filter.getAnnotation(WebFilter.class);
-        FilterRegistration.Dynamic dynamic = servletContext.addFilter(webFilter.filterName(), filter);
+        FilterRegistration.Dynamic dynamic = servletContext.addFilter(webFilter.filterName(), beanManager.createInstance().select(filter).get());
         dynamic.addMappingForUrlPatterns(EnumSet.copyOf(Arrays.asList(webFilter.dispatcherTypes())), false, webFilter.urlPatterns());
         dynamic.setAsyncSupported(webFilter.asyncSupported());
         Stream.of(webFilter.initParams()).forEach(p -> dynamic.setInitParameter(p.name(), p.value()));

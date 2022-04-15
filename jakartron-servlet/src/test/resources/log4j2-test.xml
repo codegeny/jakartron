@@ -19,7 +19,7 @@
 <Configuration status="INFO">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="[%highlight{%-5level}] %style{%date{HH:mm:ss.SSS}}{bright,yellow} [%thread] %style{%logger}{cyan} - %message%n%rException" disableAnsi="false"/>
+            <PatternLayout pattern="[%highlight{%level}] %style{%date{HH:mm:ss.SSS}}{bright,yellow} [%thread] %style{%logger}{cyan} - %message%n%rException" disableAnsi="false"/>
         </Console>
     </Appenders>
     <Loggers>
