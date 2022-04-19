@@ -20,12 +20,12 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
-import org.codegeny.jakartron.PriorityLiteral;
-import org.junit.platform.commons.annotation.Testable;
-
 import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.*;
+import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AfterTypeDiscovery;
+import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessBeanAttributes;
 
 public final class TestExtension implements Extension {
 

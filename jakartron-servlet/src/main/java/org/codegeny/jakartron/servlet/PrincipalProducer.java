@@ -9,9 +9,9 @@ package org.codegeny.jakartron.servlet;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
-import org.codegeny.jakartron.security.PrincipalHolder;
+import org.codegeny.jakartron.security.SecurityContextController;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
@@ -33,19 +33,19 @@ import javax.servlet.http.HttpServletRequest;
 
 public class PrincipalProducer {
 
-    public void observe(@Observes @Initialized(ApplicationScoped.class) ServletContext context, PrincipalHolder holder) {
+    public void observe(@Observes @Initialized(ApplicationScoped.class) ServletContext context, SecurityContextController manager) {
         context.addListener(new ServletRequestListener() {
 
             @Override
             public void requestDestroyed(ServletRequestEvent event) {
-                holder.setPrincipal(null);
+                manager.setPrincipal(null);
             }
 
             @Override
             public void requestInitialized(ServletRequestEvent event) {
                 ServletRequest request = event.getServletRequest();
                 if (request instanceof HttpServletRequest) {
-                    holder.setPrincipal(((HttpServletRequest) request).getUserPrincipal());
+                    manager.setPrincipal(((HttpServletRequest) request).getUserPrincipal());
                 }
             }
         });

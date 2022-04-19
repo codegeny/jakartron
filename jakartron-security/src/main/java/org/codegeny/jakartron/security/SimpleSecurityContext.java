@@ -9,9 +9,9 @@ package org.codegeny.jakartron.security;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ package org.codegeny.jakartron.security;
  */
 
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Produces;
 import javax.security.enterprise.AuthenticationStatus;
 import javax.security.enterprise.SecurityContext;
 import javax.security.enterprise.authentication.mechanism.http.AuthenticationParameters;
@@ -32,22 +33,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequestScoped
-public class SimpleSecurityContext implements SecurityContext {
+public class SimpleSecurityContext implements SecurityContext, SecurityContextController {
 
-    private Set<Principal> principals = new HashSet<>();
+    private Set<? extends Principal> principals = new HashSet<>();
     private Set<String> roles = new HashSet<>();
 
-    public Set<Principal> principals() {
-        return this.principals;
-    }
-
-    public Set<String> roles() {
-        return this.roles;
-    }
-
     @Override
+    @Produces
+    @RequestScoped
     public Principal getCallerPrincipal() {
-        return principals.stream().findAny().orElse(null);
+        return principals.stream().findFirst().orElse(null);
     }
 
     @Override
@@ -68,5 +63,25 @@ public class SimpleSecurityContext implements SecurityContext {
     @Override
     public AuthenticationStatus authenticate(HttpServletRequest request, HttpServletResponse response, AuthenticationParameters parameters) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPrincipals(Set<? extends Principal> principals) {
+        this.principals = principals;
+    }
+
+    @Override
+    public void setRoles(Set<String> roles) {
+        this.roles = roles;
+    }
+
+    @Override
+    public Set<? extends Principal> getPrincipals() {
+        return principals;
+    }
+
+    @Override
+    public Set<String> getRoles() {
+        return roles;
     }
 }

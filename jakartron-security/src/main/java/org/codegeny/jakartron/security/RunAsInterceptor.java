@@ -9,9 +9,9 @@ package org.codegeny.jakartron.security;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,6 +28,9 @@ import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Interceptor
 @RunAsUser(name = "dummy")
@@ -35,18 +38,21 @@ import java.security.Principal;
 public class RunAsInterceptor {
 
     @Inject
-    private PrincipalHolder principalHolder;
+    private SecurityContextController controller;
 
     @AroundInvoke
     public Object intercept(InvocationContext context) throws Exception {
         WeldInvocationContext weldInvocationContext = (WeldInvocationContext) context;
         RunAsUser runAs = weldInvocationContext.getInterceptorBindingsByType(RunAsUser.class).stream().findFirst().orElseThrow(InternalError::new);
-        Principal old = principalHolder.getPrincipal();
-        principalHolder.setPrincipal(runAs::name);
+        Set<? extends Principal> principals = controller.getPrincipals();
+        Set<String> roles = controller.getRoles();
+        controller.setPrincipal(runAs::name);
+        controller.setRoles(new HashSet<>(Arrays.asList(runAs.roles())));
         try {
             return context.proceed();
         } finally {
-            principalHolder.setPrincipal(old);
+            controller.setPrincipals(principals);
+            controller.setRoles(roles);
         }
     }
 }
