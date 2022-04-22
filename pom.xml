@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codegeny.jakartron</groupId>
     <artifactId>jakartron</artifactId>
-    <version>0.0.7-SNAPSHOT</version>
+    <version>0.0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Jakartron</name>
@@ -93,7 +93,7 @@
         <module>jakartron-mailra</module>
         <module>jakartron-ejb</module>
         <module>jakartron-servlet</module>
-		<module>jakartron-jaxws</module>
+        <module>jakartron-jaxws</module>
         <module>jakartron-jaxrs</module>
         <module>jakartron-dbunit</module>
         <module>jakartron-mp-config</module>
@@ -143,6 +143,16 @@
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
                 <version>1.12.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jvnet.staxex</groupId>
+                <artifactId>stax-ex</artifactId>
+                <version>1.8.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>2.3.6</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -223,6 +233,16 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>2.3.3</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>1.2.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -283,7 +303,8 @@
                         <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <systemPropertyVariables>
-                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
+                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager
+                            </java.util.logging.manager>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -295,7 +316,8 @@
                         <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory"/>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <systemPropertyVariables>
-                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager</java.util.logging.manager>
+                            <java.util.logging.manager>org.apache.logging.log4j.jul.LogManager
+                            </java.util.logging.manager>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
@@ -378,7 +400,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
                 <executions>
                     <execution>
                         <goals>
@@ -405,6 +427,7 @@
                 <artifactId>duplicate-finder-maven-plugin</artifactId>
                 <version>1.5.1</version>
                 <configuration>
+                    <includeBootClasspath>false</includeBootClasspath>
                     <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
                     <ignoredResourcePatterns>
                         <ignoredResourcePattern>about.html</ignoredResourcePattern>
@@ -460,20 +483,20 @@
                                 <plugin>org.apache.maven.plugins:maven-surefire-report-plugin</plugin>
                             </plugins>
                         </requireSameVersions>
-<!--                        <bannedDependencies>-->
-<!--                            <searchTransitive>true</searchTransitive>-->
-<!--                            <excludes>-->
-<!--                                <exclude>commons-logging:*</exclude>-->
-<!--                                <exclude>org.slf4j:*</exclude>-->
-<!--                            </excludes>-->
-<!--                        </bannedDependencies>-->
+                        <!--                        <bannedDependencies>-->
+                        <!--                            <searchTransitive>true</searchTransitive>-->
+                        <!--                            <excludes>-->
+                        <!--                                <exclude>commons-logging:*</exclude>-->
+                        <!--                                <exclude>org.slf4j:*</exclude>-->
+                        <!--                            </excludes>-->
+                        <!--                        </bannedDependencies>-->
                     </rules>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-	
-	<reporting>
+
+    <reporting>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -563,7 +586,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.7</version>
+                <version>0.8.8</version>
                 <reportSets>
                     <reportSet>
                         <reports>
@@ -576,6 +599,15 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <maven.compiler.release>8</maven.compiler.release>
+            </properties>
+        </profile>
         <profile>
             <id>deploy</id>
             <distributionManagement>

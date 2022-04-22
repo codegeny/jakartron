@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.codegeny.jakartron</groupId>
         <artifactId>jakartron</artifactId>
-        <version>0.0.7-SNAPSHOT</version>
+        <version>0.0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -53,6 +53,16 @@
             <artifactId>jakartron-junit</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.eclipse</groupId>
@@ -160,12 +170,12 @@
             <artifactId>resteasy-multipart-provider</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-runtime</artifactId>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>com.sun.mail</groupId>
-                    <artifactId>jakarta.mail</artifactId>
+                    <groupId>com.sun.activation</groupId>
+                    <artifactId>*</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.jboss.spec.javax.ws.rs</groupId>

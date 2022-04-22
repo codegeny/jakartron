@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.codegeny.jakartron</groupId>
         <artifactId>jakartron</artifactId>
-        <version>0.0.7-SNAPSHOT</version>
+        <version>0.0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -82,10 +82,10 @@
                     <groupId>javax.xml.bind</groupId>
                     <artifactId>jaxb-api</artifactId>
                 </exclusion>
-                <exclusion>
-                    <groupId>org.glassfish.jaxb</groupId>
-                    <artifactId>jaxb-runtime</artifactId>
-                </exclusion>
+<!--                <exclusion>-->
+<!--                    <groupId>org.glassfish.jaxb</groupId>-->
+<!--                    <artifactId>jaxb-runtime</artifactId>-->
+<!--                </exclusion>-->
             </exclusions>
         </dependency>
         <dependency>

@@ -20,8 +20,6 @@ package org.codegeny.jakartron.servlet;
  * #L%
  */
 
-import sun.security.krb5.internal.crypto.Des;
-
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Qualifier;
 import java.lang.annotation.Retention;
