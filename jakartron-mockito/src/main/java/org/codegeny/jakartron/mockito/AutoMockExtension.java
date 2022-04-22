@@ -21,6 +21,8 @@ package org.codegeny.jakartron.mockito;
  */
 
 import org.codegeny.jakartron.BeanContract;
+import org.codegeny.jakartron.junit.TestEvent;
+import org.codegeny.jakartron.junit.TestPhase;
 import org.codegeny.jakartron.junit.TestScoped;
 import org.mockito.Mockito;
 
@@ -28,6 +30,7 @@ import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.spi.*;
+import javax.inject.Singleton;
 import javax.interceptor.Interceptor;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -53,15 +56,24 @@ public final class AutoMockExtension implements Extension {
 
     public void createMocks(@Observes @Priority(Interceptor.Priority.LIBRARY_AFTER) AfterBeanDiscovery event, BeanManager beanManager) {
         // create a mock for all non-resolvable injection point
+        Set<Object> reset = new HashSet<>();
         contracts.stream()
                 .filter(contract -> beanManager.resolve(beanManager.getBeans(contract.getType(), contract.getQualifiersAsArray())) == null)
                 .forEach(contract -> event.addBean()
                         .alternative(true)
-                        .scope(TestScoped.class)
+                        .scope(Singleton.class)
                         .qualifiers(contract.getQualifiers())
                         .types(contract.getType())
-                        .produceWith(instance -> Mockito.mock(rawType(contract.getType())))
+                        .produceWith(instance -> {
+                            Object mock = Mockito.mock(rawType(contract.getType()));
+                            reset.add(mock);
+                            return mock;
+                        })
                 );
+        event.addObserverMethod()
+                .observedType(Object.class)
+                .qualifiers(TestEvent.Literal.of(TestPhase.AFTER_EACH))
+                .notifyWith(e -> reset.forEach(Mockito::reset));
     }
 
     private static Class<?> rawType(Type type) {

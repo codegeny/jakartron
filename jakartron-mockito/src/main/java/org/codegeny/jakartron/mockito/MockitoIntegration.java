@@ -21,6 +21,8 @@ package org.codegeny.jakartron.mockito;
  */
 
 import org.codegeny.jakartron.BeanContract;
+import org.codegeny.jakartron.junit.TestEvent;
+import org.codegeny.jakartron.junit.TestPhase;
 import org.codegeny.jakartron.junit.TestScoped;
 import org.kohsuke.MetaInfServices;
 import org.mockito.Mock;
@@ -29,6 +31,7 @@ import org.mockito.Spy;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.*;
+import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,24 +56,35 @@ public final class MockitoIntegration implements Extension {
     }
 
     public void registerBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        Set<Object> reset = new HashSet<>();
         mocks.forEach(contract -> event.addBean()
                 .alternative(true)
                 .types(contract.getType())
                 .qualifiers(contract.getQualifiers())
-                .scope(TestScoped.class)
-                .createWith(context -> Mockito.mock((Class<?>) contract.getType()))
+                .scope(Singleton.class)
+                .createWith(context -> {
+                    Object mock = Mockito.mock((Class<?>) contract.getType());
+                    reset.add(mock);
+                    return mock;
+                })
         );
         spies.forEach(contract -> event.addBean()
                 .alternative(true)
                 .types(contract.getType())
                 .qualifiers(contract.getQualifiers())
-                .scope(TestScoped.class)
+                .scope(Singleton.class)
                 .createWith(context -> {
                     Bean<?> bean = beanManager.getBeans(contract.getType(), contract.getQualifiersAsArray()).stream()
                             .filter(b -> !getClass().equals(b.getBeanClass()))
                             .collect(Collectors.collectingAndThen(Collectors.toSet(), beanManager::resolve));
-                    return Mockito.spy(beanManager.getReference(bean, contract.getType(), context));
+                    Object spy = Mockito.spy(beanManager.getReference(bean, contract.getType(), context));
+                    reset.add(spy);
+                    return spy;
                 })
         );
+        event.addObserverMethod()
+                .observedType(Object.class)
+                .qualifiers(TestEvent.Literal.of(TestPhase.AFTER_EACH))
+                .notifyWith(e -> reset.forEach(Mockito::reset));
     }
 }

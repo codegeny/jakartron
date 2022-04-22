@@ -25,18 +25,20 @@ import org.junit.jupiter.api.extension.*;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
 import org.junit.platform.commons.util.ReflectionUtils;
 
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.control.RequestContextController;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.*;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public final class JakartronExtension implements TestInstanceFactory, BeforeAllCallback, AfterAllCallback, BeforeEachCallback, AfterEachCallback, ParameterResolver, TestInstancePreDestroyCallback {
 
     private static final Namespace NAMESPACE = Namespace.create(JakartronExtension.class);
+    private static final Logger LOGGER = Logger.getLogger(JakartronExtension.class.getName());
 
     @Override
     public void afterAll(ExtensionContext context) {
@@ -46,13 +48,18 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
 
     @Override
     public void beforeAll(ExtensionContext extensionContext) {
-        SeContainer container = Jakartron.initialize(Stream.concat(Stream.of(extensionContext.getRequiredTestClass()), ReflectionUtils.findNestedClasses(extensionContext.getRequiredTestClass(), t -> true).stream()))
-                .addExtensions(new TestExtension(extensionContext.getRequiredTestClass()))
-                .addBeanClasses(extensionContext.getRequiredTestClass())
-                .initialize();
-        getStore(extensionContext).put(SeContainer.class, container);
-        getStore(extensionContext).put(AnnotatedType.class, container.getBeanManager().createAnnotatedType(extensionContext.getRequiredTestClass()));
-        container.getBeanManager().fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.BEFORE_ALL));
+        try {
+            SeContainer container = Jakartron.initialize(Stream.concat(Stream.of(extensionContext.getRequiredTestClass()), ReflectionUtils.findNestedClasses(extensionContext.getRequiredTestClass(), t -> true).stream()))
+                    .addExtensions(new TestExtension(extensionContext.getRequiredTestClass()))
+                    .addBeanClasses(extensionContext.getRequiredTestClass())
+                    .initialize();
+            getStore(extensionContext).put(SeContainer.class, container);
+            getStore(extensionContext).put(AnnotatedType.class, container.getBeanManager().createAnnotatedType(extensionContext.getRequiredTestClass()));
+            container.getBeanManager().fireEvent(extensionContext, TestEvent.Literal.of(TestPhase.BEFORE_ALL));
+        } catch (RuntimeException exception) {
+            LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
+            throw exception;
+        }
     }
 
     @Override
