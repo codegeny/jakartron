@@ -21,6 +21,7 @@ package org.codegeny.jakartron;
  */
 
 import org.codegeny.jakartron.concurrent.ConcurrenceProducer;
+import org.codegeny.jakartron.jndi.BeanManagerProducer;
 import org.codegeny.jakartron.jndi.JNDIExtension;
 import org.codegeny.jakartron.logging.LoggerProducer;
 
@@ -47,7 +48,7 @@ public final class Jakartron {
     public static SeContainerInitializer initialize(Stream<Class<?>> classes) {
         SeContainerInitializer initializer = SeContainerInitializer.newInstance()
                 .addExtensions(CoreExtension.class, JNDIExtension.class)
-                .addBeanClasses(ConcurrenceProducer.class, LoggerProducer.class);
+                .addBeanClasses(ConcurrenceProducer.class, LoggerProducer.class, BeanManagerProducer.class);
         Set<Class<?>> visited = new HashSet<>();
         classes.forEach(c -> scanAnnotations(c, initializer, visited));
         return initializer;

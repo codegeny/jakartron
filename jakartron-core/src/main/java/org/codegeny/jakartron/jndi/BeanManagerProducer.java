@@ -20,15 +20,18 @@ package org.codegeny.jakartron.jndi;
  * #L%
  */
 
-import javax.enterprise.inject.spi.CDI;
-import javax.naming.Context;
-import javax.naming.spi.InitialContextFactory;
-import java.util.Hashtable;
+import javax.enterprise.context.Dependent;
+import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.BeanManager;
 
-public final class CDIInitialContextFactory implements InitialContextFactory {
+@Dependent
+public class BeanManagerProducer {
 
-    @Override
-    public Context getInitialContext(Hashtable<?, ?> environment) {
-        return new CDIContext(CDI.current().getBeanManager());
+    public static final String BEAN_MANAGER_JNDI_NAME = "java:comp/BeanManager";
+
+    @Produces
+    @JNDI(BEAN_MANAGER_JNDI_NAME)
+    public BeanManager beanManager(BeanManager beanManager) {
+        return beanManager;
     }
 }

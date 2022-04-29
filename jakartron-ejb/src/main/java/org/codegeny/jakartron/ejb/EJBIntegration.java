@@ -24,17 +24,16 @@ import org.codegeny.jakartron.jca.ConfigureResourceAdapter;
 import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
-import javax.annotation.Resource;
 import javax.ejb.*;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.control.ActivateRequestContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.spi.*;
 import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
 import javax.transaction.Transactional;
 import java.io.Externalizable;
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -57,15 +56,17 @@ public final class EJBIntegration implements Extension {
         AnnotatedTypeConfigurator<?> configurator = event.configureAnnotatedType()
                 .add(() -> ActivateRequestContext.class);
 
-        configurator
-                .filterFields(f -> f.isAnnotationPresent(Resource.class) && EJBContext.class.isAssignableFrom(f.getJavaMember().getType()))
-                .forEach(f -> f.add(InjectLiteral.INSTANCE));
-
         if (transactionManagementType == TransactionManagementType.CONTAINER) {
             event.configureAnnotatedType()
                     .add(transactionLiteral(event.getAnnotatedType()))
                     .filterMethods(m -> m.isAnnotationPresent(TransactionAttribute.class))
                     .forEach(m -> m.add(transactionLiteral(m.getAnnotated())));
+        }
+    }
+
+    public <T> void inject(@Observes ProcessInjectionTarget<T> event, BeanManager beanManager) {
+        if (event.getAnnotatedType().getAnnotations().stream().map(Annotation::annotationType).anyMatch(Arrays.asList(Stateless.class, Singleton.class, Stateful.class, MessageDriven.class)::contains)) {
+            event.setInjectionTarget(new EJBContextInjectionTarget<>(event, beanManager));
         }
     }
 

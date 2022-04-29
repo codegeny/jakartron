@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jndi;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,23 +21,15 @@ package org.codegeny.jakartron.jndi;
  */
 
 import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.Binding;
-import javax.naming.CompoundName;
-import javax.naming.Context;
-import javax.naming.Name;
-import javax.naming.NameClassPair;
-import javax.naming.NameNotFoundException;
-import javax.naming.NameParser;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
+import javax.naming.*;
 import java.util.Hashtable;
 import java.util.Properties;
 
-public class CDIContext implements Context {
+public final class CDIContext implements Context {
 
     private final static Properties SYNTAX = new Properties();
 
-    static   {
+    static {
         SYNTAX.put("jndi.syntax.direction", "left_to_right");
         SYNTAX.put("jndi.syntax.separator", "/");
         SYNTAX.put("jndi.syntax.ignorecase", "false");
@@ -61,42 +53,34 @@ public class CDIContext implements Context {
 
     @Override
     public void bind(Name name, Object obj) {
-
     }
 
     @Override
     public void bind(String name, Object obj) {
-
     }
 
     @Override
     public void rebind(Name name, Object obj) {
-
     }
 
     @Override
     public void rebind(String name, Object obj) {
-
     }
 
     @Override
     public void unbind(Name name) {
-
     }
 
     @Override
     public void unbind(String name) {
-
     }
 
     @Override
     public void rename(Name oldName, Name newName) {
-
     }
 
     @Override
     public void rename(String oldName, String newName) {
-
     }
 
     @Override
@@ -121,12 +105,10 @@ public class CDIContext implements Context {
 
     @Override
     public void destroySubcontext(Name name) {
-
     }
 
     @Override
     public void destroySubcontext(String name) {
-
     }
 
     @Override
@@ -186,7 +168,6 @@ public class CDIContext implements Context {
 
     @Override
     public void close() {
-
     }
 
     @Override

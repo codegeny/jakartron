@@ -36,12 +36,14 @@ import java.util.logging.Logger;
 public class ConcurrenceProducer {
 
     public static final String MANAGED_EXECUTOR_SERVICE_JNDI_NAME = "java:comp/concurrent/ThreadPool";
+    public static final String MANAGED_THREAD_FACTORY_JNDI_NAME = "java:comp/concurrent/ThreadFactory";
 
     @Inject
     @Internal
     private Logger logger;
 
     @Produces
+    @JNDI(MANAGED_THREAD_FACTORY_JNDI_NAME)
     @ApplicationScoped
     public ManagedThreadFactory createManagedThreadFactory() {
         return ManageableThreadImpl::new;
@@ -50,7 +52,7 @@ public class ConcurrenceProducer {
     @Produces
     @JNDI(MANAGED_EXECUTOR_SERVICE_JNDI_NAME)
     @ApplicationScoped
-    public ManagedScheduledExecutorService createManagedScheduledExecutorService(ManagedThreadFactory managedThreadFactory) {
+    public ManagedScheduledExecutorService createManagedScheduledExecutorService(@JNDI(MANAGED_THREAD_FACTORY_JNDI_NAME) ManagedThreadFactory managedThreadFactory) {
         return new ManagedScheduledExecutorServiceImpl(managedThreadFactory);
     }
 

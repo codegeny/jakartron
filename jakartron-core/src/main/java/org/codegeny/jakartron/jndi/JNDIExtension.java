@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jndi;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,26 +22,15 @@ package org.codegeny.jakartron.jndi;
 
 import org.kohsuke.MetaInfServices;
 
-import javax.annotation.Resource;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.literal.InjectLiteral;
-import javax.enterprise.inject.spi.*;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessInjectionTarget;
 
 @MetaInfServices
 public class JNDIExtension implements Extension {
 
-    public static final String BEAN_MANAGER_JNDI_NAME = "java:comp/BeanManager";
-
-    public void addBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
-        event.addBean()
-                .types(Object.class)
-                .qualifiers(JNDI.Literal.of(BEAN_MANAGER_JNDI_NAME))
-                .createWith(context -> beanManager);
-    }
-
-    public void processResources(@Observes @WithAnnotations(Resource.class) ProcessAnnotatedType<?> event) {
-        event.configureAnnotatedType()
-                .filterFields(f -> f.isAnnotationPresent(Resource.class) && !f.getAnnotation(Resource.class).lookup().isEmpty())
-                .forEach(f -> f.add(InjectLiteral.INSTANCE).add(JNDI.Literal.of(f.getAnnotated().getAnnotation(Resource.class).lookup())));
+    public <T> void inject(@Observes ProcessInjectionTarget<T> event, BeanManager beanManager) {
+        event.setInjectionTarget(new ResourceInjectionTarget<>(event, beanManager));
     }
 }

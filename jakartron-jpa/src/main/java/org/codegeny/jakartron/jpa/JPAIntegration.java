@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jpa;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,6 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Any;
-import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.spi.*;
 import javax.enterprise.inject.spi.configurator.AnnotatedFieldConfigurator;
 import javax.enterprise.util.AnnotationLiteral;
@@ -43,7 +42,6 @@ import javax.persistence.spi.PersistenceProviderResolverHolder;
 import javax.persistence.spi.PersistenceUnitInfo;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
-import javax.transaction.TransactionScoped;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -62,6 +60,7 @@ public final class JPAIntegration implements Extension {
     private final Set<QualifierInstance<PersistenceUnit>> persistenceUnits = new HashSet<>();
     private final Set<QualifierInstance<PersistenceContext>> persistenceContexts = new HashSet<>();
     private final Set<PersistenceUnitInfo> persistenceUnitInfos = new HashSet<>();
+
     public void addQualifiers(@Observes BeforeBeanDiscovery event) {
         event.addQualifier(PersistenceUnit.class);
         event.configureQualifier(PersistenceContext.class)
@@ -76,11 +75,15 @@ public final class JPAIntegration implements Extension {
     public void makeInjectable(@Observes @WithAnnotations({PersistenceUnit.class, PersistenceContext.class}) ProcessAnnotatedType<?> event, BeanManager beanManager) {
         event.configureAnnotatedType()
                 .filterFields(f -> f.isAnnotationPresent(PersistenceUnit.class) || f.isAnnotationPresent(PersistenceContext.class))
-                .forEach(f ->makeInjectable(f, beanManager));
+                .forEach(f -> makeInjectable(f, beanManager));
     }
 
     public void registerAlternative(@Observes @Priority(-50) AfterTypeDiscovery event) {
         event.getAlternatives().add(getClass());
+    }
+
+    public <T> void inject(@Observes ProcessInjectionTarget<T> event, BeanManager beanManager) {
+        event.setInjectionTarget(new PersistenceInjectionTarget<>(event, beanManager));
     }
 
     private void makeInjectable(AnnotatedFieldConfigurator<?> fieldConfigurator, BeanManager beanManager) {
@@ -91,7 +94,6 @@ public final class JPAIntegration implements Extension {
             persistenceUnit = new PersistenceUnitLiteral(persistenceContext);
         }
         persistenceUnits.add(new QualifierInstance<>(persistenceUnit, beanManager));
-        fieldConfigurator.add(InjectLiteral.INSTANCE);
     }
 
     public void addBeans(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
