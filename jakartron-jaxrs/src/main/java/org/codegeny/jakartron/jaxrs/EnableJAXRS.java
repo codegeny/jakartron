@@ -34,6 +34,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @EnableServlet
 @EnableValidation
-@AdditionalClasses({JAXRSIntegration.class, ResteasyCdiExtension.class, JAXRSProducer.class})
+@AdditionalClasses({ResteasyCdiExtension.class, JAXRSProducer.class})
 public @interface EnableJAXRS {
 }
