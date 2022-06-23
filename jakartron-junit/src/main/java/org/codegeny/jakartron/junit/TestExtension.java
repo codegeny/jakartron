@@ -20,7 +20,6 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
-import javax.annotation.Priority;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AfterTypeDiscovery;
@@ -36,7 +35,7 @@ public final class TestExtension implements Extension {
         this.testClass = testClass;
     }
 
-    public void setPriority(@Observes @Priority(Integer.MIN_VALUE) AfterTypeDiscovery event) {
+    public void setPriority(@Observes AfterTypeDiscovery event) {
         event.getAlternatives().add(testClass);
     }
 
