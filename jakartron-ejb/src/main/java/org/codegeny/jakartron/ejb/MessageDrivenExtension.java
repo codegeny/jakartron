@@ -9,9 +9,9 @@ package org.codegeny.jakartron.ejb;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +21,13 @@ package org.codegeny.jakartron.ejb;
  */
 
 import org.codegeny.jakartron.jca.ConfigureResourceAdapter;
-import org.codegeny.jakartron.jta.TransactionalLiteral;
 import org.kohsuke.MetaInfServices;
 
-import javax.ejb.*;
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.control.ActivateRequestContext;
+import javax.ejb.MessageDriven;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.*;
-import javax.enterprise.inject.spi.configurator.AnnotatedTypeConfigurator;
-import javax.transaction.Transactional;
 import java.io.Externalizable;
 import java.io.Serializable;
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -45,36 +39,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @MetaInfServices
-public final class EJBIntegration implements Extension {
+public final class MessageDrivenExtension implements Extension {
 
-    public void common(@Observes @WithAnnotations({Stateless.class, Singleton.class, Stateful.class, MessageDriven.class}) ProcessAnnotatedType<?> event) {
-
-        TransactionManagementType transactionManagementType = event.getAnnotatedType().isAnnotationPresent(TransactionManagement.class)
-                ? event.getAnnotatedType().getAnnotation(TransactionManagement.class).value()
-                : TransactionManagementType.CONTAINER;
-
-        AnnotatedTypeConfigurator<?> configurator = event.configureAnnotatedType()
-                .add(() -> ActivateRequestContext.class);
-
-        if (transactionManagementType == TransactionManagementType.CONTAINER) {
-            event.configureAnnotatedType()
-                    .add(transactionLiteral(event.getAnnotatedType()))
-                    .filterMethods(m -> m.isAnnotationPresent(TransactionAttribute.class))
-                    .forEach(m -> m.add(transactionLiteral(m.getAnnotated())));
-        }
-    }
-
-    public <T> void inject(@Observes ProcessInjectionTarget<T> event, BeanManager beanManager) {
-        if (event.getAnnotatedType().getAnnotations().stream().map(Annotation::annotationType).anyMatch(Arrays.asList(Stateless.class, Singleton.class, Stateful.class, MessageDriven.class)::contains)) {
-            event.setInjectionTarget(new EJBContextInjectionTarget<>(event, beanManager));
-        }
-    }
-
-    public void scope(@Observes @WithAnnotations({Stateless.class, Singleton.class}) ProcessAnnotatedType<?> event) {
-        event.configureAnnotatedType().add(ApplicationScoped.Literal.INSTANCE);
-    }
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([^}]+)}");
 
     private final Set<AnnotatedType<?>> messageDrivenBeans = new HashSet<>();
+
+    public void configure(@Observes BeforeBeanDiscovery event) {
+        event.addAnnotatedType(ContextDataHolder.class, ContextDataHolder.class.getName());
+        event.addAnnotatedType(EJBContextImpl.class, EJBContextImpl.class.getName());
+    }
 
     public void processMessageListeners(@Observes @WithAnnotations(MessageDriven.class) ProcessAnnotatedType<?> event) {
         messageDrivenBeans.add(event.getAnnotatedType());
@@ -83,11 +57,11 @@ public final class EJBIntegration implements Extension {
     public void registerMDB(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
         event.<ConfigureResourceAdapter>addObserverMethod()
                 .observedType(ConfigureResourceAdapter.class)
-                .notifyWith(e -> messageDrivenBeans.forEach(mdb -> {
-                    MessageDriven messageDriven = mdb.getAnnotation(MessageDriven.class);
+                .notifyWith(e -> messageDrivenBeans.forEach(messageDrivenBean -> {
+                    MessageDriven messageDriven = messageDrivenBean.getAnnotation(MessageDriven.class);
                     Class<?> listenerInterface;
                     if (messageDriven.messageListenerInterface().equals(Object.class)) {
-                        Set<Class<?>> interfaces = getAllInterfaces(mdb.getJavaClass())
+                        Set<Class<?>> interfaces = getAllInterfaces(messageDrivenBean.getJavaClass())
                                 .distinct()
                                 .filter(i -> !i.getPackage().getName().startsWith("javax.ejb"))
                                 .filter(i -> !Arrays.asList(Serializable.class, Externalizable.class).contains(i))
@@ -102,7 +76,7 @@ public final class EJBIntegration implements Extension {
 
                     Properties properties = new Properties();
                     Stream.of(messageDriven.activationConfig()).forEach(a -> properties.setProperty(a.propertyName(), evaluate(a.propertyValue())));
-                    e.getEvent().addMessageEndpoint(listenerInterface, beanManager.createInstance().select(mdb.getJavaClass()), properties, mdb.getJavaClass());
+                    e.getEvent().addMessageEndpoint(listenerInterface, beanManager.createInstance().select(messageDrivenBean.getJavaClass()), properties, messageDrivenBean.getJavaClass());
                 }));
     }
 
@@ -115,20 +89,11 @@ public final class EJBIntegration implements Extension {
         return matcher.appendTail(buffer).toString();
     }
 
-    private static Stream<Class<?>> getAllInterfaces(Class<?> klass) {
+    private Stream<Class<?>> getAllInterfaces(Class<?> klass) {
         return klass == null ? Stream.empty() : Stream.<Stream<Class<?>>>of(
                 klass.isInterface() ? Stream.of(klass) : Stream.empty(),
                 getAllInterfaces(klass.getSuperclass()),
-                Stream.of(klass.getInterfaces()).flatMap(EJBIntegration::getAllInterfaces)
+                Stream.of(klass.getInterfaces()).flatMap(this::getAllInterfaces)
         ).flatMap(Function.identity());
     }
-
-    private static TransactionalLiteral transactionLiteral(Annotated annotated) {
-        return new TransactionalLiteral(annotated.isAnnotationPresent(TransactionAttribute.class)
-                ? Transactional.TxType.valueOf(annotated.getAnnotation(TransactionAttribute.class).value().name())
-                : Transactional.TxType.REQUIRED
-        );
-    }
-
-    private static final Pattern PLACEHOLDER =  Pattern.compile("\\$\\{([^}]+)}");
 }

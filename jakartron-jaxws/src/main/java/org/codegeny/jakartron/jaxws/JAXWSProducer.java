@@ -30,18 +30,23 @@ import com.sun.xml.ws.transport.http.servlet.ServletAdapter;
 import com.sun.xml.ws.transport.http.servlet.ServletAdapterList;
 import com.sun.xml.ws.transport.http.servlet.WSServlet;
 import com.sun.xml.ws.transport.http.servlet.WSServletDelegate;
+import com.sun.xml.ws.util.HandlerAnnotationInfo;
+import com.sun.xml.ws.util.HandlerAnnotationProcessor;
 import com.sun.xml.ws.util.xml.XmlUtil;
 import org.codegeny.jakartron.servlet.Initialized;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.Unmanaged;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletRegistration.Dynamic;
 import javax.xml.namespace.QName;
+import javax.xml.ws.handler.Handler;
+import javax.xml.ws.soap.SOAPBinding;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
@@ -69,14 +74,17 @@ public final class JAXWSProducer {
         // TODO Allow customization of url
         String urlPattern = "/" + webService.name();
 
+        QName serviceName = new QName(webService.targetNamespace(), webService.serviceName());
+        QName portName = new QName(webService.targetNamespace(), webService.portName());
+
         WSEndpoint<?> endpoint = WSEndpoint.create(
                 implementorClass,
-                true, // TODO reimplement handlers processing (so they can be managed by CDI)
+                false,
                 new BeanInvoker(beanManager),
-                new QName(webService.targetNamespace(), webService.serviceName()),
-                new QName(webService.targetNamespace(), webService.portName()),
+                serviceName,
+                portName,
                 createContainer(context),
-                createBinding(implementorClass),
+                createBinding(implementorClass, serviceName, portName, beanManager),
                 createWsdl(webService.wsdlLocation()),
                 Collections.emptyList(),
                 XmlUtil.createDefaultCatalogResolver(),
@@ -94,11 +102,25 @@ public final class JAXWSProducer {
         return new ServletContainer(context, new ServletContextModule(context), new ServletContextResourceLoader(context));
     }
 
-    private static WSBinding createBinding(Class<?> implementorClass) {
+    private static WSBinding createBinding(Class<?> implementorClass, QName serviceName, QName portName, BeanManager beanManager) {
         WebServiceFeatureList features = new WebServiceFeatureList();
         features.parseAnnotations(implementorClass);
         BindingID bindingID = BindingID.parse(implementorClass);
         features.addAll(bindingID.createBuiltinFeatureList());
-        return bindingID.createBinding(features.toArray());
+        WSBinding binding = bindingID.createBinding(features.toArray());
+        HandlerAnnotationInfo chainInfo = HandlerAnnotationProcessor.buildHandlerInfo(implementorClass, serviceName, portName, binding);
+        if (chainInfo != null) {
+            binding.setHandlerChain(chainInfo.getHandlers().stream().map(handler -> processHandler(handler, beanManager)).collect(Collectors.toList()));
+            if (binding instanceof SOAPBinding) {
+                ((SOAPBinding) binding).setRoles(chainInfo.getRoles());
+            }
+        }
+        return binding;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private static Handler processHandler(Handler handler, BeanManager beanManager) {
+        Instance<? extends Handler> instance = beanManager.createInstance().select(handler.getClass());
+        return instance.isResolvable() ? instance.get() : handler;
     }
 }

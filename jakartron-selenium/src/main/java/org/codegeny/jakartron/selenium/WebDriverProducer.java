@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jsf;
+package org.codegeny.jakartron.selenium;
 
 /*-
  * #%L
- * jakartron-jsf
+ * jakartron-selenium
  * %%
  * Copyright (C) 2018 - 2021 Codegeny
  * %%

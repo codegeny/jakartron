@@ -21,6 +21,7 @@ package org.codegeny.jakartron.jpa;
  */
 
 import org.codegeny.jakartron.QualifierInstance;
+import org.hibernate.Session;
 import org.kohsuke.MetaInfServices;
 
 import javax.annotation.Priority;
@@ -139,7 +140,7 @@ public final class JPAIntegration implements Extension {
                 .produceWith(instance -> instance.select(EntityManagerFactory.class, new PersistenceUnitLiteral(persistenceContext)).get().createEntityManager(properties))
                 .disposeWith((entityManager, instance) -> entityManager.close())
                 .scope(toScope(persistenceContext.type()))
-                .types(Object.class, EntityManager.class)
+                .types(Object.class, EntityManager.class, Session.class)
                 .qualifiers(persistenceContext, Any.Literal.INSTANCE);
     }
 

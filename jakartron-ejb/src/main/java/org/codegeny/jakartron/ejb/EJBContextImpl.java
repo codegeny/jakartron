@@ -43,7 +43,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Dependent
-public class EJBContextImpl implements EJBContext, SessionContext, MessageDrivenContext {
+public final class EJBContextImpl implements EJBContext, SessionContext, MessageDrivenContext {
 
     @Inject
     private Instance<Object> instance;

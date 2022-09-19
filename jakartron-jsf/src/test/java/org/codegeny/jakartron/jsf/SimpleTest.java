@@ -21,6 +21,8 @@ package org.codegeny.jakartron.jsf;
  */
 
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
+import org.codegeny.jakartron.selenium.FragmentablePageFactory;
+import org.codegeny.jakartron.selenium.Page;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;

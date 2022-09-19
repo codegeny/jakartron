@@ -29,6 +29,7 @@ import org.eclipse.jetty.security.LoginService;
 import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.util.resource.ResourceCollection;
 import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.webapp.Configuration;
 import org.eclipse.jetty.webapp.JettyWebXmlConfiguration;
@@ -43,9 +44,12 @@ import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Singleton;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -102,7 +106,21 @@ final class ServletProducer {
     private WebAppContext webAppContext(BeanManager beanManager, LoginService loginService) throws Exception {
         //WebAppContext webAppContext = new WebAppContext(Resource.newClassPathResource("META-INF/resources"), "/");
         WebAppContext webAppContext = new WebAppContext(System.getProperty("java.io.tmpdir"), "/");
-        webAppContext.setBaseResource(new FilterResource());
+
+        List<org.eclipse.jetty.util.resource.Resource> baseResources = new ArrayList<>();
+        baseResources.add(org.eclipse.jetty.util.resource.Resource.newClassPathResource("/"));
+        baseResources.add(org.eclipse.jetty.util.resource.Resource.newClassPathResource("/META-INF/resources"));
+        File user = new File(System.getProperty("user.dir"));
+        File main = new File(user, "src/main/webapp");
+        if (main.exists() && main.isDirectory()) {
+            baseResources.add(org.eclipse.jetty.util.resource.Resource.newResource(main));
+        }
+        File test = new File(user, "src/test/webapp");
+        if (test.exists() && test.isDirectory()) {
+            baseResources.add(org.eclipse.jetty.util.resource.Resource.newResource(test));
+        }
+        webAppContext.setBaseResource(new ResourceCollection(baseResources.toArray(new org.eclipse.jetty.util.resource.Resource[0])));
+        
         webAppContext.setAttribute(WebInfConfiguration.CONTAINER_JAR_PATTERN, ".*taglibs-standard-impl-.*\\.jar$");
         webAppContext.addEventListener(new WeldInitialListener(BeanManagerProxy.unwrap(beanManager)));
         webAppContext.addEventListener(new BridgingServletContextListener(beanManager));

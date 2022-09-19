@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.codegeny.jakartron</groupId>
     <artifactId>jakartron</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Jakartron</name>
@@ -93,6 +93,7 @@
         <module>jakartron-mailra</module>
         <module>jakartron-ejb</module>
         <module>jakartron-servlet</module>
+        <module>jakartron-selenium</module>
         <module>jakartron-jaxws</module>
         <module>jakartron-jaxrs</module>
         <module>jakartron-dbunit</module>
@@ -388,14 +389,14 @@
                         <exclude>.gitignore</exclude>
                     </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>verify</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>check</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
