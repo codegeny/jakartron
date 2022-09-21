@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FragmentablePageFactory {
+public final class FragmentablePageFactory {
 
     public static void initPage(WebDriver driver, Object pageObject) {
         PageFactory.initElements(new FragmentDefaultFieldDecorator(driver, driver), pageObject);

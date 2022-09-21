@@ -1,8 +1,8 @@
-package org.codegeny.jakartron.jsf;
+package org.codegeny.jakartron.selenium;
 
 /*-
  * #%L
- * jakartron-jsf
+ * jakartron-selenium
  * %%
  * Copyright (C) 2018 - 2021 Codegeny
  * %%
@@ -20,14 +20,6 @@ package org.codegeny.jakartron.jsf;
  * #L%
  */
 
-import com.sun.faces.application.view.ViewScopeExtension;
-import com.sun.faces.cdi.CdiExtension;
-import com.sun.faces.flow.FlowCDIExtension;
-import com.sun.faces.flow.FlowDiscoveryCDIExtension;
-import org.codegeny.jakartron.AdditionalClasses;
-import org.codegeny.jakartron.servlet.EnableServlet;
-import org.codegeny.jakartron.validation.EnableValidation;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -35,8 +27,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-@EnableServlet
-@EnableValidation
-@AdditionalClasses({JSFProducer.class, CdiExtension.class, FlowCDIExtension.class, FlowDiscoveryCDIExtension.class, ViewScopeExtension.class})
-public @interface EnableJSF {
+public @interface Location {
+
+    String value();
 }

@@ -9,9 +9,9 @@ package org.codegeny.jakartron.selenium;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,34 +20,32 @@ package org.codegeny.jakartron.selenium;
  * #L%
  */
 
-import org.codegeny.jakartron.servlet.Base;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Disposes;
-import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import java.lang.annotation.Annotation;
+import javax.inject.Singleton;
+import java.time.Duration;
 
 @Dependent
 public class WebDriverProducer {
 
     @Produces
-    @Base
-    public WebDriver driver(InjectionPoint injectionPoint, @Any Instance<String> uriProvider) {
-        Annotation base = injectionPoint.getQualifiers().stream().filter(Base.class::isInstance).findFirst().orElseThrow(InternalError::new);
-        String uri = uriProvider.select(base).get();
-        WebDriver driver = new HtmlUnitDriver();
-        if (!uri.isEmpty()) {
-            driver.get(uri);
-        }
-        return driver;
+    @Singleton
+    public WebDriver produceWebDriver() {
+        return new HtmlUnitDriver();
     }
 
-    public void closeDriver(@Disposes @Base WebDriver driver) {
+    public void disposeWebDriver(@Disposes WebDriver driver) {
         driver.close();
+    }
+
+    @Produces
+    @Singleton
+    public WebDriverWait produceWebDriverWait(WebDriver webDriver) {
+        return new WebDriverWait(webDriver, Duration.ofSeconds(15));
     }
 }

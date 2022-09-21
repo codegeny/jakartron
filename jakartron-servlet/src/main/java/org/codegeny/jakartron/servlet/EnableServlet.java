@@ -21,6 +21,7 @@ package org.codegeny.jakartron.servlet;
  */
 
 import org.codegeny.jakartron.AdditionalClasses;
+import org.codegeny.jakartron.security.EnableSecurity;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,6 +30,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@EnableSecurity
 @AdditionalClasses({BridgingServletContextListener.class, ServletExtension.class, ServletProducer.class, SecurityExtension.class, PrincipalProducer.class})
 public @interface EnableServlet {
 }

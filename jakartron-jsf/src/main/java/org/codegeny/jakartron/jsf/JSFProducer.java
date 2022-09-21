@@ -29,14 +29,15 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 
-import static com.sun.faces.config.WebConfiguration.BooleanWebContextInitParameter.ForceLoadFacesConfigFiles;
+//import static com.sun.faces.config.WebConfiguration.BooleanWebContextInitParameter.ForceLoadFacesConfigFiles;
 
 @Dependent
 public class JSFProducer {
 
     public void configure(@Observes @Initialized ServletContextEvent event) {
         ServletContext context = event.getServletContext();
-        //context.setInitParameter(ForceLoadFacesConfigFiles.getQualifiedName(), Boolean.TRUE.toString());
+//        context.setInitParameter(ForceLoadFacesConfigFiles.getQualifiedName(), Boolean.TRUE.toString());
+//        context.setInitParameter(PushContext.ENABLE_WEBSOCKET_ENDPOINT_PARAM_NAME, Boolean.TRUE.toString());
         context.setInitParameter(UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME, Boolean.TRUE.toString());
         context.addServlet("faces", FacesServlet.class).addMapping("*.xhtml");
     }

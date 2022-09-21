@@ -9,9 +9,9 @@ package org.codegeny.jakartron.jsf;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,21 +20,26 @@ package org.codegeny.jakartron.jsf;
  * #L%
  */
 
+import org.codegeny.jakartron.AdditionalClasses;
+import org.codegeny.jakartron.DisableDiscovery;
 import org.codegeny.jakartron.junit.ExtendWithJakartron;
-import org.codegeny.jakartron.selenium.FragmentablePageFactory;
-import org.codegeny.jakartron.selenium.Page;
+import org.codegeny.jakartron.selenium.EnableSelenium;
+import org.codegeny.jakartron.selenium.Location;
+import org.codegeny.jakartron.selenium.Navigator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @ExtendWithJakartron
+@DisableDiscovery
+@EnableJSF
+@EnableSelenium
+@EnableOmnifaces
+@AdditionalClasses(MyBean.class)
 public class SimpleTest {
 
     public static class MyForm {
-
-        private final WebDriver driver;
 
         @FindBy(id = "form:input")
         private WebElement input;
@@ -42,18 +47,14 @@ public class SimpleTest {
         @FindBy(id = "form:submit")
         private WebElement submit;
 
-        public MyForm(WebDriver driver) {
-            this.driver = driver;
-        }
-
-        public MyPage submit(String message) {
+        public void submit(String message) {
             input.clear();
             input.sendKeys(message);
             submit.submit();
-            return FragmentablePageFactory.createPage(driver, MyPage.class);
         }
     }
 
+    @Location("my-bean.xhtml")
     public static class MyPage {
 
         @FindBy(id = "message")
@@ -72,10 +73,12 @@ public class SimpleTest {
     }
 
     @Test
-    public void test(@Page("my-bean.xhtml") MyPage page) {
+    public void test(Navigator navigator) {
+        MyPage page = navigator.navigateTo(MyPage.class);
         Assertions.assertEquals("hello", page.getMessage());
 
-        page = page.getMyForm().submit("world");
+        page.getMyForm().submit("world");
+        page = navigator.current(MyPage.class);
         Assertions.assertEquals("world", page.getMessage());
     }
 }

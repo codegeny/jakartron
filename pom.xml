@@ -126,6 +126,13 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.78.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.eclipse.jetty.toolchain</groupId>
                 <artifactId>jetty-schemas</artifactId>
                 <version>4.0.3</version>
@@ -138,12 +145,12 @@
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
-                <version>1.12.8</version>
+                <version>1.12.10</version>
             </dependency>
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy-agent</artifactId>
-                <version>1.12.8</version>
+                <version>1.12.10</version>
             </dependency>
             <dependency>
                 <groupId>org.jvnet.staxex</groupId>
