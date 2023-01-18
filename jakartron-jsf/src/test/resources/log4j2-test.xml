@@ -24,6 +24,7 @@
     </Appenders>
     <Loggers>
         <Logger name="org.codegeny.jakartron" level="INFO"/>
+        <Logger name="com.gargoylesoftware.htmlunit.DefaultCssErrorHandler" level="ERROR"/>
         <Root level="WARN">
             <AppenderRef ref="Console"/>
         </Root>

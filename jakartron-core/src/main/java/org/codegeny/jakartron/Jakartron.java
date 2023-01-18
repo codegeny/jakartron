@@ -25,6 +25,7 @@ import org.codegeny.jakartron.jndi.BeanManagerProducer;
 import org.codegeny.jakartron.jndi.JNDIExtension;
 import org.codegeny.jakartron.logging.LoggerProducer;
 
+import javax.annotation.Priority;
 import javax.decorator.Decorator;
 import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.se.SeContainer;
@@ -81,7 +82,7 @@ public final class Jakartron {
         } else if (Extension.class.isAssignableFrom(type)) {
             initializer.addExtensions(type.asSubclass(Extension.class));
         } else {
-            if (type.isAnnotationPresent(Interceptor.class)) {
+            if (type.isAnnotationPresent(Interceptor.class) && !type.isAnnotationPresent(Priority.class)) {
                 initializer.enableInterceptors(type);
             }
             if (type.isAnnotationPresent(Decorator.class)) {

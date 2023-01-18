@@ -23,6 +23,8 @@ package org.codegeny.jakartron.selenium;
 import org.codegeny.jakartron.servlet.Base;
 import org.openqa.selenium.WebDriver;
 
+import javax.annotation.Priority;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
@@ -31,6 +33,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.stream.Stream;
 
+@Priority(Interceptor.Priority.APPLICATION)
+@Dependent
 @Interceptor
 @BasicLogin(name = "dummy", password = "dummy")
 public class BasicLoginInterceptor {
