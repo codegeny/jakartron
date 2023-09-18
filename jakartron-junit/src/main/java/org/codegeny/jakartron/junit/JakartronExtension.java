@@ -30,6 +30,8 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.spi.*;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +53,7 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
         try {
             SeContainer container = Jakartron.initialize(Stream.concat(Stream.of(extensionContext.getRequiredTestClass()), ReflectionUtils.findNestedClasses(extensionContext.getRequiredTestClass(), t -> true).stream()))
                     .addExtensions(new TestExtension(extensionContext.getRequiredTestClass()))
-                    .addBeanClasses(extensionContext.getRequiredTestClass())
+                    .addBeanClasses(hierarchy(extensionContext.getRequiredTestClass()))
                     .initialize();
             getStore(extensionContext).put(SeContainer.class, container);
             getStore(extensionContext).put(AnnotatedType.class, container.getBeanManager().createAnnotatedType(extensionContext.getRequiredTestClass()));
@@ -60,6 +62,15 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
             LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
             throw exception;
         }
+    }
+
+    private static Class<?>[] hierarchy(Class<?> testClass) {
+        List<Class<?>> hierarchy = new ArrayList<>();
+        while (testClass != null) {
+            hierarchy.add(testClass);
+            testClass = testClass.getEnclosingClass();
+        }
+        return hierarchy.toArray(new Class<?>[0]);
     }
 
     @Override
@@ -89,8 +100,11 @@ public final class JakartronExtension implements TestInstanceFactory, BeforeAllC
     @Override
     public Object createTestInstance(TestInstanceFactoryContext testInstanceFactoryContext, ExtensionContext extensionContext) {
         return getBeanManager(extensionContext).map(beanManager -> {
-            CreationalContext<?> creationalContext = beanManager.createCreationalContext(null);
-            getStore(extensionContext).put(CreationalContext.class, creationalContext);
+            CreationalContext<?> creationalContext = getStore(extensionContext).get(CreationalContext.class, CreationalContext.class);
+            if (creationalContext == null) {
+                creationalContext = beanManager.createCreationalContext(null);
+                getStore(extensionContext).put(CreationalContext.class, creationalContext);
+            }
             Bean<?> testBean = beanManager.resolve(beanManager.getBeans(extensionContext.getRequiredTestClass()));
             return beanManager.getReference(testBean, extensionContext.getRequiredTestClass(), creationalContext);
         }).orElse(null);

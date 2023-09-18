@@ -10,7 +10,6 @@ public class NestedTestTest {
 
     @Test
     public void simpleTest() {
-        System.out.println("simple");
     }
 
     @Nested
@@ -18,7 +17,6 @@ public class NestedTestTest {
 
         @Test
         public void nested() {
-            System.out.println("nested");
         }
     }
 }

@@ -20,6 +20,7 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
+import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Scope;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,4 +28,9 @@ import java.lang.annotation.RetentionPolicy;
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestScoped {
+
+    class Literal extends AnnotationLiteral<TestScoped> implements TestScoped {
+
+        public static final TestScoped INSTANCE = new Literal();
+    }
 }

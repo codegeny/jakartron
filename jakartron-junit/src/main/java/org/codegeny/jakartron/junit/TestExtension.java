@@ -24,25 +24,38 @@ import org.junit.jupiter.api.Nested;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.CreationException;
 import javax.enterprise.inject.literal.InjectLiteral;
 import javax.enterprise.inject.spi.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Parameter;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public final class TestExtension implements Extension {
 
     private final TestContext context = new TestContext();
+
     private final Class<?> testClass;
+
+    private final Set<AnnotatedType<?>> nestedTestClasses = new HashSet<>();
 
     public TestExtension(Class<?> testClass) {
         this.testClass = testClass;
     }
 
     public void setPriority(@Observes AfterTypeDiscovery event) {
-        event.getAlternatives().add(testClass);
+        for (Class<?> current = this.testClass; current != null; current = current.getEnclosingClass()) {
+            event.getAlternatives().add(current);
+        }
     }
 
     public void nestedTest(@Observes @WithAnnotations(Nested.class) ProcessAnnotatedType<?> event) {
         event.configureAnnotatedType().constructors().forEach(c -> c.add(InjectLiteral.INSTANCE));
         event.configureAnnotatedType().add(Dependent.Literal.INSTANCE);
+        nestedTestClasses.add(event.getAnnotatedType());
+        event.veto();
     }
 
 //    public void processTestClass(@Observes @WithAnnotations(Testable.class) ProcessAnnotatedType<?> event) {
@@ -51,15 +64,41 @@ public final class TestExtension implements Extension {
 //    }
 
     public void processTestAttributes(@Observes ProcessBeanAttributes<?> attributes) {
-        if (attributes.getBeanAttributes().getTypes().contains(testClass)) {
-            attributes.configureBeanAttributes()
-                    .scope(TestScoped.class)
-                    .alternative(true);
+        for (Class<?> current = this.testClass; current != null; current = current.getEnclosingClass()) {
+            if (attributes.getBeanAttributes().getTypes().contains(current)) {
+                attributes.configureBeanAttributes()
+                        .scope(TestScoped.class)
+                        .alternative(true);
+            }
         }
     }
 
-    public void registerContext(@Observes AfterBeanDiscovery event) {
+    public void registerContext(@Observes AfterBeanDiscovery event, BeanManager beanManager) {
+        //nestedTestClasses.stream().map(nestedTestType -> createNestedBean(nestedTestType, beanManager)).forEach(event::addBean);
+        nestedTestClasses.forEach(nestedTestType -> addNestedTest(nestedTestType, event, beanManager));
         event.addContext(context);
+    }
+
+    private <X> Bean<?> createNestedBean(AnnotatedType<X> type, BeanManager beanManager) {
+        return beanManager.createBean(beanManager.createBeanAttributes(type), type.getJavaClass(), beanManager.getInjectionTargetFactory(type));
+    }
+
+    private <X> void addNestedTest(AnnotatedType<X> type, AfterBeanDiscovery event, BeanManager beanManager) {
+        event.addBean().read(type).createWith(creationalContext -> {
+            Constructor<?> constructor = type.getJavaClass().getConstructors()[0];
+            Object[] args = Stream.of(constructor.getParameters())
+                    .map(Parameter::getType)
+                    .map(t -> {
+                        Bean<?> testBean = beanManager.resolve(beanManager.getBeans(t));
+                        return beanManager.getReference(testBean, t, creationalContext);
+                    })
+                    .toArray();
+            try {
+                return (X) constructor.newInstance(args);
+            } catch (Exception exception) {
+                throw new CreationException(exception);
+            }
+        });
     }
 
     public void reset() {
