@@ -49,8 +49,8 @@ public class MailTest {
     @MessageDriven(activationConfig = {
             @ActivationConfigProperty(propertyName = "mailServer", propertyValue = "localhost"),
             @ActivationConfigProperty(propertyName = "mailFolder", propertyValue = "INBOX"),
-            @ActivationConfigProperty(propertyName = "userName", propertyValue = "bar@example.com"),
-            @ActivationConfigProperty(propertyName = "password", propertyValue = "secret-pwd"),
+            @ActivationConfigProperty(propertyName = "userName", propertyValue = "bar"),
+            @ActivationConfigProperty(propertyName = "password", propertyValue = "secret"),
             @ActivationConfigProperty(propertyName = "pollingInterval", propertyValue = "1000"),
             @ActivationConfigProperty(propertyName = "port", propertyValue = "3143")
     })
@@ -78,7 +78,7 @@ public class MailTest {
 
     @RegisterExtension
     public static final GreenMailExtension GREEN_MAIL = new GreenMailExtension(ServerSetupTest.ALL)
-            .withConfiguration(new GreenMailConfiguration().withUser("bar@example.com", "bar@example.com", "secret-pwd"));
+            .withConfiguration(new GreenMailConfiguration().withUser("bar@example.com", "bar", "secret"));
 
     static final AtomicBoolean RECEIVED = new AtomicBoolean();
 

@@ -23,10 +23,12 @@ package org.codegeny.jakartron.jpa;
 import javax.persistence.SharedCacheMode;
 import javax.persistence.ValidationMode;
 import javax.persistence.spi.PersistenceUnitTransactionType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
+@Repeatable(PersistenceUnitDefinitions.class)
 public @interface PersistenceUnitDefinition {
 
     /**

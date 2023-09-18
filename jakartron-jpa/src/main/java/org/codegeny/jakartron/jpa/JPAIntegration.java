@@ -69,8 +69,8 @@ public final class JPAIntegration implements Extension {
                 .forEach(m -> m.add(Nonbinding.Literal.INSTANCE));
     }
 
-    public void defineUnits(@Observes @WithAnnotations(PersistenceUnitDefinition.class) ProcessAnnotatedType<?> event) {
-        persistenceUnitInfos.add(new PersistenceUnitInfoImpl(event.getAnnotatedType().getAnnotation(PersistenceUnitDefinition.class)));
+    public void defineUnits(@Observes @WithAnnotations({PersistenceUnitDefinition.class, PersistenceUnitDefinitions.class}) ProcessAnnotatedType<?> event) {
+        event.getAnnotatedType().getAnnotations(PersistenceUnitDefinition.class).stream().map(PersistenceUnitInfoImpl::new).forEach(persistenceUnitInfos::add);
     }
 
     public void makeInjectable(@Observes @WithAnnotations({PersistenceUnit.class, PersistenceContext.class}) ProcessAnnotatedType<?> event, BeanManager beanManager) {

@@ -20,11 +20,12 @@ package org.codegeny.jakartron.junit;
  * #L%
  */
 
+import org.junit.jupiter.api.Nested;
+
+import javax.enterprise.context.Dependent;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterTypeDiscovery;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessBeanAttributes;
+import javax.enterprise.inject.literal.InjectLiteral;
+import javax.enterprise.inject.spi.*;
 
 public final class TestExtension implements Extension {
 
@@ -37,6 +38,11 @@ public final class TestExtension implements Extension {
 
     public void setPriority(@Observes AfterTypeDiscovery event) {
         event.getAlternatives().add(testClass);
+    }
+
+    public void nestedTest(@Observes @WithAnnotations(Nested.class) ProcessAnnotatedType<?> event) {
+        event.configureAnnotatedType().constructors().forEach(c -> c.add(InjectLiteral.INSTANCE));
+        event.configureAnnotatedType().add(Dependent.Literal.INSTANCE);
     }
 
 //    public void processTestClass(@Observes @WithAnnotations(Testable.class) ProcessAnnotatedType<?> event) {
